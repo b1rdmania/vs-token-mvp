@@ -19,12 +19,15 @@ dataSources:
       entities:
         - NFTDeposited
         - NFTWithdrawn
+        - Redeemed
       abis:
         - name: Vault
           file: ./abis/Vault.json
       eventHandlers:
-        - event: NFTDeposited(indexed address,indexed uint256,uint256)
+        - event: NFTDeposited(indexed address,indexed uint256,uint256,uint256,uint256)
           handler: handleNFTDeposited
-        - event: NFTWithdrawn(indexed address,indexed uint256,uint256)
+        - event: NFTWithdrawn(indexed address,indexed uint256,uint256,uint256,uint256)
           handler: handleNFTWithdrawn
+        - event: Redeemed(indexed address,uint256,uint256,uint256,uint256)
+          handler: handleRedeemed
       file: ./src/mapping.ts 

@@ -3,6 +3,8 @@ type NFTDeposited @entity {
   user: Bytes!
   nftId: BigInt!
   value: BigInt!
+  claimableValue: BigInt!
+  penalty: BigInt!
   blockNumber: BigInt!
   timestamp: BigInt!
   transactionHash: Bytes!
@@ -13,6 +15,19 @@ type NFTWithdrawn @entity {
   user: Bytes!
   nftId: BigInt!
   value: BigInt!
+  claimableValue: BigInt!
+  penalty: BigInt!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Redeemed @entity {
+  id: ID!
+  user: Bytes!
+  amount: BigInt!
+  claimableValue: BigInt!
+  penalty: BigInt!
   blockNumber: BigInt!
   timestamp: BigInt!
   transactionHash: Bytes!
