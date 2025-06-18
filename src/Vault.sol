@@ -3,9 +3,11 @@ pragma solidity ^0.8.24;
 
 import {ERC20} from "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import {ERC721Holder} from "openzeppelin-contracts/contracts/token/ERC721/utils/ERC721Holder.sol";
-import {ERC4626} from "openzeppelin-contracts/contracts/token/ERC4626/ERC4626.sol";
+import {ERC4626} from "openzeppelin-contracts/contracts/token/ERC20/extensions/ERC4626.sol";
 import {Ownable} from "openzeppelin-contracts/contracts/access/Ownable.sol";
 import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
+import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import {IERC20Metadata} from "openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "./vSToken.sol";
 
 /**
@@ -35,14 +37,12 @@ contract Vault is ERC4626, ERC721Holder, Ownable {
 
     /**
      * @param _sToken The address of the underlying fungible token ($S). This is the `asset` for ERC4626.
-     * @param _vsToken The address of the vault's share token (vSToken). This is the `shares` for ERC4626.
      * @param _fNFT The address of the fractionalized NFT contract.
      */
     constructor(
         IERC20 _sToken,
-        VSToken _vsToken,
         address _fNFT
-    ) ERC4626(IERC20Metadata(_sToken), IERC20Metadata(_vsToken)) Ownable(msg.sender) {
+    ) ERC20("Vault Share Token", "vS") ERC4626(ERC20(address(_sToken))) Ownable(msg.sender) {
         fNFT = _fNFT;
     }
 
@@ -114,6 +114,6 @@ contract Vault is ERC4626, ERC721Holder, Ownable {
     function totalAssets() public view override returns (uint256) {
         // For now, it will return the balance of $S tokens held by the vault directly.
         // We will need to add logic to sum up the value from the NFTs.
-        return asset.balanceOf(address(this));
+        return IERC20(asset()).balanceOf(address(this));
     }
 } 
