@@ -47,52 +47,18 @@
 
 ---
 
-## ✅ What's Built So Far
-- **Smart contracts:** Vault (penalty-based), vS Token (ERC-20), mocks. Fully tested and ready for mainnet.
-- **Subgraph:** Scaffolded for event indexing, ready for deployment.
-- **Backend:** Node.js API for vault data and user positions, including penalty logic.
-- **Frontend:** React dApp with wallet connect, live stats, penalty curve, and deposit/redeem flows.
-- **Deployment scripts:** Scripts for easy deployment to Sonic mainnet or testnet.
-- **Docs:** This README, plus in-code NatSpec and comments.
-
----
-
-## 🏁 Quickstart
-
-```sh
-# Install dependencies
-forge install
-
-# Run tests
-forge test
-
-# Deploy (set PRIVATE_KEY and use Sonic RPC)
-export PRIVATE_KEY=0xYOUR_PRIVATE_KEY
-forge script script/Deploy.s.sol --rpc-url https://rpc.soniclabs.com --broadcast --chain-id 146 --private-key $PRIVATE_KEY
-```
-
----
-
-## 📊 The Graph (Subgraph)
-- To run locally:
-```sh
-npm install -g @graphprotocol/graph-cli
-graph codegen
-graph build
-graph create --node http://localhost:8020 vs-token-mvp
-graph deploy --node http://localhost:8020 --ipfs http://localhost:5001 vs-token-mvp
-```
-- Edit `subgraph.yaml` and `schema.graphql` as needed.
-
----
-
-## 🖥️ Backend (Node.js)
-- See `/backend` for API and indexer scaffolding (includes penalty curve logic).
-
----
-
-## 💻 Frontend (React)
-- See `/frontend` for a modern dApp with wallet connect, penalty curve display, and live vault UI.
+## ✅ Project Status (June 2025)
+- **Smart contracts and subgraph:** Fully updated for penalty-based, non-linear vesting logic. All events and data structures reflect the current claimable S value and penalty.
+- **Backend and frontend:** Scaffolded and ready for integration. Frontend supports wallet connect, vault stats, and deposit/redeem flows. Penalty-curve integration and UI enhancements are the next focus.
+- **Next steps:**
+  - Integrate penalty-curve logic into the frontend UI and flows
+  - Finalize mainnet deployment scripts and environment
+  - Deploy the frontend to a live service (Vercel, Netlify, etc.) for public access
+- **Local development:**
+  - See `/frontend`, `/backend`, and contract directories for setup and usage instructions
+  - For deployment, follow the updated docs and scripts in the repo
+- **Live demo:**
+  - To share a live version, deploy the frontend to Vercel, Netlify, or a similar service
 
 ---
 
