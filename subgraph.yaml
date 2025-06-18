@@ -1,0 +1,30 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+
+# Add Vault and vSToken contract addresses after deployment
+
+dataSources:
+  - kind: ethereum/contract
+    name: Vault
+    network: sepolia
+    source:
+      address: "<VAULT_ADDRESS>"
+      abi: Vault
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - NFTDeposited
+        - NFTWithdrawn
+      abis:
+        - name: Vault
+          file: ./abis/Vault.json
+      eventHandlers:
+        - event: NFTDeposited(indexed address,indexed uint256,uint256)
+          handler: handleNFTDeposited
+        - event: NFTWithdrawn(indexed address,indexed uint256,uint256)
+          handler: handleNFTWithdrawn
+      file: ./src/mapping.ts 

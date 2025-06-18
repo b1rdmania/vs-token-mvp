@@ -1,0 +1,19 @@
+type NFTDeposited @entity {
+  id: ID!
+  user: Bytes!
+  nftId: BigInt!
+  value: BigInt!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type NFTWithdrawn @entity {
+  id: ID!
+  user: Bytes!
+  nftId: BigInt!
+  value: BigInt!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  transactionHash: Bytes!
+} 
