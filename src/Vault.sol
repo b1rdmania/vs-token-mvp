@@ -8,37 +8,31 @@ import {Ownable} from "openzeppelin-contracts/contracts/access/Ownable.sol";
 import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
 import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import {IERC20Metadata} from "openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+import "../test/MockfNFT.sol";
 import "./vSToken.sol";
 
 /**
  * @title Vault
  * @dev An ERC4626 vault adapted to hold fNFTs (ERC721) as collateral
  * and manage the streaming of the underlying fungible token ($S).
- * It mints vS (ERC20) tokens as shares.
+ * It mints vS (ERC20) tokens as shares, using the claimable value from the fNFT's penalty curve.
  */
 contract Vault is ERC4626, ERC721Holder, Ownable {
-    /**
-     * @dev The address of the fNFT (ERC721) contract that this vault accepts.
-     */
+    /// @dev The address of the fNFT (ERC721) contract that this vault accepts.
     address public immutable fNFT;
 
-    /**
-     * @dev Maps an NFT ID to the original address that deposited it.
-     */
+    /// @dev Maps an NFT ID to the original address that deposited it.
     mapping(uint256 => address) public nftOriginalOwner;
 
-    /**
-     * @dev Thrown when a user tries to withdraw an NFT they didn't deposit.
-     */
+    /// @dev Thrown when a user tries to withdraw an NFT they didn't deposit.
     error NotNFTOwner();
 
-    // Here we can add more state variables as needed, for example:
-    // mapping(uint256 => VestingSchedule) public vestingSchedules;
-
     /// @notice Emitted when an NFT is deposited into the vault
-    event NFTDeposited(address indexed user, uint256 indexed nftId, uint256 value);
+    event NFTDeposited(address indexed user, uint256 indexed nftId, uint256 value, uint256 claimableValue, uint256 penalty);
     /// @notice Emitted when an NFT is withdrawn from the vault
-    event NFTWithdrawn(address indexed user, uint256 indexed nftId, uint256 value);
+    event NFTWithdrawn(address indexed user, uint256 indexed nftId, uint256 value, uint256 claimableValue, uint256 penalty);
+    /// @notice Emitted when vS is redeemed for S tokens
+    event Redeemed(address indexed user, uint256 amount, uint256 claimableValue, uint256 penalty);
 
     /**
      * @param _sToken The address of the underlying fungible token ($S). This is the `asset` for ERC4626.
@@ -51,31 +45,24 @@ contract Vault is ERC4626, ERC721Holder, Ownable {
         fNFT = _fNFT;
     }
 
-    // =============================================================
-    // =========== Overrides & Custom Functions Go Here ============
-    // =============================================================
-
     /**
      * @notice Deposits a specific fNFT into the vault and mints vS tokens for the user.
      * @param nftId The ID of the fNFT to deposit.
      */
     function depositNFT(uint256 nftId) external {
-        // 1. Record the original owner
         require(nftOriginalOwner[nftId] == address(0), "NFT already deposited");
         nftOriginalOwner[nftId] = msg.sender;
 
-        // 2. Transfer the NFT from the user to the vault
+        // Transfer the NFT from the user to the vault
         IERC721(fNFT).safeTransferFrom(msg.sender, address(this), nftId);
 
-        // 3. Determine the value of the underlying S tokens in the NFT
-        //    NOTE: This is a placeholder. We need a function on the fNFT contract
-        //    or an oracle to get the actual locked amount.
-        uint256 underlyingValue = _getUnderlyingValue(nftId);
+        // Get the current claimable value and penalty from the fNFT
+        uint256 claimableValue = MockfNFT(fNFT).claimable(nftId);
+        uint256 penalty = MockfNFT(fNFT).penalty(nftId);
 
-        // 4. Mint vS tokens to the depositor based on the value
-        //    The ERC4626 `_mint` function handles the shares calculation.
-        _mint(msg.sender, underlyingValue);
-        emit NFTDeposited(msg.sender, nftId, underlyingValue);
+        // Mint vS tokens to the depositor based on the claimable value
+        _mint(msg.sender, claimableValue);
+        emit NFTDeposited(msg.sender, nftId, claimableValue, claimableValue, penalty);
     }
 
     /**
@@ -83,34 +70,35 @@ contract Vault is ERC4626, ERC721Holder, Ownable {
      * @param nftId The ID of the fNFT to withdraw.
      */
     function withdrawNFT(uint256 nftId) external {
-        // 1. Check if the caller is the original owner
         if (nftOriginalOwner[nftId] != msg.sender) {
             revert NotNFTOwner();
         }
 
-        // 2. Determine the value of the underlying S tokens
-        uint256 underlyingValue = _getUnderlyingValue(nftId);
+        uint256 claimableValue = MockfNFT(fNFT).claimable(nftId);
+        uint256 penalty = MockfNFT(fNFT).penalty(nftId);
 
-        // 3. Burn the corresponding amount of vS tokens from the user
-        _burn(msg.sender, underlyingValue);
+        // Burn the corresponding amount of vS tokens from the user
+        _burn(msg.sender, claimableValue);
 
-        // 4. Clear the owner mapping
+        // Clear the owner mapping
         delete nftOriginalOwner[nftId];
 
-        // 5. Transfer the NFT back to the original owner
+        // Transfer the NFT back to the original owner
         IERC721(fNFT).safeTransferFrom(address(this), msg.sender, nftId);
-        emit NFTWithdrawn(msg.sender, nftId, underlyingValue);
+        emit NFTWithdrawn(msg.sender, nftId, claimableValue, claimableValue, penalty);
     }
 
     /**
-     * @dev Placeholder function to determine the value of an fNFT.
-     * In a real scenario, this would interact with the fNFT contract.
+     * @notice Redeems vS tokens for S tokens at the current claimable value.
+     * @param amount The amount of vS tokens to redeem.
      */
-    function _getUnderlyingValue(uint256 nftId) internal pure returns (uint256) {
-        // For the MVP, we can assume a fixed value or a simple mock logic.
-        // Example: return 1000 * 1e18;
-        // The actual implementation depends on the fNFT contract's interface.
-        return 100 * (10**18); // Mock value: 100 tokens
+    function redeemVS(uint256 amount) external {
+        // Burn vS tokens from the user
+        _burn(msg.sender, amount);
+        // Transfer S tokens to the user (1:1 for claimable value)
+        IERC20(asset()).transfer(msg.sender, amount);
+        // For demo: penalty is 0 for direct S redemption (could be extended)
+        emit Redeemed(msg.sender, amount, amount, 0);
     }
 
     /**

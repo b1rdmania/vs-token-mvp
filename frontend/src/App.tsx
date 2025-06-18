@@ -28,6 +28,7 @@ function VaultDashboard() {
   const [nftId, setNftId] = useState("");
   const [action, setAction] = useState<"deposit"|"withdraw"|null>(null);
   const [txHash, setTxHash] = useState<string|null>(null);
+  const [nfts, setNfts] = useState<any[]>([]);
   const { address, isConnected } = useAccount();
 
   useEffect(() => {
@@ -37,6 +38,9 @@ function VaultDashboard() {
       if (vaults && vaults[0]) {
         const details = await fetch(`/vault/${vaults[0].address}`).then(r => r.json());
         setVault({ ...vaults[0], ...details });
+        // Fetch NFTs held by the vault
+        const nftsResp = await fetch(`/vault/${vaults[0].address}/nfts`).then(r => r.json());
+        setNfts(nftsResp.nfts || []);
       }
       setLoading(false);
     }
@@ -69,7 +73,7 @@ function VaultDashboard() {
       setTxHash(null);
       setAction(null);
       setNftId("");
-      // Optionally, refetch vault stats
+      // Optionally, refetch vault stats and NFTs
     }
   });
 
@@ -96,6 +100,30 @@ function VaultDashboard() {
             </div>
             <div style={{ marginBottom: 16 }}>
               <strong>Total Assets:</strong> {vault.totalAssets}
+            </div>
+            {/* NFT Gallery: Show NFTs held by the vault with claimable and penalty values */}
+            <div style={{ margin: '24px 0' }}>
+              <h4>NFTs Held by Vault</h4>
+              {nfts.length === 0 ? <p>No NFTs in vault.</p> : (
+                <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 16 }}>
+                  <thead>
+                    <tr>
+                      <th style={{ borderBottom: '1px solid #ccc', textAlign: 'left' }}>Token ID</th>
+                      <th style={{ borderBottom: '1px solid #ccc', textAlign: 'left' }}>Claimable S</th>
+                      <th style={{ borderBottom: '1px solid #ccc', textAlign: 'left' }}>Penalty (%)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {nfts.map(nft => (
+                      <tr key={nft.tokenId}>
+                        <td>{nft.tokenId}</td>
+                        <td>{parseFloat(nft.claimable) / 1e18}</td>
+                        <td>{((parseFloat(nft.penalty) / 1e16).toFixed(2))}%</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
             </div>
             <div style={{ margin: '24px 0' }}>
               <input
