@@ -113,7 +113,7 @@ $ cast --help
 - **Subgraph:** Scaffolded for event indexing, ready for deployment.
 - **Backend:** Node.js API for vault data and user positions.
 - **Frontend:** React dApp with wallet connect, live stats, and deposit/withdraw flows.
-- **Deployment scripts:** Foundry scripts for easy deployment to Sonic mainnet or testnet.
+- **Deployment scripts:** Scripts for easy deployment to Sonic mainnet or testnet.
 - **Docs:** This README, plus in-code NatSpec and comments.
 
 ---
@@ -121,9 +121,6 @@ $ cast --help
 ## 🏁 Quickstart
 
 ```sh
-# Install Foundry
-curl -L https://foundry.paradigm.xyz | bash && foundryup
-
 # Install dependencies
 forge install
 
