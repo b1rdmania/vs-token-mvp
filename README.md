@@ -106,7 +106,18 @@ forge script script/Deploy.s.sol --rpc-url $SEPOLIA_RPC_URL --private-key $PRIVA
 - `out/` - Build artifacts
 
 ## The Graph (Subgraph)
-- To be added: subgraph.yaml, schema.graphql, mappings
+- To run locally:
+```sh
+npm install -g @graphprotocol/graph-cli
+# Generate types
+graph codegen
+# Build
+graph build
+# Deploy (local node)
+graph create --node http://localhost:8020 vs-token-mvp
+graph deploy --node http://localhost:8020 --ipfs http://localhost:5001 vs-token-mvp
+```
+- Edit `subgraph.yaml` and `schema.graphql` as needed.
 
 ## Backend (Node.js)
 - To be added: `/backend` directory with API and indexer
