@@ -35,6 +35,11 @@ contract Vault is ERC4626, ERC721Holder, Ownable {
     // Here we can add more state variables as needed, for example:
     // mapping(uint256 => VestingSchedule) public vestingSchedules;
 
+    /// @notice Emitted when an NFT is deposited into the vault
+    event NFTDeposited(address indexed user, uint256 indexed nftId, uint256 value);
+    /// @notice Emitted when an NFT is withdrawn from the vault
+    event NFTWithdrawn(address indexed user, uint256 indexed nftId, uint256 value);
+
     /**
      * @param _sToken The address of the underlying fungible token ($S). This is the `asset` for ERC4626.
      * @param _fNFT The address of the fractionalized NFT contract.
@@ -51,7 +56,7 @@ contract Vault is ERC4626, ERC721Holder, Ownable {
     // =============================================================
 
     /**
-     * @dev Deposits a specific fNFT into the vault and mints vS tokens for the user.
+     * @notice Deposits a specific fNFT into the vault and mints vS tokens for the user.
      * @param nftId The ID of the fNFT to deposit.
      */
     function depositNFT(uint256 nftId) external {
@@ -70,10 +75,11 @@ contract Vault is ERC4626, ERC721Holder, Ownable {
         // 4. Mint vS tokens to the depositor based on the value
         //    The ERC4626 `_mint` function handles the shares calculation.
         _mint(msg.sender, underlyingValue);
+        emit NFTDeposited(msg.sender, nftId, underlyingValue);
     }
 
     /**
-     * @dev Withdraws a specific fNFT from the vault by burning vS tokens.
+     * @notice Withdraws a specific fNFT from the vault by burning vS tokens.
      * @param nftId The ID of the fNFT to withdraw.
      */
     function withdrawNFT(uint256 nftId) external {
@@ -93,6 +99,7 @@ contract Vault is ERC4626, ERC721Holder, Ownable {
 
         // 5. Transfer the NFT back to the original owner
         IERC721(fNFT).safeTransferFrom(address(this), msg.sender, nftId);
+        emit NFTWithdrawn(msg.sender, nftId, underlyingValue);
     }
 
     /**

@@ -12,6 +12,11 @@ import {Ownable} from "openzeppelin-contracts/contracts/access/Ownable.sol";
 contract VSToken is ERC20, Ownable {
     address public vault;
 
+    /// @notice Emitted when tokens are minted by the vault
+    event Mint(address indexed to, uint256 amount);
+    /// @notice Emitted when tokens are burned by the vault
+    event Burn(address indexed from, uint256 amount);
+
     /**
      * @dev Throws if called by any account other than the vault.
      */
@@ -33,20 +38,22 @@ contract VSToken is ERC20, Ownable {
     }
 
     /**
-     * @dev Creates `amount` tokens and assigns them to `to`, only callable by the vault.
+     * @notice Creates `amount` tokens and assigns them to `to`, only callable by the vault.
      * @param to The address that will receive the minted tokens.
      * @param amount The amount of tokens to mint.
      */
     function mint(address to, uint256 amount) public onlyVault {
         _mint(to, amount);
+        emit Mint(to, amount);
     }
 
     /**
-     * @dev Destroys `amount` tokens from `from`, only callable by the vault.
+     * @notice Destroys `amount` tokens from `from`, only callable by the vault.
      * @param from The address whose tokens will be burned.
      * @param amount The amount of tokens to burn.
      */
     function burn(address from, uint256 amount) public onlyVault {
         _burn(from, amount);
+        emit Burn(from, amount);
     }
 } 
