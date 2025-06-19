@@ -1,17 +1,17 @@
-specVersion: 0.0.4
+specVersion: 0.0.5
 schema:
   file: ./schema.graphql
 
 # Add Vault and vSToken contract addresses after deployment
 
 dataSources:
-  - kind: ethereum/contract
+  - kind: ethereum
     name: Vault
     network: sepolia
     source:
-      address: "<VAULT_ADDRESS>"
+      address: "0x0000000000000000000000000000000000000000"  # Replace with actual deployed address
       abi: Vault
-      startBlock: 0
+      startBlock: 0  # Replace with actual deployment block
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -28,6 +28,6 @@ dataSources:
           handler: handleNFTDeposited
         - event: NFTWithdrawn(indexed address,indexed uint256,uint256,uint256,uint256)
           handler: handleNFTWithdrawn
-        - event: Redeemed(indexed address,uint256,uint256,uint256,uint256)
+        - event: Redeemed(indexed address,uint256,uint256,uint256)
           handler: handleRedeemed
       file: ./src/mapping.ts 
