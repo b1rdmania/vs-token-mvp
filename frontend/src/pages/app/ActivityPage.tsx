@@ -20,7 +20,7 @@ export const ActivityPage: React.FC = () => {
   const tabs = ['All', 'Deposits', 'Claims', 'Swaps', 'Fees'];
 
   return (
-    <div className="activity-page">
+    <div className="activity-page content-card">
       <h1>Protocol Activity</h1>
       <p>A live feed of all deposits, mints, swaps, and claims occurring on the vS Vault protocol.</p>
       

@@ -15,7 +15,7 @@ export const TradePage: React.FC = () => {
   const availableToBuy = 4051.89;
 
   return (
-    <div className="trade-page">
+    <div className="trade-page content-card">
       <h1>Trade</h1>
       <p>Trade vS tokens for S tokens and vice-versa. The exchange rate is determined by the live penalty curve.</p>
       <div className="trade-container">

@@ -161,4 +161,15 @@
   font-weight: 600;
   padding: 0.5rem 1rem;
   border-left: 1px solid #D1D5DB;
+}
+
+.trade-page.content-card {
+  background: white;
+  padding: 1.5rem 2rem;
+  border-radius: 16px;
+  border: 1px solid #EAECEF;
+}
+
+.trade-page h1 {
+  margin-top: 0;
 } 
