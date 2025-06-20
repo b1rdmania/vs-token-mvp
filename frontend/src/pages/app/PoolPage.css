@@ -56,17 +56,20 @@
   margin-bottom: 2rem;
 }
 
-.pool-layout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  align-items: start;
+.pool-header .page-title {
+  margin-bottom: 0.5rem;
 }
 
-@media (max-width: 900px) {
-  .pool-layout {
-    grid-template-columns: 1fr;
-  }
+.pool-header .page-description {
+  font-size: 1.1rem;
+  color: #ccc;
+}
+
+.pool-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+  align-items: flex-start;
 }
 
 .provide-liquidity-panel, .stat-card {
@@ -89,8 +92,7 @@
 .liquidity-input-group label {
   display: block;
   margin-bottom: 0.5rem;
-  font-size: 0.9rem;
-  opacity: 0.8;
+  font-weight: 600;
 }
 
 .liquidity-input-group input {
@@ -110,42 +112,37 @@
   text-align: center;
   margin-top: 1.5rem;
   font-size: 0.9rem;
-  opacity: 0.6;
+  color: #6c757d;
 }
 
 .powered-by a {
-  color: inherit;
-  font-weight: 600;
+  color: #007BFF;
+  font-weight: bold;
   text-decoration: none;
-}
-.powered-by a:hover {
-  text-decoration: underline;
 }
 
 .pool-stats-container {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
-.pool-ratio {
-  text-align: center;
-  margin: 1.5rem 0;
-  font-weight: 600;
-  color: #333;
-}
-
-.stat-item {
+.stat-row {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 1rem;
-  font-size: 1rem;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e9ecef;
 }
 
-.stat-item span {
+.stat-card .stat-row:last-child {
+  border-bottom: none;
+}
+
+.stat-row label {
   color: #6c757d;
 }
 
-.stat-item:last-child {
-  margin-bottom: 0;
+.stat-row span {
+  font-weight: 600;
 } 

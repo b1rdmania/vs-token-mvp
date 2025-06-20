@@ -13,21 +13,31 @@
   margin-top: 0;
 }
 
+.page-description {
+  text-align: center;
+  color: #ccc;
+  margin-top: -1.5rem;
+  margin-bottom: 2rem;
+}
+
 .fee-summary {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1.5rem;
-  padding: 1.5rem;
-  border-bottom: 1px solid #EAECEF;
 }
+
 .fee-summary > div {
   display: flex;
   flex-direction: column;
+  text-align: center;
 }
+
 .fee-summary label {
-  opacity: 0.7;
+  color: #6c757d;
+  font-size: 0.9rem;
   margin-bottom: 0.25rem;
 }
+
 .fee-summary span {
   font-size: 1.5rem;
   font-weight: 600;
@@ -36,66 +46,35 @@
 .filter-tabs {
   display: flex;
   gap: 0.5rem;
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid #EAECEF;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #e9ecef;
 }
 
 .tab-button {
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
   border: none;
   background-color: transparent;
-  font-size: 0.9rem;
-  font-weight: 600;
   cursor: pointer;
-  color: var(--secondary-color);
-  opacity: 0.7;
-  transition: all 0.2s ease;
+  font-size: 1rem;
+  color: #6c757d;
+  border-bottom: 2px solid transparent;
+  transform: translateY(1px);
 }
+
 .tab-button.active {
-  background-color: var(--primary-color);
-  color: white;
-  opacity: 1;
-}
-.tab-button:hover:not(.active) {
-  background-color: #EAECEF;
-}
-
-.activity-table-container table {
-  width: 100%;
-  border-collapse: collapse;
-}
-.activity-table-container th, .activity-table-container td {
-  padding: 1rem 1.5rem;
-  text-align: left;
-  border-bottom: 1px solid #EAECEF;
-}
-.activity-table-container tbody tr:last-child td {
-  border-bottom: none;
-}
-.activity-table-container th {
+  color: #007BFF;
+  border-bottom-color: #007BFF;
   font-weight: 600;
-  opacity: 0.8;
-  font-size: 0.85rem;
 }
-
-.explorer-link {
-  font-size: 1.25rem;
-  text-decoration: none;
-  color: var(--primary-color);
-}
-
-/* Styles for ActivityPage can be added here if specific overrides are needed. */
 
 .activity-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 2rem;
 }
 
 .activity-table th,
 .activity-table td {
-  padding: 1rem;
+  padding: 0.75rem 1rem;
   text-align: left;
   border-bottom: 1px solid #e9ecef;
 }
@@ -103,19 +82,15 @@
 .activity-table th {
   font-weight: 600;
   color: #6c757d;
-  background-color: #f8f9fa;
+  font-size: 0.9rem;
 }
 
 .activity-table tbody tr:last-child td {
   border-bottom: none;
 }
 
-.activity-table a {
+.explorer-link {
   color: #007BFF;
   text-decoration: none;
-  font-family: monospace;
-}
-
-.activity-table a:hover {
-  text-decoration: underline;
+  font-size: 1.25rem;
 } 

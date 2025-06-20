@@ -2,49 +2,54 @@ import React from 'react';
 import './PoolPage.css';
 
 const mockPoolStats = {
-  tvl: "2,450,000",
-  volume24h: "320,540",
-  apr: "14.88",
+  tvl: "1,234,567",
+  volume24h: "256,789",
+  apr: "15.7",
 };
 
 const mockUserPosition = {
-  lpTokens: "1,250.75",
+  lpTokens: "1,234.56",
   poolShare: "0.05",
-  value: "1,245.50",
+  value: "1,234.56",
 };
 
 export const PoolPage: React.FC = () => {
   return (
     <div className="page-container">
-      <h1 className="page-title">Provide Liquidity</h1>
+      <div className="pool-header">
+        <h1 className="page-title">vS / S Liquidity Pool</h1>
+        <p className="page-description">
+          Provide liquidity to the vS/S pool to earn trading fees and boosted rewards.
+        </p>
+      </div>
+
       <div className="pool-layout">
-        <div className="content-card">
-          <h2>Add Liquidity</h2>
-          <div className="form-group">
-            <label htmlFor="vs-amount">vS Amount</label>
-            <input id="vs-amount" type="number" placeholder="0.0" className="form-input" />
+        <div className="content-card provide-liquidity-panel">
+          <h3>Provide Liquidity</h3>
+          <div className="liquidity-input-group form-group">
+            <label>vS Amount</label>
+            <input type="number" placeholder="0.0" className="form-input" />
           </div>
-          <div className="form-group">
-            <label htmlFor="s-amount">S Amount</label>
-            <input id="s-amount" type="number" placeholder="0.0" className="form-input" />
+          <div className="liquidity-input-group form-group">
+            <label>S Amount</label>
+            <input type="number" placeholder="0.0" className="form-input" />
           </div>
-          <p className="pool-ratio">1 vS = 1.002 S</p>
-          <button className="button-primary" style={{ width: '100%' }}>Provide Liquidity</button>
+          <button className="button-primary" style={{width: '100%'}} disabled>Zap into Pool</button>
+          <p className="powered-by">powered by <a href="https://www.shadow.so/" target="_blank" rel="noopener noreferrer">Shadow</a></p>
         </div>
 
         <div className="pool-stats-container">
-          <div className="content-card">
-            <h3>Pool Stats</h3>
-            <div className="stat-item"><span>Total Liquidity:</span> <strong>$1.2M</strong></div>
-            <div className="stat-item"><span>24h Volume:</span> <strong>$150,234</strong></div>
-            <div className="stat-item"><span>APR (30d avg):</span> <strong>12.5%</strong></div>
+          <div className="content-card stat-card">
+            <h4>Pool Stats</h4>
+            <div className="stat-row"><label>TVL</label><span>${mockPoolStats.tvl}</span></div>
+            <div className="stat-row"><label>24h Volume</label><span>${mockPoolStats.volume24h}</span></div>
+            <div className="stat-row"><label>APR</label><span>{mockPoolStats.apr}%</span></div>
           </div>
-          <div className="content-card">
-            <h3>My Position</h3>
-            <div className="stat-item"><span>My Pool Share:</span> <strong>0.05%</strong></div>
-            <div className="stat-item"><span>My Liquidity:</span> <strong>$600.00</strong></div>
-            <div className="stat-item"><span>Unclaimed Fees:</span> <strong>$12.34</strong></div>
-            <button className="button-primary" style={{ width: '100%', marginTop: '1rem' }} disabled>Claim Fees</button>
+          <div className="content-card stat-card">
+            <h4>My Position</h4>
+            <div className="stat-row"><label>LP Tokens</label><span>{mockUserPosition.lpTokens}</span></div>
+            <div className="stat-row"><label>Pool Share</label><span>{mockUserPosition.poolShare}%</span></div>
+            <div className="stat-row"><label>Value</label><span>${mockUserPosition.value}</span></div>
           </div>
         </div>
       </div>

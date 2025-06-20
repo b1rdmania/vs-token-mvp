@@ -1,12 +1,194 @@
-/* Styles for TradePage can be added here if specific overrides are needed. */
+.card-style {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 16px;
+  border: 1px solid #EAECEF;
+}
 
-.shadow-dex-widget-placeholder {
-  border: 2px dashed #ccc;
-  border-radius: 12px;
-  padding: 4rem 2rem;
+.trade-page {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.trade-container {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.trade-widget h3, .pool-panel h3, .liquidity-form h3 {
+  font-size: 1.25rem;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+}
+
+.swap-input-container {
+  margin-bottom: 1rem;
+}
+.swap-input-container > span {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  margin-left: 0.5rem;
+}
+
+.swap-input {
+  display: flex;
+  background-color: #F7F9FC;
+  border-radius: 8px;
+  padding: 0.5rem;
+}
+.swap-input input {
+  flex-grow: 1;
+  border: none;
+  background: transparent;
+  font-size: 1.5rem;
+  outline: none;
+  width: 100%;
+}
+.swap-arrow {
   text-align: center;
-  margin-top: 2rem;
-  background-color: #f8f9fa;
+  font-size: 1.5rem;
+  margin: -0.5rem 0;
+}
+
+.token-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: white;
+  border: 1px solid #EAECEF;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.arrow-down {
+  border: solid black;
+  border-width: 0 2px 2px 0;
+  display: inline-block;
+  padding: 3px;
+  transform: rotate(45deg);
+}
+
+.trade-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin: 1.5rem 0;
+}
+
+.trade-details > div {
+  display: flex;
+  justify-content: space-between;
+}
+
+.trade-details a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+.trade-details a:hover {
+  text-decoration: underline;
+}
+
+.trade-box .button-primary {
+  width: 100%;
+}
+
+.trade-separator {
+  font-size: 2rem;
   color: #6c757d;
   font-weight: bold;
+  text-align: center;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.pool-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+.pool-stats > div {
+  display: flex;
+  justify-content: space-between;
+}
+.pool-stats label {
+  color: #6c757d;
+}
+.pool-stats span {
+  font-weight: 600;
+}
+
+.liquidity-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.liquidity-details {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  margin-bottom: 1.5rem;
+  border-top: 1px solid #EAECEF;
+  padding-top: 1.5rem;
+}
+
+.trade-input {
+  display: flex;
+  align-items: center;
+}
+
+.trade-input .form-input {
+  border-right: none;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.token-select {
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  border: 1px solid #ccc;
+  border-left: none;
+  background-color: #f8f9fa;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.trade-page.content-card {
+  background: white;
+  padding: 1.5rem 2rem;
+  border-radius: 16px;
+  border: 1px solid #EAECEF;
+}
+
+.trade-page h1 {
+  margin-top: 0;
+}
+
+.page-description {
+  text-align: center;
+  color: #ccc;
+  margin-top: -1.5rem;
+  margin-bottom: 2rem;
+}
+
+.trade-box h2 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+}
+
+.button-link {
+  background: none;
+  border: none;
+  color: #007BFF;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 0;
 } 
