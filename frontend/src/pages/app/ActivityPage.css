@@ -15,8 +15,8 @@
 
 .page-description {
   text-align: center;
-  color: #ccc;
-  margin-top: -1.5rem;
+  color: #6c757d;
+  margin-top: -0.5rem;
   margin-bottom: 2rem;
 }
 
@@ -62,8 +62,8 @@
 }
 
 .tab-button.active {
-  color: #007BFF;
-  border-bottom-color: #007BFF;
+  color: #0d6efd;
+  border-bottom-color: #0d6efd;
   font-weight: 600;
 }
 
@@ -90,7 +90,7 @@
 }
 
 .explorer-link {
-  color: #007BFF;
+  color: #0d6efd;
   text-decoration: none;
   font-size: 1.25rem;
 } 
