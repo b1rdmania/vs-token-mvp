@@ -14,30 +14,26 @@
 This protocol is engineered for maximum security, transparency, and decentralization. There are no admin keys, no upgradeability in V1, and no single points of failure.
 
 - **Immutable Contracts:** The core contracts (`vSVault.sol`, `vSToken.sol`) are built using OpenZeppelin standards and are non-upgradeable by design. What is deployed is final.
-- **Public, Incentivized Automation:** The daily streaming of vested `S` tokens is not dependent on a centralized server. It's managed by a dual system:
-    1.  **Primary Driver:** A decentralized keeper network (e.g., Chainlink Automation) ensures consistent, reliable execution.
-    2.  **Public Backstop:** The `auto-stream` function includes a small gas incentive, making it profitable for anyone in the public to trigger it. This creates a permissionless, self-healing mechanism that guarantees liveness.
+- **Public, Incentivized Automation:** The harvesting of vested `S` tokens is not dependent on a centralized server. It's managed by a public, batchable `claimVested` function that can be called by anyone. This makes it ideal for decentralized keepers (like Chainlink Automation) and ensures the process is scalable and will never fail due to high gas costs.
 - **Transparent Data Layer:** All frontend data is served by a public, open-source Subgraph. The UI will explicitly state the freshness of the data, so users always know they are viewing verified, on-chain information.
 
 ## How It Works: The User Journey
 
-1.  **Deposit:** A user sends their Sonic fNFT to the audited `vSVault` contract.
-2.  **Mint:** The Vault instantly mints an equal amount of `vS` tokens to the user's wallet.
-3.  **Utilize & Create Value:** The user now holds a fully-composable DeFi asset, ready to be deployed across the ecosystem to:
+1.  **Deposit & Mint:** A user makes a **permanent, one-way deposit** of their Sonic fNFT to the audited `vSVault` contract. The Vault instantly mints an equal amount of `vS` tokens to the user's wallet.
+2.  **Utilize & Create Value:** The user now holds a fully-composable DeFi asset, ready to be deployed across the ecosystem to:
     - **Trade Instantly:** Swap `vS` for `S` or other assets on our partner DEX, **Shadow DEX**.
     - **Earn Deep Yield:** Provide liquidity to the incentivized `vS`/`S` pool to earn trading fees and rewards.
     - **Borrow Against Future Value:** Use `vS` as collateral on partner lending markets.
     This composability is the core of the **vS Flywheel**, turning locked assets into an engine for ecosystem-wide liquidity and growth.
-4.  **Stream:** The Vault's `auto-stream` function is triggered daily, claiming all newly vested `S` from the entire pool of fNFTs and distributing it pro-rata to all `vS` holders.
-5.  **Redeem:** At any time, a user can burn their `vS` to withdraw their proportional share of the underlying `S` tokens.
+4.  **Claim Vested:** The Vault's public `claimVested` function is triggered periodically by a keeper, harvesting all newly vested `S` from the entire pool of fNFTs and storing them within the vault.
+5.  **Redeem:** At any time, a user can burn their `vS` to withdraw their proportional share of the underlying `S` tokens held inside the vault.
 
 ## Smart Contract Architecture
 
-The entire system is comprised of three core, minimal contracts:
+The entire system is comprised of two core, minimal contracts:
 
-- **[vSVault.sol](https://github.com/b1rdmania/vs-token-mvp/blob/main/src/vSVault.sol):** An ERC-4626 compliant vault that securely holds all deposited fNFTs and manages all minting, streaming, and redemption logic.
-- **[vSToken.sol](https://github.com/b1rdmania/vs-token-mvp/blob/main/src/vSToken.sol):** The liquid ERC-20 token that represents a 1:1 claim on the underlying `S` held within the vault.
-- **[PenaltyCurveLib.sol](https://github.com/b1rdmania/vs-token-mvp/blob/main/src/PenaltyCurveLib.sol):** A placeholder library to handle any early-redemption logic that mirrors the fNFT's native penalty system.
+- **[vSVault.sol](https://github.com/b1rdmania/vs-token-mvp/blob/main/src/vSVault.sol):** The core logic contract. It permanently custodies all deposited fNFTs and manages all minting and redemption logic. Its `claimVested` function is designed to be scalable and gas-efficient.
+- **[vSToken.sol](https://github.com/b1rdmania/vs-token-mvp/blob/main/src/vSToken.sol):** A standard OpenZeppelin ERC-20 token whose mint/burn functions are exclusively controlled by the `vSVault` contract.
 
 ## Technical Implementation Roadmap
 This roadmap ensures robust deployment, decentralization, security, and strategic readiness for mainnet launch.

@@ -5,32 +5,43 @@ import {Script} from "forge-std/Script.sol";
 import {vSVault} from "../src/vSVault.sol";
 import {vSToken} from "../src/vSToken.sol";
 import {MockSonicNFT} from "../test/MockSonicNFT.sol";
+import {MockSToken} from "../test/MockSToken.sol";
 
 contract Deploy_vSVault is Script {
-    function run() external returns (address, address, address) {
+    function run() external returns (address, address, address, address) {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+        address deployer = vm.addr(deployerPrivateKey);
         vm.startBroadcast(deployerPrivateKey);
 
-        // 1. Deploy vSToken
+        // 1. Deploy MockSToken (the underlying asset)
+        MockSToken mockSToken = new MockSToken();
+        
+        // 2. Deploy vSToken
         vSToken vsToken = new vSToken();
 
-        // 2. Deploy MockSonicNFT
-        MockSonicNFT mockSonicNFT = new MockSonicNFT();
+        // 3. Deploy MockSonicNFT, linking it to the underlying S-Token
+        MockSonicNFT mockSonicNFT = new MockSonicNFT(address(mockSToken));
 
-        // 3. Deploy vSVault, linking the other two contracts
-        vSVault vault = new vSVault(address(vsToken), address(mockSonicNFT));
+        // 4. Fund the MockSonicNFT contract with 100M S-Tokens to cover vesting
+        uint256 initialFunding = 100_000_000 * 10**18;
+        mockSToken.mint(deployer, initialFunding);
+        mockSToken.approve(address(mockSonicNFT), initialFunding);
+        mockSonicNFT.fund(initialFunding);
+        
+        // 5. Deploy vSVault, linking all contracts
+        vSVault vault = new vSVault(address(vsToken), address(mockSonicNFT), address(mockSToken));
 
-        // 4. Grant minting rights from vSToken to the Vault
+        // 6. Grant minting/burning rights from vSToken to the Vault
         vsToken.transferOwnership(address(vault));
 
-        // 5. Mint a test NFT to the deployer
+        // 7. Mint a test NFT to the deployer
         // (1,000,000 tokens, vesting over 30 days)
         uint256 oneMillionTokens = 1_000_000 * 10**18;
         uint256 thirtyDays = 30 days;
-        mockSonicNFT.safeMint(msg.sender, oneMillionTokens, thirtyDays);
+        mockSonicNFT.safeMint(deployer, oneMillionTokens, thirtyDays);
 
         vm.stopBroadcast();
 
-        return (address(vsToken), address(mockSonicNFT), address(vault));
+        return (address(vsToken), address(mockSonicNFT), address(vault), address(mockSToken));
     }
 } 

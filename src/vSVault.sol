@@ -11,110 +11,122 @@ import {MockSonicNFT} from "../test/MockSonicNFT.sol";
 
 /**
  * @title vSVault
- * @dev A vault that holds Sonic vesting NFTs (ERC721) as collateral
- * and allows users to mint vS (ERC20) tokens against the vested value.
+ * @dev A vault that permanently locks Sonic vesting NFTs (fNFTs)
+ * and mints vS tokens against their full future value.
+ * This contract then collects vested tokens from the fNFTs over time,
+ * allowing vS holders to redeem them for the underlying asset.
  */
 contract vSVault is ERC721Holder, Ownable {
-    /// @dev The underlying asset of the vault, which is the vS token itself.
     vSToken public immutable vsToken;
-
-    /// @dev The address of the Sonic NFT (ERC721) contract that this vault accepts.
     address public immutable sonicNFT;
+    address public immutable underlyingToken; // The actual token being vested, e.g. SONIC
 
-    /// @dev Maps an NFT ID to the original address that deposited it.
-    mapping(uint256 => address) public nftOriginalOwner;
-    
-    /// @dev Maps a user to the amount of vS they have minted for a specific NFT.
-    mapping(address => mapping(uint256 => uint256)) public mintedPerNFT;
+    // Keep track of all NFTs held by the vault to claim from them
+    uint256[] public heldNFTs;
 
-    /// @dev Thrown when a user tries to withdraw an NFT they didn't deposit.
-    error NotNFTOwner();
-
-    /// @notice Emitted when an NFT is deposited into the vault
-    event NFTDeposited(address indexed user, uint256 indexed nftId, uint256 totalValue);
-    /// @notice Emitted when an NFT is withdrawn from the vault
-    event NFTWithdrawn(address indexed user, uint256 indexed nftId);
-    /// @notice Emitted when vS is minted
-    event VSMinted(address indexed user, uint256 indexed nftId, uint256 amount);
-    /// @notice Emitted when vS is burned
-    event VSBurned(address indexed user, uint256 indexed nftId, uint256 amount);
+    /// @notice Emitted when an NFT is deposited and vS is minted
+    event NFTDeposited(address indexed user, uint256 indexed nftId, uint256 amountMinted);
+    /// @notice Emitted when the vault claims vested tokens from the fNFTs
+    event VestedTokensClaimed(address indexed caller, uint256 amount);
+    /// @notice Emitted when a user redeems vS for the underlying token
+    event Redeemed(address indexed user, uint256 vsAmount, uint256 underlyingAmount);
 
     /**
      * @param _vsToken The address of the vS token contract.
      * @param _sonicNFT The address of the Sonic vesting NFT contract.
+     * @param _underlyingToken The address of the underlying asset being vested (e.g., SONIC).
      */
     constructor(
         address _vsToken,
-        address _sonicNFT
+        address _sonicNFT,
+        address _underlyingToken
     ) Ownable(msg.sender) {
         vsToken = vSToken(_vsToken);
         sonicNFT = _sonicNFT;
+        underlyingToken = _underlyingToken;
     }
 
     /**
-     * @notice Deposits a specific Sonic NFT into the vault.
+     * @notice Deposits an fNFT and mints vS tokens for its full future value.
+     * @dev This is a one-way bridge. The NFT is permanently locked.
      * @param nftId The ID of the Sonic NFT to deposit.
      */
-    function depositNFT(uint256 nftId) external {
-        require(nftOriginalOwner[nftId] == address(0), "NFT already deposited");
-        nftOriginalOwner[nftId] = msg.sender;
-
-        // Transfer the NFT from the user to the vault
+    function deposit(uint256 nftId) external {
+        // 1. Take ownership of the NFT
         IERC721(sonicNFT).safeTransferFrom(msg.sender, address(this), nftId);
+        heldNFTs.push(nftId);
 
+        // 2. Calculate its total potential value
         uint256 totalValue = MockSonicNFT(sonicNFT).getTotalAmount(nftId);
+        require(totalValue > 0, "NFT has no value");
+
+        // 3. Mint vS tokens 1:1 for the total future value
+        vsToken.mint(msg.sender, totalValue);
+
         emit NFTDeposited(msg.sender, nftId, totalValue);
     }
 
     /**
-     * @notice Allows a user to mint vS tokens against their deposited NFT's vested value.
-     * @param nftId The ID of the deposited NFT.
+     * @notice Claims currently vested tokens from a batch of NFTs held by the vault.
+     * @dev This is a public function that should be called periodically by a keeper or incentivized actor.
+     * The collected tokens are held by this contract for redemption.
+     * @param startIndex The starting index in the heldNFTs array to process.
+     * @param count The number of NFTs to process in this batch.
      */
-    function mintVS(uint256 nftId) external {
-        if (nftOriginalOwner[nftId] != msg.sender) {
-            revert NotNFTOwner();
+    function claimVested(uint256 startIndex, uint256 count) external {
+        uint256 totalClaimed = 0;
+        uint256 endIndex = startIndex + count;
+        require(endIndex <= heldNFTs.length, "Index out of bounds");
+
+        for (uint i = startIndex; i < endIndex; i++) {
+            uint256 nftId = heldNFTs[i];
+            // In a real scenario, the NFT contract would have a `claim` function
+            // that transfers the vested tokens. We simulate this in our mock.
+            uint256 vested = MockSonicNFT(sonicNFT).claimVestedTokens(nftId);
+            if (vested > 0) {
+                totalClaimed += vested;
+            }
+        }
+        
+        if (totalClaimed == 0) {
+            // It's okay if there's nothing to claim in this batch, just return.
+            return;
         }
 
-        uint256 vestedAmount = MockSonicNFT(sonicNFT).getVestedAmount(nftId);
-        uint256 previouslyMinted = mintedPerNFT[msg.sender][nftId];
-        uint256 mintableAmount = vestedAmount - previouslyMinted;
-
-        require(mintableAmount > 0, "No new value has vested");
-
-        mintedPerNFT[msg.sender][nftId] += mintableAmount;
-        vsToken.mint(msg.sender, mintableAmount);
-
-        emit VSMinted(msg.sender, nftId, mintableAmount);
+        // The MockSonicNFT is responsible for transferring the `underlyingToken` to this vault.
+        // This call confirms that the vault has received the tokens.
+        // A real implementation would need robust checks here.
+        emit VestedTokensClaimed(msg.sender, totalClaimed);
     }
     
     /**
-     * @notice Withdraws a specific Sonic NFT from the vault.
-     * @dev The NFT must be fully vested before it can be withdrawn.
-     * @param nftId The ID of the Sonic NFT to withdraw.
+     * @notice Burns vS tokens to redeem a proportional share of the underlying tokens held by the vault.
+     * @param amount The amount of vS tokens to burn.
      */
-    function withdrawNFT(uint256 nftId) external {
-        if (nftOriginalOwner[nftId] != msg.sender) {
-            revert NotNFTOwner();
-        }
+    function redeem(uint256 amount) external {
+        require(amount > 0, "Cannot redeem 0");
         
-        uint256 totalValue = MockSonicNFT(sonicNFT).getTotalAmount(nftId);
-        uint256 vestedAmount = MockSonicNFT(sonicNFT).getVestedAmount(nftId);
+        // Calculate proportional share of underlying tokens held by the vault
+        uint256 totalUnderlying = IERC20(underlyingToken).balanceOf(address(this));
+        uint256 vsTotalSupply = vsToken.totalSupply();
+        
+        require(vsTotalSupply > 0, "No vS tokens in circulation");
+        uint256 redeemableAmount = (amount * totalUnderlying) / vsTotalSupply;
+        require(redeemableAmount > 0, "No underlying assets to redeem");
 
-        require(vestedAmount >= totalValue, "NFT not fully vested");
+        // 1. Burn user's vS tokens first to prevent re-entrancy
+        vsToken.burn(msg.sender, amount);
+        
+        // 2. Transfer underlying tokens to the user
+        IERC20(underlyingToken).transfer(msg.sender, redeemableAmount);
 
-        // Clear the owner mapping
-        delete nftOriginalOwner[nftId];
-
-        // Transfer the NFT back to the original owner
-        IERC721(sonicNFT).safeTransferFrom(address(this), msg.sender, nftId);
-        emit NFTWithdrawn(msg.sender, nftId);
+        emit Redeemed(msg.sender, amount, redeemableAmount);
     }
 
     /**
-     * @dev The total amount of assets under management.
-     * This is the total supply of the vS token, representing all vested value claimed.
+     * @dev The total amount of redeemable assets held by the vault.
      */
     function totalAssets() public view returns (uint256) {
-        return vsToken.totalSupply();
+        return IERC20(underlyingToken).balanceOf(address(this));
     }
 } 
