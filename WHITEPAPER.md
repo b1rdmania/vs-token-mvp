@@ -1,5 +1,5 @@
 # vS Vault: Technical Whitepaper
-Version 1.1 – Last updated 20 Jun 2025
+Version 1.2 – Last updated 21 Jun 2025
 
 ## 1. Why vS Vault Exists
 Sonic's airdrop locks 75 % of rewards in 9-month vesting NFTs. Great for supply discipline, terrible for users who want to move capital. Most will dump their 25 % liquid slice and forget Sonic. vS Vault unlocks the locked share without breaking the vest schedule—turning dead capital into tradable, yield-bearing liquidity.
@@ -8,27 +8,31 @@ Sonic's airdrop locks 75 % of rewards in 9-month vesting NFTs. Great for supply 
 - Total fNFTs in Season-1: 90 M S
 - User action: deposit fNFT → receive 1:1 vS tokens
 - vS tokens: standard ERC-20, tradable, LP-able, lendable
-- Underlying S continues vesting; unlocked S streams to vS holders daily
+- Underlying S vests over time; the vault harvests this value for vS holders.
 
 ## 3. How the Flow Works
-Deposit – user sends fNFT to the Vault contract
-Mint – Vault mints equal vS balance to the user
-Trade / LP – user swaps or LPs vS/S to earn fees
-Stream – Vault auto-claims newly-unlocked S each day and distributes pro-rata to vS balances
-Redeem – when vest hits 100 %, user burns vS to withdraw remaining S (early redemption allowed but pays the same penalty curve baked into the fNFT)
+The vS Vault operates on a simple, robust, and irreversible flow:
+
+**Deposit & Mint** – A user makes a one-way deposit of their fNFT into the Vault contract. The Vault immediately mints an equal number of `vS` tokens to the user, representing the full, future value of the vested asset. The original fNFT is now permanently locked.
+
+**Trade / LP** – The user's `vS` tokens are a standard ERC-20, immediately usable across the DeFi ecosystem. They can be traded, provided as liquidity, or used as collateral.
+
+**Claim Vested (Battle-Hardened)** – The Vault exposes a public `claimVested` function. This function can be called by anyone (typically an automated keeper) to instruct the Vault to harvest all available underlying `S` tokens from the fNFTs it holds. To ensure scalability and prevent out-of-gas errors, this function operates on batches of NFTs.
+
+**Redeem** – At any time, a user can burn their `vS` tokens. In exchange, they receive a proportional share of all the underlying `S` tokens currently held by the Vault. This is the primary mechanism for realizing the underlying value.
 
 ## 4. Smart-Contract Anatomy
+The architecture is designed for security, simplicity, and scalability.
+
 ### [vSVault.sol](https://github.com/b1rdmania/vs-token-mvp/blob/main/src/vSVault.sol)
-- ERC-4626 compliant, owns all fNFTs
-- Reads vesting schedule, tracks claimable S
-- Auto-stream function anyone can trigger (gas refund)
+- The core logic contract that permanently custodies all deposited fNFTs.
+- Mints `vS` tokens 1:1 against the total future value of a deposited fNFT.
+- Features a gas-efficient, batchable `claimVested` function to allow keepers to harvest vested tokens without hitting block gas limits.
+- Manages the redemption process, allowing `vS` holders to burn their tokens for a proportional share of the underlying asset.
 
 ### [vSToken.sol](https://github.com/b1rdmania/vs-token-mvp/blob/main/src/vSToken.sol)
-- ERC-20 with EIP-2612 permits
-- Mint / burn controlled by the Vault only
-
-### [PenaltyCurveLib.sol](https://github.com/b1rdmania/vs-token-mvp/blob/main/src/PenaltyCurveLib.sol)
-- Pure library replicating Sonic's linear burn formula for early exits
+- A standard, secure ERC-20 token contract based on OpenZeppelin.
+- Minting and burning are controlled exclusively by the `vSVault` contract, which is set as the contract's `owner`.
 
 ## 5. Technical Implementation Roadmap
 
