@@ -5,6 +5,7 @@ import { RainbowKitProvider, getDefaultWallets } from '@rainbow-me/rainbowkit';
 import { sonicTestnet } from './config/chains';
 import { AppShell } from './components/layout/AppShell';
 import { LandingPage } from './pages/LandingPage';
+import { WhitepaperPage } from './pages/WhitepaperPage';
 import '@rainbow-me/rainbowkit/styles.css';
 
 const projectId = import.meta.env.VITE_PROJECT_ID;
@@ -36,6 +37,7 @@ export function App() {
           <Router>
             <Routes>
               <Route path="/" element={<LandingPage />} />
+              <Route path="/whitepaper" element={<WhitepaperPage />} />
               <Route path="/app/*" element={<AppShell />} />
             </Routes>
           </Router>
