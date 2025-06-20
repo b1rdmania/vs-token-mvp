@@ -1,0 +1,27 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="1200" height="630" fill="#111827"/>
+<foreignObject x="100" y="200" width="1000" height="400">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+        <style>
+            .container {
+                font-family: sans-serif;
+                color: white;
+            }
+            .title {
+                font-size: 96px;
+                font-weight: bold;
+                color: #FFFFFF;
+                margin-bottom: 20px;
+            }
+            .subtitle {
+                font-size: 48px;
+                color: #9CA3AF;
+            }
+        </style>
+        <div class="container">
+            <div class="title">vS Vault</div>
+            <div class="subtitle">Activate your locked capital. The liquid staking standard for vesting tokens.</div>
+        </div>
+    </div>
+</foreignObject>
+</svg> 
