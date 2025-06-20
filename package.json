@@ -1,0 +1,10 @@
+{
+  "name": "vs-monorepo",
+  "private": true,
+  "workspaces": [
+    "frontend"
+  ],
+  "scripts": {
+    "build": "cd frontend && npm run build"
+  }
+} 
