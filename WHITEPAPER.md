@@ -3,7 +3,7 @@
 
 ## 1. Abstract
 
-The vS Vault protocol is a decentralized application designed to unlock liquidity from vesting-wrapped NFTs, specifically focusing on the upcoming Sonic (S) token airdrop. Airdropped tokens are often distributed inside time-locked NFTs to facilitate a gradual release into the market. While this promotes network stability, it locks up significant capital for individual holders. vS Vault solves this by allowing users to deposit their vesting NFTs into a secure, non-custodial smart contract and mint `vS` tokens—a liquid ERC20 token that represents a claim on the underlying, vested portion of their deposit. This provides users with instant liquidity, enabling them to trade or participate in other DeFi activities while their original assets continue to vest as intended.
+The vS Vault protocol is a decentralized application designed to unlock liquidity from vesting-wrapped NFTs, specifically focusing on the upcoming Sonic (S) token airdrop. The Sonic Airdrop is distributed inside time-locked NFTs to facilitate a gradual release into the market. While this promotes network stability, it locks up significant capital for individual holders. vS Vault solves this by allowing users to deposit their vesting NFTs into a secure, non-custodial smart contract and mint `vS` tokens—a liquid ERC20 token that represents a claim on the underlying, vested portion of their deposit. This provides users with instant liquidity, enabling them to trade or participate in other DeFi activities while their original assets continue to vest as intended.
 
 ## 2. Core Concepts
 
