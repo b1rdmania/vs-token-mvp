@@ -58,9 +58,15 @@
 
 .pool-layout {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 2rem;
-  align-items: flex-start;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .pool-layout {
+    grid-template-columns: 1fr;
+  }
 }
 
 .provide-liquidity-panel, .stat-card {
@@ -119,24 +125,27 @@
 .pool-stats-container {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 2rem;
 }
 
-.stat-row {
+.pool-ratio {
+  text-align: center;
+  margin: 1.5rem 0;
+  font-weight: 600;
+  color: #333;
+}
+
+.stat-item {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem 0;
-  border-bottom: 1px solid #EAECEF;
-}
-.stat-card .stat-row:last-child {
-  border-bottom: none;
+  margin-bottom: 1rem;
+  font-size: 1rem;
 }
 
-.stat-row label {
-  opacity: 0.8;
+.stat-item span {
+  color: #6c757d;
 }
 
-.stat-row span {
-  font-weight: 600;
+.stat-item:last-child {
+  margin-bottom: 0;
 } 
