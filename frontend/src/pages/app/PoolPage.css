@@ -72,6 +72,12 @@
   align-items: flex-start;
 }
 
+@media (max-width: 992px) {
+    .pool-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
 .provide-liquidity-panel, .stat-card {
   background: white;
   padding: 1.5rem 2rem;

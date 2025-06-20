@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { DepositPage } from '../../pages/app/DepositPage';
@@ -8,6 +8,7 @@ import { PoolPage } from '../../pages/app/PoolPage';
 import { ActivityPage } from '../../pages/app/ActivityPage';
 import { RedeemPage } from '../../pages/app/RedeemPage';
 import './AppShell.css';
+import { useAccount } from 'wagmi';
 
 const navLinks = [
   { path: '/app/deposit', label: 'Deposit' },
@@ -26,29 +27,54 @@ const navLinkStyles = ({ isActive }: { isActive: boolean }) => ({
 
 export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
+  const { isConnected } = useAccount();
+  const [isMenuOpen, setMenuOpen] = useState(false);
 
   return (
     <div className="app-shell">
       <header className="app-header">
-        <div className="container header-content">
-          <div className="logo-section">
-            <Link to="/" className="logo">vS Vault</Link>
-            <span className="beta-badge">TESTNET BETA</span>
-          </div>
-          <div className="wallet-section">
+        <div className="header-container">
+          <Link to="/" className="logo">
+            vS Vault
+            <span className="testnet-badge">TESTNET BETA</span>
+          </Link>
+
+          <nav className="nav-links">
+            {navLinks.map((link) => (
+              <NavLink key={link.path} to={link.path} style={navLinkStyles}>
+                {link.label}
+              </NavLink>
+            ))}
+          </nav>
+
+          <div className="header-actions">
             <ConnectButton />
           </div>
+
+          <button className="hamburger-menu" onClick={() => setMenuOpen(!isMenuOpen)}>
+            &#9776;
+          </button>
         </div>
       </header>
-      <nav className="app-nav">
-        <div className="container">
+
+      {isMenuOpen && (
+        <nav className="mobile-nav-links">
           {navLinks.map((link) => (
-            <NavLink key={link.path} to={link.path} style={navLinkStyles}>
+            <NavLink
+              key={link.path}
+              to={link.path}
+              style={navLinkStyles}
+              onClick={() => setMenuOpen(false)}
+            >
               {link.label}
             </NavLink>
           ))}
-        </div>
-      </nav>
+          <div className="mobile-wallet-connect">
+            <ConnectButton />
+          </div>
+        </nav>
+      )}
+
       <main className="app-main">
         <div className="container">
           <Routes>

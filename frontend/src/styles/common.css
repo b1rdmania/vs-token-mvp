@@ -44,6 +44,15 @@ h4 {
     margin-right: auto;
 }
 
+@media (max-width: 768px) {
+    .page-title {
+        font-size: 1.75rem;
+    }
+    h2 {
+        font-size: 1.25rem;
+    }
+}
+
 /* Standard Content Card */
 .content-card {
   background-color: #FFFFFF;
