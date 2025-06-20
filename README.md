@@ -23,10 +23,11 @@ This protocol is engineered for maximum security, transparency, and decentraliza
 
 1.  **Deposit:** A user sends their Sonic fNFT to the audited `vSVault` contract.
 2.  **Mint:** The Vault instantly mints an equal amount of `vS` tokens to the user's wallet.
-3.  **Utilize:** The user can now:
-    - Swap `vS` for liquid `S` (or any other token) on a DEX.
-    - Provide liquidity to a `vS`/`S` pool to earn trading fees and incentives.
-    - Use `vS` as collateral on partner lending protocols.
+3.  **Utilize & Create Value:** The user now holds a fully-composable DeFi asset, ready to be deployed across the ecosystem to:
+    - **Trade Instantly:** Swap `vS` for `S` or other assets on our partner DEX, **Shadow DEX**.
+    - **Earn Deep Yield:** Provide liquidity to the incentivized `vS`/`S` pool to earn trading fees and rewards.
+    - **Borrow Against Future Value:** Use `vS` as collateral on partner lending markets.
+    This composability is the core of the **vS Flywheel**, turning locked assets into an engine for ecosystem-wide liquidity and growth.
 4.  **Stream:** The Vault's `auto-stream` function is triggered daily, claiming all newly vested `S` from the entire pool of fNFTs and distributing it pro-rata to all `vS` holders.
 5.  **Redeem:** At any time, a user can burn their `vS` to withdraw their proportional share of the underlying `S` tokens.
 
