@@ -1,20 +1,15 @@
-/* Styles for RedeemPage can be added here if specific overrides are needed. */
-
 .redeem-page {
   max-width: 600px;
   margin: 0 auto;
 }
 
 .warning-banner {
-  background-color: #FFFBEB; /* Yellow-50 */
-  color: #B45309; /* Yellow-700 */
-  padding: 1rem 1.5rem;
-  border-radius: 16px;
-  border: 1px solid #FDE68A; /* Yellow-200 */
-  margin-bottom: 1.5rem;
-}
-.warning-banner p {
-  margin: 0;
+  background-color: #3e2723;
+  color: #ffccbc;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  text-align: center;
 }
 
 .redeem-form h3 {
@@ -26,57 +21,57 @@
 .redeem-input-container {
   margin-bottom: 1.5rem;
 }
-.redeem-input-container > label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-}
+
 .redeem-input-container > span {
-  font-size: 0.8rem;
-  opacity: 0.7;
-  margin-left: 0.5rem;
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin-top: 0.5rem;
+  display: inline-block;
 }
 
 .redeem-input {
   display: flex;
-  background-color: #F7F9FC;
-  border-radius: 8px;
-  padding: 0.5rem;
+  align-items: center;
 }
-.redeem-input input {
-  flex-grow: 1;
-  border: none;
-  background: transparent;
-  font-size: 1.5rem;
-  outline: none;
-  width: 100%;
+
+.redeem-input .form-input {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-right: none;
 }
+
 .max-button {
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 0 1rem;
+  padding: 0.75rem 1.5rem;
+  border: 1px solid #ccc;
+  border-left: none;
+  background-color: #f8f9fa;
   cursor: pointer;
-  font-weight: 600;
+  font-weight: bold;
+  color: #007BFF;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
 }
 
 .redeem-summary {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-top: 1.5rem;
+  margin: 1.5rem 0;
   padding-top: 1.5rem;
-  border-top: 1px solid #EAECEF;
-  margin-bottom: 1.5rem;
+  border-top: 1px solid #e9ecef;
 }
+
 .redeem-summary > div {
   display: flex;
   justify-content: space-between;
+  margin-bottom: 0.75rem;
 }
+
 .redeem-summary label {
-  opacity: 0.7;
+  color: #6c757d;
 }
+
 .redeem-summary span {
   font-weight: 600;
+}
+
+.full-width {
+  width: 100%;
 } 

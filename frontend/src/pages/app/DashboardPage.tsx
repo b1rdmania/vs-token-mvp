@@ -1,17 +1,17 @@
 import React from 'react';
 import './DashboardPage.css';
 
-// Mock data, replace with actual data
 const mockDashboardData = {
   totalVsBalance: 12500.75,
   unlockedS: 150.22,
+  currentApy: 18.5,
   nextUnlock: '12h 45m',
   vestCompletedPercent: 25,
   nftsInVault: [
     { id: '#001', principal: '10,000 S', maturity: 'in 9 months' },
     { id: '#002', principal: '5,000 S', maturity: 'in 6 months' },
   ],
-  mintableVs: 25,
+  unlockedToday: 25,
 };
 
 export const DashboardPage: React.FC = () => {
@@ -24,27 +24,29 @@ export const DashboardPage: React.FC = () => {
         <p>Balances reflect on-chain data from the public Subgraph. The vault streams new rewards approximately every 6 hours.</p>
       </div>
 
-      <div className="dashboard-grid">
-        <div className="content-card stat-card">
-          <h3>Total vS Balance</h3>
-          <p className="stat-value">{data.totalVsBalance.toLocaleString()} vS</p>
+      <div className="stats-row">
+        <div className="content-card stat-card-dash">
+          <label>Total vS Balance</label>
+          <span>{data.totalVsBalance.toLocaleString()} vS</span>
         </div>
-        <div className="content-card stat-card">
-          <h3>Unlocked S Streamed</h3>
-          <p className="stat-value">{data.unlockedS.toLocaleString()} S</p>
+        <div className="content-card stat-card-dash">
+          <label>Unlocked S Streamed</label>
+          <span>{data.unlockedS.toLocaleString()} S</span>
         </div>
-        <div className="content-card stat-card">
-          <h3>Next Unlock In</h3>
-          <p className="stat-value">{data.nextUnlock}</p>
+        <div className="content-card stat-card-dash">
+          <label>Next Unlock In</label>
+          <span>{data.nextUnlock}</span>
         </div>
       </div>
 
       <div className="content-card">
-        <h3>Overall Vesting Progress</h3>
+        <div className="progress-info">
+          <label>Overall Vesting Progress</label>
+          <span>{data.vestCompletedPercent}%</span>
+        </div>
         <div className="progress-bar-container">
           <div className="progress-bar-fill" style={{ width: `${data.vestCompletedPercent}%` }}></div>
         </div>
-        <p className="progress-label">{data.vestCompletedPercent}% Complete</p>
       </div>
 
       <div className="content-card">
@@ -69,12 +71,12 @@ export const DashboardPage: React.FC = () => {
         </table>
       </div>
 
-      <div className="content-card mint-panel">
+      <div className="content-card claim-panel">
         <div>
-          <h3>Mintable vS</h3>
-          <p className="stat-value">{data.mintableVs.toLocaleString()} vS</p>
+          <label>Mintable vS</label>
+          <span>{data.unlockedToday.toLocaleString()} vS</span>
         </div>
-        <button className="button-primary" disabled={data.mintableVs <= 0}>
+        <button className="button-primary" disabled={data.unlockedToday <= 0}>
           Mint vS
         </button>
       </div>
