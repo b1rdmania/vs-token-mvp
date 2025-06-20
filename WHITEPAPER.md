@@ -30,7 +30,35 @@ Redeem – when vest hits 100 %, user burns vS to withdraw remaining S (early re
 ### [PenaltyCurveLib.sol](https://github.com/b1rdmania/vs-token-mvp/blob/main/src/PenaltyCurveLib.sol)
 - Pure library replicating Sonic's linear burn formula for early exits
 
-## 5. Deep DeFi Composability & The Flywheel Effect
+## 5. Technical Implementation Roadmap
+
+### Phase 1: Testnet Deployment
+**Objective:** Deploy fully functional vS Vault MVP on Sepolia testnet.
+- Deploy `MockSonicNFT.sol` contract (public minting enabled).
+- Complete core functions in `vSVault.sol` (deposit, mint, redeem).
+- Deploy smart contracts to Sepolia testnet via Foundry.
+- Update frontend configuration (Wagmi/RainbowKit) for Sepolia.
+- Conduct comprehensive end-to-end testing.
+
+### Phase 2: Decentralized Integration & Infrastructure
+**Objective:** Integrate robust, decentralized protocol components.
+- Implement Chainlink Automation for reward streaming.
+- Deploy production-ready Subgraph on The Graph for decentralized indexing.
+- Integrate Shadow AMM for liquidity provision and token swaps.
+- Finalize frontend to source data exclusively from decentralized components.
+- Complete internal testing and finalize user documentation.
+
+### Phase 3: Security Hardening & Mainnet Readiness
+**Objective:** Ensure rigorous security and prepare for mainnet launch.
+- Initiate external security audit engagement with leading firm.
+- Perform comprehensive internal security reviews using automated tools (Slither, Mythril).
+- Prepare and validate mainnet deployment scripts.
+- Establish initial liquidity seeding plan (250k S + 250k vS).
+- Finalize launch strategy and documentation, pending audit results.
+
+This roadmap ensures robust deployment, decentralization, security, and strategic readiness for mainnet launch.
+
+## 6. Deep DeFi Composability & The Flywheel Effect
 `vS` is more than a liquid token; it's a foundational building block for the Sonic ecosystem. By converting locked fNFTs into a standard, permissionless ERC-20, vS Vault unlocks immediate composability with other DeFi protocols.
 
 - **Lending & Borrowing:** `vS` can be listed as collateral on lending markets, allowing users to borrow against their vesting assets without selling.
@@ -43,18 +71,7 @@ Redeem – when vest hits 100 %, user burns vS to withdraw remaining S (early re
 
 This model transforms static, vesting assets into a dynamic engine for ecosystem-wide liquidity and growth.
 
-## 6. Decentralized & Battle-Hardened Architecture
-The vS Vault is engineered for maximum uptime, security, and transparency, removing all centralized points of failure.
-
-- **Immutable by Design:** The core contracts are non-upgradeable. The code deployed is final, ensuring predictable behavior and removing administrative risk.
-- **Reliable Automation via Keepers:** The daily `auto-stream` function is not run from a private server. It is driven by a decentralized automation network (e.g., Chainlink Automation) that guarantees execution.
-- **Public Incentivization:** As a backstop, the `auto-stream` function includes a gas incentive, making it profitable for any public user or bot to trigger it. This ensures the protocol is self-healing and perpetually live.
 - **Transparent Data via Subgraph:** All data for the user interface is indexed from on-chain events via a public Subgraph. This guarantees that what you see is a direct and verifiable reflection of on-chain reality.
-
-## 7. Security & Audits
-- Built with [OpenZeppelin templates](https://github.com/b1rdmania/vs-token-mvp/tree/main/lib/openzeppelin-contracts/contracts), no owner functions, no upgradeability in V1
-- Audit booked with BlockSec, report live before airdrop launch (1 Jul 2025)
-- $25 k Immunefi bug bounty live from testnet day-one
 
 ## 8. Economic Impact for Sonic
 - Deep vS/S liquidity absorbs airdrop sell pressure
@@ -62,11 +79,5 @@ The vS Vault is engineered for maximum uptime, security, and transparency, remov
 - Continuous swap volume drives fee burn, aligning with S token economics
 - More "things to do" on-chain keeps users active during the 9-month vest window
 
-## 9. Launch Parameters (testnet → mainnet)
-- Testnet beta: contracts live, subgraph indexing, UI functional
-- Mainnet launch target: 1 Jul 2025 (before Season-1 claim portal opens)
-- Initial liquidity: 250 k S + 250 k vS seeded by team
-- Partner gauge incentives: 500 k S over first 30 days
-
-## 10. Get Involved
+## 9. Get Involved
 Seed liquidity, integrate vS in your dApp, or [review the code](https://github.com/b1rdmania/vs-token-mvp). 

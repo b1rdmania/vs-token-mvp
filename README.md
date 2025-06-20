@@ -39,6 +39,33 @@ The entire system is comprised of three core, minimal contracts:
 - **[vSToken.sol](https://github.com/b1rdmania/vs-token-mvp/blob/main/src/vSToken.sol):** The liquid ERC-20 token that represents a 1:1 claim on the underlying `S` held within the vault.
 - **[PenaltyCurveLib.sol](https://github.com/b1rdmania/vs-token-mvp/blob/main/src/PenaltyCurveLib.sol):** A placeholder library to handle any early-redemption logic that mirrors the fNFT's native penalty system.
 
+## Technical Implementation Roadmap
+This roadmap ensures robust deployment, decentralization, security, and strategic readiness for mainnet launch.
+
+#### Phase 1: Testnet Deployment
+**Objective:** Deploy fully functional vS Vault MVP on Sepolia testnet.
+- Deploy `MockSonicNFT.sol` contract (public minting enabled).
+- Complete core functions in `vSVault.sol` (deposit, mint, redeem).
+- Deploy smart contracts to Sepolia testnet via Foundry.
+- Update frontend configuration (Wagmi/RainbowKit) for Sepolia.
+- Conduct comprehensive end-to-end testing.
+
+#### Phase 2: Decentralized Integration & Infrastructure
+**Objective:** Integrate robust, decentralized protocol components.
+- Implement Chainlink Automation for reward streaming.
+- Deploy production-ready Subgraph on The Graph for decentralized indexing.
+- Integrate Shadow AMM for liquidity provision and token swaps.
+- Finalize frontend to source data exclusively from decentralized components.
+- Complete internal testing and finalize user documentation.
+
+#### Phase 3: Security Hardening & Mainnet Readiness
+**Objective:** Ensure rigorous security and prepare for mainnet launch.
+- Initiate external security audit engagement with leading firm.
+- Perform comprehensive internal security reviews using automated tools (Slither, Mythril).
+- Prepare and validate mainnet deployment scripts.
+- Establish initial liquidity seeding plan (250k S + 250k vS).
+- Finalize launch strategy and documentation, pending audit results.
+
 ## Project Status
 
 This repository contains the complete, production-ready code for the vS Vault protocol, including:
