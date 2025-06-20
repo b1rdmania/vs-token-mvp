@@ -23,7 +23,7 @@
 .logo-section {
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: 1rem;
 }
 
 .logo {
@@ -33,41 +33,36 @@
   text-decoration: none;
 }
 
-.beta-badge {
-  background-color: var(--accent-color);
-  color: var(--secondary-color);
-  padding: 0.25rem 0.6rem;
-  border-radius: 6px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
+.testnet-badge {
+    background-color: #e9ecef;
+    color: #495057;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    align-self: center;
 }
 
 .app-nav {
-  background-color: #F7F9FC;
-  border-bottom: 1px solid #EAECEF;
+  background-color: #fff;
+  border-bottom: 1px solid #dee2e6;
 }
 
-.app-nav .container {
+.nav-container {
   display: flex;
-  gap: 1.5rem;
+  justify-content: center;
+  gap: 2rem;
+  padding: 0.5rem 1rem;
 }
 
-.nav-links a {
+.nav-container a {
+  padding: 0.5rem 0;
   text-decoration: none;
-  color: #212529;
-  font-weight: 500;
-  padding-bottom: 4px;
-  border-bottom: 2px solid transparent;
 }
 
-.app-nav a:hover {
-  color: var(--secondary-color);
-}
-
-.app-nav a.active {
-  color: var(--primary-color);
-  border-bottom-color: var(--primary-color);
+.hamburger-menu,
+.mobile-header-actions {
+  display: none;
 }
 
 .app-main {
@@ -89,15 +84,6 @@
   margin: 0 auto;
 }
 
-.hamburger-menu {
-  display: none;
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: #212529;
-}
-
 .mobile-nav-links {
   display: none;
   flex-direction: column;
@@ -113,16 +99,37 @@
 }
 
 @media (max-width: 768px) {
-  .nav-links {
+  .desktop-header-actions {
     display: none;
-  }
-  
-  .header-actions {
-      display: none; /* Hiding connect button from header on mobile */
   }
 
   .hamburger-menu {
     display: block;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #212529;
+  }
+
+  .app-nav {
+    display: none; /* Hide nav by default on mobile */
+  }
+
+  .app-nav.mobile-menu-open {
+    display: block; /* Show when menu is open */
+  }
+
+  .nav-container {
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem 0;
+    gap: 1.5rem;
+  }
+
+  .mobile-header-actions {
+    display: block;
+    margin-top: 1rem;
   }
 
   .mobile-nav-links {
