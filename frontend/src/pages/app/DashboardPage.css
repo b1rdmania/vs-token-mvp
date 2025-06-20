@@ -1,0 +1,117 @@
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-card-dash {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 16px;
+  border: 1px solid #EAECEF;
+}
+
+.stat-card-dash label {
+  display: block;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.8;
+}
+
+.stat-card-dash span {
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+.progress-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 16px;
+  border: 1px solid #EAECEF;
+  margin-bottom: 1.5rem;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.progress-info label {
+  opacity: 0.8;
+}
+.progress-info span {
+  font-weight: 600;
+}
+
+.progress-bar-container {
+  height: 8px;
+  width: 100%;
+  background-color: #EAECEF;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background-color: var(--primary-color);
+  border-radius: 4px;
+}
+
+.table-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 16px;
+  border: 1px solid #EAECEF;
+  margin-bottom: 1.5rem;
+}
+
+.table-card h3 {
+  font-size: 1.25rem;
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.table-card table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.table-card th, .table-card td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #EAECEF;
+}
+.table-card thead {
+  background-color: #F7F9FC;
+}
+.table-card th {
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.claim-panel {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 16px;
+  border: 1px solid #EAECEF;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.claim-panel label {
+  font-size: 1rem;
+  opacity: 0.8;
+}
+.claim-panel span {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-left: 1rem;
+}
+.claim-panel button:disabled {
+  background-color: #EAECEF;
+  border-color: #EAECEF;
+  color: var(--secondary-color);
+  opacity: 0.5;
+  cursor: not-allowed;
+} 

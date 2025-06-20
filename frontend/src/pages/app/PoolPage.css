@@ -1,0 +1,52 @@
+.pool-page {
+  max-width: 800px;
+}
+
+.pool-page h1 {
+  margin-bottom: 0.5rem;
+}
+
+.pool-page .page-description {
+  font-size: 1.125rem;
+  color: #6B7280;
+  margin-bottom: 2rem;
+}
+
+.pool-strategy-card {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #EAECEF;
+  padding: 2rem;
+}
+
+.pool-strategy-card h2 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.pool-strategy-card ul {
+  padding-left: 1.5rem;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.pool-strategy-card li {
+  line-height: 1.6;
+}
+
+.pool-strategy-card strong {
+  color: var(--secondary-color);
+}
+
+.coming-soon-banner {
+  margin-top: 2rem;
+  text-align: center;
+  padding: 1rem;
+  background-color: #F7F9FC;
+  border-radius: 8px;
+  font-weight: 500;
+  color: #6B7280;
+} 

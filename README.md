@@ -25,7 +25,32 @@
 - Alice receives a Sonic airdrop as a vesting NFT (fNFT).
 - She deposits her fNFT into the vS Vault and receives vS tokens, calculated at the current claimable S value (using the penalty curve).
 - Alice can now trade, LP, or use vS tokens in DeFi, instead of waiting for her rewards to vest.
+- A month later, her fNFT has vested further. Alice returns to the vS Vault dashboard and sees she can now mint more vS tokens against the same fNFT. She does so with a single click, increasing her liquid position without having to move the underlying fNFT.
 - When she wants to redeem, she can burn her vS tokens for S tokens at the current claimable value, or (optionally) withdraw the fNFT at fair value.
+
+---
+
+## ✨ Key Features
+
+*   **Continuous Liquidity:** Deposit your fNFT once. As it vests and the penalty decays, you can return to the protocol to mint more vS tokens against its increased claimable value. No need to withdraw and redeposit.
+*   **Fair Value Minting:** All vS minting is based on the real-time claimable value of your fNFT, determined by the on-chain penalty curve.
+*   **Instant Fungibility:** Convert your unique, illiquid fNFT into a standard, liquid ERC-20 token (vS) that is fully composable in DeFi.
+*   **Non-Custodial & On-Chain:** Your deposited fNFTs are secured in an on-chain vault. You retain ownership and control.
+
+---
+
+## 💧 Liquidity & APR (MVP Strategy)
+
+*   **External DEX Integration:** The primary vS/S liquidity pool will reside on the dominant DEX on Sonic to leverage existing infrastructure and prevent liquidity fragmentation.
+*   **Partner-Sponsored APR:** To ensure a highly attractive yield for liquidity providers from day one, the initial "boosted APR" will be sponsored by ecosystem partners (e.g., Sonic). The vS protocol acts as the distribution mechanism for these third-party incentives.
+
+---
+
+## 💰 Business Model (MVP)
+
+The protocol's revenue model is simple and transparent:
+*   **Redemption Fee:** A small, configurable fee is charged only when vS tokens are redeemed for the underlying S tokens from the vault.
+*   **Treasury Accrual:** This fee is collected by the protocol treasury, ensuring a direct and sustainable revenue stream from the core utility of the service.
 
 ---
 

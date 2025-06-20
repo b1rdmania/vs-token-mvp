@@ -1,0 +1,75 @@
+.activity-page {
+  padding: 0; /* Remove padding from card-style if needed */
+}
+
+.fee-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  padding: 1.5rem;
+  border-bottom: 1px solid #EAECEF;
+}
+.fee-summary > div {
+  display: flex;
+  flex-direction: column;
+}
+.fee-summary label {
+  opacity: 0.7;
+  margin-bottom: 0.25rem;
+}
+.fee-summary span {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.filter-tabs {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #EAECEF;
+}
+
+.tab-button {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: none;
+  background-color: transparent;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--secondary-color);
+  opacity: 0.7;
+  transition: all 0.2s ease;
+}
+.tab-button.active {
+  background-color: var(--primary-color);
+  color: white;
+  opacity: 1;
+}
+.tab-button:hover:not(.active) {
+  background-color: #EAECEF;
+}
+
+.activity-table-container table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.activity-table-container th, .activity-table-container td {
+  padding: 1rem 1.5rem;
+  text-align: left;
+  border-bottom: 1px solid #EAECEF;
+}
+.activity-table-container tbody tr:last-child td {
+  border-bottom: none;
+}
+.activity-table-container th {
+  font-weight: 600;
+  opacity: 0.8;
+  font-size: 0.85rem;
+}
+
+.explorer-link {
+  font-size: 1.25rem;
+  text-decoration: none;
+  color: var(--primary-color);
+} 
