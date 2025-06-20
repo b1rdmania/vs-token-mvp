@@ -16,7 +16,7 @@ export const RedeemPage: React.FC = () => {
         </div>
       )}
       <div className="content-card">
-        <h3>Redeem vS for S</h3>
+        <h2>Redeem vS for S</h2>
         <div className="redeem-input-container form-group">
           <label>vS to Burn</label>
           <div className="redeem-input">

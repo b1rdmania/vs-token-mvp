@@ -54,7 +54,7 @@ export const TradePage: React.FC = () => {
       </div>
 
       <div className="content-card">
-        <h3>vS / S Pool</h3>
+        <h2>vS / S Pool</h2>
         <div className="pool-stats">
           <div><label>TVL</label><span>${poolData.tvl}</span></div>
           <div><label>24h Volume</label><span>${poolData.volume24h}</span></div>

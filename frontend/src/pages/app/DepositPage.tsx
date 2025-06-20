@@ -80,7 +80,7 @@ export const DepositPage: React.FC = () => {
       <div className="nft-grid">
         {mockNfts.map((nft) => (
           <div key={nft.id} className="content-card nft-card">
-            <h2>Token ID: {nft.id}</h2>
+            <h3>Token ID: {nft.id}</h3>
             <div className="nft-details">
               <div>
                 <span>Locked Amount</span>
