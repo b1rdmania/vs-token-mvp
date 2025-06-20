@@ -83,4 +83,39 @@
   font-size: 1.25rem;
   text-decoration: none;
   color: var(--primary-color);
+}
+
+/* Styles for ActivityPage can be added here if specific overrides are needed. */
+
+.activity-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 2rem;
+}
+
+.activity-table th,
+.activity-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.activity-table th {
+  font-weight: 600;
+  color: #6c757d;
+  background-color: #f8f9fa;
+}
+
+.activity-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.activity-table a {
+  color: #007BFF;
+  text-decoration: none;
+  font-family: monospace;
+}
+
+.activity-table a:hover {
+  text-decoration: underline;
 } 
