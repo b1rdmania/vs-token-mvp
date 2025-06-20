@@ -18,16 +18,16 @@ Stream – Vault auto-claims newly-unlocked S each day and distributes pro-rata 
 Redeem – when vest hits 100 %, user burns vS to withdraw remaining S (early redemption allowed but pays the same penalty curve baked into the fNFT)
 
 ## 4. Smart-Contract Anatomy
-### vSVault.sol
+### [vSVault.sol](https://github.com/b1rdmania/vs-token-mvp/blob/main/src/vSVault.sol)
 - ERC-4626 compliant, owns all fNFTs
 - Reads vesting schedule, tracks claimable S
 - Auto-stream function anyone can trigger (gas refund)
 
-### vSToken.sol
+### [vSToken.sol](https://github.com/b1rdmania/vs-token-mvp/blob/main/src/vSToken.sol)
 - ERC-20 with EIP-2612 permits
 - Mint / burn controlled by the Vault only
 
-### PenaltyCurveLib.sol
+### [PenaltyCurveLib.sol](https://github.com/b1rdmania/vs-token-mvp/blob/main/src/PenaltyCurveLib.sol)
 - Pure library replicating Sonic's linear burn formula for early exits
 
 ## 5. Fee Model (governance-tunable)
@@ -38,7 +38,7 @@ Redeem – when vest hits 100 %, user burns vS to withdraw remaining S (early re
 - All fees: 50 % to LP gauge, 30 % to protocol treasury, 20 % to automatic $S buy-and-burn (default split).
 
 ## 6. Security & Audits
-- Built with OpenZeppelin templates, no owner functions, no upgradeability in V1
+- Built with [OpenZeppelin templates](https://github.com/b1rdmania/vs-token-mvp/tree/main/lib/openzeppelin-contracts/contracts), no owner functions, no upgradeability in V1
 - Audit booked with BlockSec, report live before airdrop launch (1 Jul 2025)
 - $25 k Immunefi bug bounty live from testnet day-one
 
@@ -55,4 +55,4 @@ Redeem – when vest hits 100 %, user burns vS to withdraw remaining S (early re
 - Partner gauge incentives: 500 k S over first 30 days
 
 ## 9. Get Involved
-Seed liquidity, integrate vS in your dApp, or review the code. 
+Seed liquidity, integrate vS in your dApp, or [review the code](https://github.com/b1rdmania/vs-token-mvp). 
