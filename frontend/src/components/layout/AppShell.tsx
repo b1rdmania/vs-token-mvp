@@ -38,27 +38,17 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
             vS Vault
             <span className="testnet-badge">TESTNET BETA</span>
           </Link>
-
-          <nav className="nav-links">
-            {navLinks.map((link) => (
-              <NavLink key={link.path} to={link.path} style={navLinkStyles}>
-                {link.label}
-              </NavLink>
-            ))}
-          </nav>
-
-          <div className="header-actions">
+          <div className="desktop-header-actions">
             <ConnectButton />
           </div>
-
           <button className="hamburger-menu" onClick={() => setMenuOpen(!isMenuOpen)}>
             &#9776;
           </button>
         </div>
       </header>
 
-      {isMenuOpen && (
-        <nav className="mobile-nav-links">
+      <nav className={`app-nav ${isMenuOpen ? 'mobile-menu-open' : ''}`}>
+        <div className="nav-container">
           {navLinks.map((link) => (
             <NavLink
               key={link.path}
@@ -69,11 +59,11 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
               {link.label}
             </NavLink>
           ))}
-          <div className="mobile-wallet-connect">
+          <div className="mobile-header-actions">
             <ConnectButton />
           </div>
-        </nav>
-      )}
+        </div>
+      </nav>
 
       <main className="app-main">
         <div className="container">
