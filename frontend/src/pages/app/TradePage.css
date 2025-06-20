@@ -17,6 +17,12 @@
   align-items: center;
 }
 
+@media (max-width: 768px) {
+    .trade-container {
+        grid-template-columns: 1fr;
+    }
+}
+
 .trade-widget h3, .pool-panel h3, .liquidity-form h3 {
   font-size: 1.25rem;
   margin-top: 0;
