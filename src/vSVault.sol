@@ -18,32 +18,47 @@ import {MockSonicNFT} from "../test/MockSonicNFT.sol";
  */
 contract vSVault is ERC721Holder, Ownable {
     vSToken public immutable vsToken;
-    address public immutable sonicNFT;
+    address public sonicNFT;
     address public immutable underlyingToken; // The actual token being vested, e.g. SONIC
 
     // Keep track of all NFTs held by the vault to claim from them
     uint256[] public heldNFTs;
 
+    // 5 Basis Points (0.05%) as a keeper reward
+    uint256 public constant KEEPER_INCENTIVE_BPS = 5;
+
     /// @notice Emitted when an NFT is deposited and vS is minted
     event NFTDeposited(address indexed user, uint256 indexed nftId, uint256 amountMinted);
     /// @notice Emitted when the vault claims vested tokens from the fNFTs
-    event VestedTokensClaimed(address indexed caller, uint256 amount);
+    event VestedTokensClaimed(address indexed caller, uint256 totalAmount, uint256 incentivePaid);
     /// @notice Emitted when a user redeems vS for the underlying token
     event Redeemed(address indexed user, uint256 vsAmount, uint256 underlyingAmount);
+    /// @notice Emitted when the owner sets the fNFT contract address
+    event NFTContractSet(address indexed nftContract);
 
     /**
      * @param _vsToken The address of the vS token contract.
-     * @param _sonicNFT The address of the Sonic vesting NFT contract.
      * @param _underlyingToken The address of the underlying asset being vested (e.g., SONIC).
      */
     constructor(
         address _vsToken,
-        address _sonicNFT,
         address _underlyingToken
     ) Ownable(msg.sender) {
         vsToken = vSToken(_vsToken);
-        sonicNFT = _sonicNFT;
         underlyingToken = _underlyingToken;
+    }
+
+    /**
+     * @notice Sets the official fNFT contract address.
+     * @dev Can only be called once by the owner. This is a critical security step
+     * to ensure the vault only ever interacts with a verified, audited fNFT contract.
+     * @param _sonicNFT The address of the Sonic vesting NFT contract.
+     */
+    function setNFTContract(address _sonicNFT) external onlyOwner {
+        require(sonicNFT == address(0), "NFT contract already set");
+        require(_sonicNFT != address(0), "NFT contract cannot be zero address");
+        sonicNFT = _sonicNFT;
+        emit NFTContractSet(_sonicNFT);
     }
 
     /**
@@ -52,6 +67,7 @@ contract vSVault is ERC721Holder, Ownable {
      * @param nftId The ID of the Sonic NFT to deposit.
      */
     function deposit(uint256 nftId) external {
+        require(sonicNFT != address(0), "NFT contract not set");
         // 1. Take ownership of the NFT
         IERC721(sonicNFT).safeTransferFrom(msg.sender, address(this), nftId);
         heldNFTs.push(nftId);
@@ -94,9 +110,13 @@ contract vSVault is ERC721Holder, Ownable {
         }
 
         // The MockSonicNFT is responsible for transferring the `underlyingToken` to this vault.
-        // This call confirms that the vault has received the tokens.
-        // A real implementation would need robust checks here.
-        emit VestedTokensClaimed(msg.sender, totalClaimed);
+        // We now pay the keeper a small incentive from the claimed amount.
+        uint256 incentiveAmount = (totalClaimed * KEEPER_INCENTIVE_BPS) / 10_000;
+        if (incentiveAmount > 0) {
+            IERC20(underlyingToken).transfer(msg.sender, incentiveAmount);
+        }
+
+        emit VestedTokensClaimed(msg.sender, totalClaimed, incentiveAmount);
     }
     
     /**
