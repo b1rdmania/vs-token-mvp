@@ -30,20 +30,26 @@ Redeem – when vest hits 100 %, user burns vS to withdraw remaining S (early re
 ### [PenaltyCurveLib.sol](https://github.com/b1rdmania/vs-token-mvp/blob/main/src/PenaltyCurveLib.sol)
 - Pure library replicating Sonic's linear burn formula for early exits
 
-## 5. Decentralized & Battle-Hardened Architecture
+## 5. Deep DeFi Composability & The Flywheel Effect
+`vS` is more than a liquid token; it's a foundational building block for the Sonic ecosystem. By converting locked fNFTs into a standard, permissionless ERC-20, vS Vault unlocks immediate composability with other DeFi protocols.
+
+- **Lending & Borrowing:** `vS` can be listed as collateral on lending markets, allowing users to borrow against their vesting assets without selling.
+- **Yield Aggregation:** Vaults and yield aggregators can build strategies on top of the core `vS`/`S` liquidity pool.
+- **The Flywheel Engine: The `vS`/`S` Pool:** The heart of this ecosystem will be a deeply liquid `vS`/`S` pool, launching on our strategic partner, **Shadow DEX**. A significant portion of protocol incentives will be directed to this pool, creating a powerful flywheel:
+    1. High incentives attract LPs.
+    2. Deep liquidity ensures a tight price peg and low slippage for traders.
+    3. Reliable liquidity makes `vS` a trustworthy collateral asset across DeFi, driving more demand.
+    4. Increased utility and demand for `vS` encourages more fNFT holders to deposit, further deepening liquidity.
+
+This model transforms static, vesting assets into a dynamic engine for ecosystem-wide liquidity and growth.
+
+## 6. Decentralized & Battle-Hardened Architecture
 The vS Vault is engineered for maximum uptime, security, and transparency, removing all centralized points of failure.
 
 - **Immutable by Design:** The core contracts are non-upgradeable. The code deployed is final, ensuring predictable behavior and removing administrative risk.
 - **Reliable Automation via Keepers:** The daily `auto-stream` function is not run from a private server. It is driven by a decentralized automation network (e.g., Chainlink Automation) that guarantees execution.
 - **Public Incentivization:** As a backstop, the `auto-stream` function includes a gas incentive, making it profitable for any public user or bot to trigger it. This ensures the protocol is self-healing and perpetually live.
 - **Transparent Data via Subgraph:** All data for the user interface is indexed from on-chain events via a public Subgraph. This guarantees that what you see is a direct and verifiable reflection of on-chain reality.
-
-## 6. Fee Model (governance-tunable)
-- 0.15 % on mint
-- 0.15 % on burn
-- 0.05 % swap fee share from the vS/S pool
-- Optional 10 % skim on compounded yield
-- All fees: 50 % to LP gauge, 30 % to protocol treasury, 20 % to automatic $S buy-and-burn (default split).
 
 ## 7. Security & Audits
 - Built with [OpenZeppelin templates](https://github.com/b1rdmania/vs-token-mvp/tree/main/lib/openzeppelin-contracts/contracts), no owner functions, no upgradeability in V1
