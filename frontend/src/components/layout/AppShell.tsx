@@ -1,4 +1,5 @@
-import { NavLink, Routes, Route, Navigate, Link } from 'react-router-dom';
+import React from 'react';
+import { NavLink, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { DepositPage } from '../../pages/app/DepositPage';
 import { DashboardPage } from '../../pages/app/DashboardPage';
@@ -8,7 +9,18 @@ import { ActivityPage } from '../../pages/app/ActivityPage';
 import { RedeemPage } from '../../pages/app/RedeemPage';
 import './AppShell.css';
 
-export const AppShell = () => {
+const navLinks = [
+  { path: '/app/deposit', label: 'Deposit' },
+  { path: '/app/redeem', label: 'Redeem' },
+  { path: '/app/dashboard', label: 'Dashboard' },
+  { path: '/app/trade', label: 'Trade' },
+  { path: '/app/pool', label: 'Pool' },
+  { path: '/app/activity', label: 'Protocol Activity' },
+];
+
+export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const location = useLocation();
+
   return (
     <div className="app-shell">
       <header className="app-header">
@@ -24,12 +36,11 @@ export const AppShell = () => {
       </header>
       <nav className="app-nav">
         <div className="container">
-          <NavLink to="/app/deposit">Deposit</NavLink>
-          <NavLink to="/app/dashboard">Dashboard</NavLink>
-          <NavLink to="/app/trade">Trade</NavLink>
-          <NavLink to="/app/pool">Pool</NavLink>
-          <NavLink to="/app/activity">Protocol Activity</NavLink>
-          <NavLink to="/app/redeem">Redeem</NavLink>
+          {navLinks.map((link) => (
+            <NavLink key={link.path} to={link.path}>
+              {link.label}
+            </NavLink>
+          ))}
         </div>
       </nav>
       <main className="app-main">
