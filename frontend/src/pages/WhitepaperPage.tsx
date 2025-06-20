@@ -44,18 +44,18 @@ export const WhitepaperPage: React.FC = () => {
 
           <section>
             <h2>4. Smart-Contract Anatomy</h2>
-            <h3>vSVault.sol</h3>
+            <h3><a href="https://github.com/b1rdmania/vs-token-mvp/blob/main/src/vSVault.sol" target="_blank" rel="noopener noreferrer">vSVault.sol</a></h3>
             <ul>
               <li>ERC-4626 compliant, owns all fNFTs</li>
               <li>Reads vesting schedule, tracks claimable S</li>
               <li>Auto-stream function anyone can trigger (gas refund)</li>
             </ul>
-            <h3>vSToken.sol</h3>
+            <h3><a href="https://github.com/b1rdmania/vs-token-mvp/blob/main/src/vSToken.sol" target="_blank" rel="noopener noreferrer">vSToken.sol</a></h3>
             <ul>
               <li>ERC-20 with EIP-2612 permits</li>
               <li>Mint / burn controlled by the Vault only</li>
             </ul>
-            <h3>PenaltyCurveLib.sol</h3>
+            <h3><a href="https://github.com/b1rdmania/vs-token-mvp/blob/main/src/PenaltyCurveLib.sol" target="_blank" rel="noopener noreferrer">PenaltyCurveLib.sol</a></h3>
             <ul>
               <li>Pure library replicating Sonic's linear burn formula for early exits</li>
             </ul>
@@ -75,7 +75,7 @@ export const WhitepaperPage: React.FC = () => {
           <section>
             <h2>6. Security & Audits</h2>
             <ul>
-              <li>Built with OpenZeppelin templates, no owner functions, no upgradeability in V1</li>
+              <li>Built with <a href="https://github.com/b1rdmania/vs-token-mvp/tree/main/lib/openzeppelin-contracts/contracts" target="_blank" rel="noopener noreferrer">OpenZeppelin templates</a>, no owner functions, no upgradeability in V1</li>
               <li>Audit booked with BlockSec, report live before airdrop launch (1 Jul 2025)</li>
               <li>$25 k Immunefi bug bounty live from testnet day-one</li>
             </ul>
@@ -103,7 +103,7 @@ export const WhitepaperPage: React.FC = () => {
           
           <section>
             <h2>9. Get Involved</h2>
-            <p>Seed liquidity, integrate <code>vS</code> in your dApp, or review the code.</p>
+            <p>Seed liquidity, integrate <code>vS</code> in your dApp, or <a href="https://github.com/b1rdmania/vs-token-mvp" target="_blank" rel="noopener noreferrer">review the code</a>.</p>
           </section>
         </div>
       </main>
