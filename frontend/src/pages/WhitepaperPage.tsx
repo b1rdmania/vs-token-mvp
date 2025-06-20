@@ -62,7 +62,18 @@ export const WhitepaperPage: React.FC = () => {
           </section>
 
           <section>
-            <h2>5. Fee Model (governance-tunable)</h2>
+            <h2>5. Decentralized &amp; Battle-Hardened Architecture</h2>
+            <p>The vS Vault is engineered for maximum uptime, security, and transparency, removing all centralized points of failure.</p>
+            <ul>
+                <li><strong>Immutable by Design:</strong> The core contracts are non-upgradeable. The code deployed is final, ensuring predictable behavior and removing administrative risk.</li>
+                <li><strong>Reliable Automation via Keepers:</strong> The daily <code>auto-stream</code> function is not run from a private server. It is driven by a decentralized automation network (e.g., Chainlink Automation) that guarantees execution.</li>
+                <li><strong>Public Incentivization:</strong> As a backstop, the <code>auto-stream</code> function includes a gas incentive, making it profitable for any public user or bot to trigger it. This ensures the protocol is self-healing and perpetually live.</li>
+                <li><strong>Transparent Data via Subgraph:</strong> All data for the user interface is indexed from on-chain events via a public Subgraph. This guarantees that what you see is a direct and verifiable reflection of on-chain reality.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>6. Fee Model (governance-tunable)</h2>
             <ul>
               <li>0.15 % on mint</li>
               <li>0.15 % on burn</li>
@@ -73,7 +84,7 @@ export const WhitepaperPage: React.FC = () => {
           </section>
           
           <section>
-            <h2>6. Security & Audits</h2>
+            <h2>7. Security &amp; Audits</h2>
             <ul>
               <li>Built with <a href="https://github.com/b1rdmania/vs-token-mvp/tree/main/lib/openzeppelin-contracts/contracts" target="_blank" rel="noopener noreferrer">OpenZeppelin templates</a>, no owner functions, no upgradeability in V1</li>
               <li>Audit booked with BlockSec, report live before airdrop launch (1 Jul 2025)</li>
@@ -82,7 +93,7 @@ export const WhitepaperPage: React.FC = () => {
           </section>
           
           <section>
-            <h2>7. Economic Impact for Sonic</h2>
+            <h2>8. Economic Impact for Sonic</h2>
             <ul>
               <li>Deep <code>vS</code>/S liquidity absorbs airdrop sell pressure</li>
               <li>Locked capital becomes TVL, boosting headline metrics</li>
@@ -92,7 +103,7 @@ export const WhitepaperPage: React.FC = () => {
           </section>
           
           <section>
-            <h2>8. Launch Parameters (testnet → mainnet)</h2>
+            <h2>9. Launch Parameters (testnet → mainnet)</h2>
             <ul>
               <li>Testnet beta: contracts live, subgraph indexing, UI functional</li>
               <li>Mainnet launch target: 1 Jul 2025 (before Season-1 claim portal opens)</li>
@@ -102,7 +113,7 @@ export const WhitepaperPage: React.FC = () => {
           </section>
           
           <section>
-            <h2>9. Get Involved</h2>
+            <h2>10. Get Involved</h2>
             <p>Seed liquidity, integrate <code>vS</code> in your dApp, or <a href="https://github.com/b1rdmania/vs-token-mvp" target="_blank" rel="noopener noreferrer">review the code</a>.</p>
           </section>
         </div>

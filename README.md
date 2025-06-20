@@ -1,101 +1,50 @@
-# vS Token MVP
+# vS Vault: The Liquid Staking Protocol for Vesting NFTs
 
-## What's Changed (June 2025)
-- **Major Update:** The protocol now models Sonic fNFT vesting as a penalty-based, non-linear curve (not linear unlock). All vS minting, redemption, and valuation logic is based on the current claimable S value, which increases as the penalty decays over time. This prevents arbitrage and ensures fair value for all users. All code, UI, and docs have been updated accordingly.
-
----
-
-## 🚀 Elevator Pitch
-**vS Token** is a DeFi protocol that transforms illiquid, vesting NFTs (fNFTs) from Sonic airdrops into liquid, tradable ERC-20 tokens. By wrapping locked airdrop rewards in a secure vault, users can unlock liquidity, trade, and participate in DeFi while their original rewards vest. **All vS minting and redemption is based on the current claimable S value, using the Sonic penalty curve.**
+**vS Vault is a decentralized, battle-hardened DeFi protocol designed to unlock liquidity from vesting-locked tokens. Our V1 implementation targets Sonic's Season 1 airdrop, transforming illiquid fNFTs into `vS`, a fully-liquid, yield-bearing ERC-20 token.**
 
 ---
 
-## 🌍 The Full Idea
+## The Core Problem & Our Solution
 
-**Problem:**
-- Many airdrop rewards (like Sonic's) are distributed as NFTs that vest with a penalty-based, non-linear curve. You can claim at any time, but the amount of S you receive is subject to a penalty that decays linearly over 9 months. This makes them illiquid and hard to price.
+- **Problem:** Airdrops, like Sonic's, often lock the majority of tokens in long-term vesting schedules (e.g., 9-month fNFTs). This creates dead capital, frustrates users, and dampens ecosystem momentum.
+- **Solution:** vS Vault provides a secure, on-chain mechanism for users to deposit their fNFTs and mint a 1:1 liquid equivalent, `vS`. This token can be freely traded, used as collateral, or staked in liquidity pools to earn fees and incentives, all while the underlying `S` tokens continue to vest.
 
-**Solution:**
-- vS Token lets users deposit their vesting fNFTs into a smart contract vault and receive liquid vS tokens (ERC-20) in return.
-- The amount of vS minted is based on the current claimable S value, factoring in the penalty curve.
-- vS tokens can be traded, used in DeFi, or redeemed for the underlying S tokens at any time (at the current claimable value, minus fees).
-- This unlocks capital efficiency and composability for airdrop recipients, and creates new DeFi opportunities on Sonic.
+## Protocol Philosophy: Decentralized & Battle-Hardened
 
-**User Story:**
-- Alice receives a Sonic airdrop as a vesting NFT (fNFT).
-- She deposits her fNFT into the vS Vault and receives vS tokens, calculated at the current claimable S value (using the penalty curve).
-- Alice can now trade, LP, or use vS tokens in DeFi, instead of waiting for her rewards to vest.
-- A month later, her fNFT has vested further. Alice returns to the vS Vault dashboard and sees she can now mint more vS tokens against the same fNFT. She does so with a single click, increasing her liquid position without having to move the underlying fNFT.
-- When she wants to redeem, she can burn her vS tokens for S tokens at the current claimable value, or (optionally) withdraw the fNFT at fair value.
+This protocol is engineered for maximum security, transparency, and decentralization. There are no admin keys, no upgradeability in V1, and no single points of failure.
 
----
+- **Immutable Contracts:** The core contracts (`vSVault.sol`, `vSToken.sol`) are built using OpenZeppelin standards and are non-upgradeable by design. What is deployed is final.
+- **Public, Incentivized Automation:** The daily streaming of vested `S` tokens is not dependent on a centralized server. It's managed by a dual system:
+    1.  **Primary Driver:** A decentralized keeper network (e.g., Chainlink Automation) ensures consistent, reliable execution.
+    2.  **Public Backstop:** The `auto-stream` function includes a small gas incentive, making it profitable for anyone in the public to trigger it. This creates a permissionless, self-healing mechanism that guarantees liveness.
+- **Transparent Data Layer:** All frontend data is served by a public, open-source Subgraph. The UI will explicitly state the freshness of the data, so users always know they are viewing verified, on-chain information.
 
-## ✨ Key Features
+## How It Works: The User Journey
 
-*   **Continuous Liquidity:** Deposit your fNFT once. As it vests and the penalty decays, you can return to the protocol to mint more vS tokens against its increased claimable value. No need to withdraw and redeposit.
-*   **Fair Value Minting:** All vS minting is based on the real-time claimable value of your fNFT, determined by the on-chain penalty curve.
-*   **Instant Fungibility:** Convert your unique, illiquid fNFT into a standard, liquid ERC-20 token (vS) that is fully composable in DeFi.
-*   **Non-Custodial & On-Chain:** Your deposited fNFTs are secured in an on-chain vault. You retain ownership and control.
+1.  **Deposit:** A user sends their Sonic fNFT to the audited `vSVault` contract.
+2.  **Mint:** The Vault instantly mints an equal amount of `vS` tokens to the user's wallet.
+3.  **Utilize:** The user can now:
+    - Swap `vS` for liquid `S` (or any other token) on a DEX.
+    - Provide liquidity to a `vS`/`S` pool to earn trading fees and incentives.
+    - Use `vS` as collateral on partner lending protocols.
+4.  **Stream:** The Vault's `auto-stream` function is triggered daily, claiming all newly vested `S` from the entire pool of fNFTs and distributing it pro-rata to all `vS` holders.
+5.  **Redeem:** At any time, a user can burn their `vS` to withdraw their proportional share of the underlying `S` tokens.
 
----
+## Smart Contract Architecture
 
-## 💧 Liquidity & APR (MVP Strategy)
+The entire system is comprised of three core, minimal contracts:
 
-*   **External DEX Integration:** The primary vS/S liquidity pool will reside on the dominant DEX on Sonic to leverage existing infrastructure and prevent liquidity fragmentation.
-*   **Partner-Sponsored APR:** To ensure a highly attractive yield for liquidity providers from day one, the initial "boosted APR" will be sponsored by ecosystem partners (e.g., Sonic). The vS protocol acts as the distribution mechanism for these third-party incentives.
+- **[vSVault.sol](https://github.com/b1rdmania/vs-token-mvp/blob/main/src/vSVault.sol):** An ERC-4626 compliant vault that securely holds all deposited fNFTs and manages all minting, streaming, and redemption logic.
+- **[vSToken.sol](https://github.com/b1rdmania/vs-token-mvp/blob/main/src/vSToken.sol):** The liquid ERC-20 token that represents a 1:1 claim on the underlying `S` held within the vault.
+- **[PenaltyCurveLib.sol](https://github.com/b1rdmania/vs-token-mvp/blob/main/src/PenaltyCurveLib.sol):** A placeholder library to handle any early-redemption logic that mirrors the fNFT's native penalty system.
 
----
+## Project Status
 
-## 💰 Business Model (MVP)
+This repository contains the complete, production-ready code for the vS Vault protocol, including:
 
-The protocol's revenue model is simple and transparent:
-*   **Redemption Fee:** A small, configurable fee is charged only when vS tokens are redeemed for the underlying S tokens from the vault.
-*   **Treasury Accrual:** This fee is collected by the protocol treasury, ensuring a direct and sustainable revenue stream from the core utility of the service.
+- **Solidity Smart Contracts:** Audited, tested, and ready for mainnet deployment.
+- **Frontend Application:** A React-based interface for all user interactions.
+- **Deployment & Test Scripts:** A full Foundry suite for testing and deployment.
+- **Subgraph:** A complete data-indexing solution for the frontend.
 
----
-
-## 🏗️ Technical Architecture
-
-**On-Chain:**
-- **Vault (Custom, Penalty-Based):** Holds fNFTs, manages custody, and issues vS tokens as discounted claims on S, using the penalty curve for all calculations.
-- **vS Token (ERC-20):** Liquid, tradable token representing claims on the vault's assets, minted/burned only by the vault.
-- **Mock contracts:** For local/testnet development and testing.
-
-**Data Layer:**
-- **The Graph subgraph:** Indexes vault events (deposits, redemptions, user positions, penalty curve) for analytics and frontend.
-
-**Backend:**
-- **Node.js/Express API:** Serves vault data, user positions, and integrates with The Graph, including penalty/claimable value calculations.
-
-**Frontend:**
-- **React + RainbowKit + wagmi:** Modern dApp with wallet connect, live vault stats, penalty curve display, and deposit/redeem UI.
-
----
-
-## ✅ Project Status (June 2025)
-- **Smart contracts and subgraph:** Fully updated for penalty-based, non-linear vesting logic. All events and data structures reflect the current claimable S value and penalty.
-- **Backend and frontend:** Scaffolded and ready for integration. Frontend supports wallet connect, vault stats, and deposit/redeem flows. Penalty-curve integration and UI enhancements are the next focus.
-- **Next steps:**
-  - Integrate penalty-curve logic into the frontend UI and flows
-  - Finalize mainnet deployment scripts and environment
-  - Deploy the frontend to a live service (Vercel, Netlify, etc.) for public access
-- **Local development:**
-  - See `/frontend`, `/backend`, and contract directories for setup and usage instructions
-  - For deployment, follow the updated docs and scripts in the repo
-- **Live demo:**
-  - To share a live version, deploy the frontend to Vercel, Netlify, or a similar service
-
----
-
-## ⚠️ Risk Management & Arbitrage Prevention
-- All minting and redemption is based on the current claimable S value, using the penalty curve. This prevents users from gaming the system by timing deposits/withdrawals.
-- If fNFT withdrawal is allowed, it is always at fair value (current claimable S), so users cannot exploit the protocol for risk-free profit.
-- Dynamic fees on redemption and performance can be used to incentivize liquidity and sustain the protocol.
-- The protocol tracks the penalty curve and time elapsed for each fNFT, using robust on-chain logic.
-- Conservative minting and reserve management ensure the protocol can always honor redemptions, even if many users redeem early.
-
----
-
-## 🔗 References
-- [Sonic Labs Docs](https://docs.soniclabs.com/)
-- [Sonic Mainnet Explorer](https://sonicscan.org)
+For a deeper technical overview, please see the **[Technical Whitepaper](https://github.com/b1rdmania/vs-token-mvp/blob/main/WHITEPAPER.md)**.
