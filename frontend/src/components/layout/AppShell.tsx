@@ -18,6 +18,12 @@ const navLinks = [
   { path: '/app/activity', label: 'Protocol Activity' },
 ];
 
+const navLinkStyles = ({ isActive }: { isActive: boolean }) => ({
+  borderBottom: isActive ? '2px solid #0d6efd' : '2px solid transparent',
+  color: isActive ? '#0d6efd' : '#212529',
+  fontWeight: isActive ? '700' : '500',
+});
+
 export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
 
@@ -37,7 +43,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
       <nav className="app-nav">
         <div className="container">
           {navLinks.map((link) => (
-            <NavLink key={link.path} to={link.path}>
+            <NavLink key={link.path} to={link.path} style={navLinkStyles}>
               {link.label}
             </NavLink>
           ))}
