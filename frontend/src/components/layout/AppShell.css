@@ -73,4 +73,10 @@
 .app-main {
   flex-grow: 1;
   padding: 2.5rem 0;
+}
+
+.app-main .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
 } 
