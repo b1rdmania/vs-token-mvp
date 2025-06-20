@@ -70,11 +70,11 @@ export const DashboardPage: React.FC = () => {
 
       <div className="claim-panel">
         <div>
-          <label>Unlocked today</label>
-          <span>{data.unlockedToday.toLocaleString()} S</span>
+          <label>Mintable vS</label>
+          <span>{data.unlockedToday.toLocaleString()} vS</span>
         </div>
         <button className="button-primary" disabled={data.unlockedToday <= 0}>
-          Claim
+          Mint vS
         </button>
       </div>
     </div>
