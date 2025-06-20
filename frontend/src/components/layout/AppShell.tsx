@@ -21,8 +21,8 @@ const navLinks = [
 
 const navLinkStyles = ({ isActive }: { isActive: boolean }) => ({
   borderBottom: isActive ? '2px solid #0d6efd' : '2px solid transparent',
-  color: isActive ? '#0d6efd' : '#212529',
-  fontWeight: isActive ? '700' : '500',
+  color: isActive ? '#0d6efd' : '#6c757d',
+  fontWeight: '500',
 });
 
 export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
