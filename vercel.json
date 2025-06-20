@@ -7,11 +7,5 @@
         "distDir": "frontend/dist"
       }
     }
-  ],
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/frontend/$1"
-    }
   ]
 } 
