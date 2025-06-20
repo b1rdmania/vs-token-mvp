@@ -1,0 +1,80 @@
+.redeem-page {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.warning-banner {
+  background-color: #FFFBEB; /* Yellow-50 */
+  color: #B45309; /* Yellow-700 */
+  padding: 1rem 1.5rem;
+  border-radius: 16px;
+  border: 1px solid #FDE68A; /* Yellow-200 */
+  margin-bottom: 1.5rem;
+}
+.warning-banner p {
+  margin: 0;
+}
+
+.redeem-form h3 {
+  font-size: 1.25rem;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+}
+
+.redeem-input-container {
+  margin-bottom: 1.5rem;
+}
+.redeem-input-container > label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+.redeem-input-container > span {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  margin-left: 0.5rem;
+}
+
+.redeem-input {
+  display: flex;
+  background-color: #F7F9FC;
+  border-radius: 8px;
+  padding: 0.5rem;
+}
+.redeem-input input {
+  flex-grow: 1;
+  border: none;
+  background: transparent;
+  font-size: 1.5rem;
+  outline: none;
+  width: 100%;
+}
+.max-button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0 1rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.redeem-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #EAECEF;
+  margin-bottom: 1.5rem;
+}
+.redeem-summary > div {
+  display: flex;
+  justify-content: space-between;
+}
+.redeem-summary label {
+  opacity: 0.7;
+}
+.redeem-summary span {
+  font-weight: 600;
+} 

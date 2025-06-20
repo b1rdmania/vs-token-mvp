@@ -1,0 +1,146 @@
+.landing-page .hero-section {
+  text-align: center;
+  padding: 6rem 0;
+}
+
+.hero-section .container {
+  text-align: center;
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+}
+
+.hero-title {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+}
+
+.hero-subtitle {
+  max-width: 65ch;
+  margin: 0 auto 2rem auto;
+  font-size: 1.125rem;
+  line-height: 1.6;
+}
+
+.hero-cta {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 3rem;
+}
+
+.button-primary, .button-secondary {
+  padding: 0.875rem 1.75rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.button-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+.button-primary:hover {
+  opacity: 0.9;
+}
+
+.button-secondary {
+  background-color: transparent;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+}
+.button-secondary:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.button-hero {
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+}
+
+.hero-visual {
+  margin-top: 3rem;
+}
+
+.hero-visual img {
+  max-width: 100%;
+  border-radius: 8px;
+}
+
+.features-section {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  padding: 4rem 0;
+  text-align: center;
+  background-color: #F7F9FC;
+}
+
+.feature-card {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 16px;
+  border: 1px solid #EAECEF;
+}
+.feature-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.feature-card p {
+  line-height: 1.6;
+  opacity: 0.8;
+}
+
+.partner-banner {
+  text-align: center;
+  padding: 2rem;
+  background-color: white;
+  border-radius: 16px;
+  margin: 4rem 0;
+  border: 1px solid #EAECEF;
+}
+
+.footer {
+  padding: 2rem 0;
+  border-top: 1px solid #EAECEF;
+  margin-top: 4rem;
+}
+.footer .container {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+}
+.footer a {
+  color: var(--secondary-color);
+  opacity: 0.8;
+  text-decoration: none;
+}
+.footer a:hover {
+  opacity: 1;
+}
+
+.github-cta-section {
+  background-color: white;
+  padding: 4rem 0;
+  text-align: center;
+  border-top: 1px solid #EAECEF;
+}
+
+.github-cta-section h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.github-cta-section p {
+  margin-bottom: 2rem;
+  opacity: 0.8;
+}
+
+.landing-footer {
+  background-color: #F7F9FC;
+  padding: 2rem 0;
+} 

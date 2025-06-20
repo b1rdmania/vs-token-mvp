@@ -1,34 +1,46 @@
-import React from "react";
-import { createConfig, WagmiConfig } from "wagmi";
-import { sepolia } from "wagmi/chains";
-import { http } from "wagmi/transport";
-import { RainbowKitProvider, getDefaultWallets } from "@rainbow-me/rainbowkit";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { WagmiProvider, createConfig, http } from 'wagmi';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { RainbowKitProvider, getDefaultWallets } from '@rainbow-me/rainbowkit';
+import { sonicTestnet } from './config/chains';
+import { AppShell } from './components/layout/AppShell';
+import { LandingPage } from './pages/LandingPage';
 import '@rainbow-me/rainbowkit/styles.css';
-import './App.css';
-import { Dashboard } from "./components/Dashboard";
 
-const { wallets } = getDefaultWallets({
-  appName: "vS Token MVP",
-  projectId: "vs-token-mvp",
-  chains: [sepolia],
-});
+const projectId = import.meta.env.VITE_PROJECT_ID;
+
+if (!projectId) {
+  // In a real app, you might render a fallback UI here.
+  // For this MVP, throwing an error is sufficient to identify the configuration issue.
+  throw new Error("VITE_PROJECT_ID is not set. Please add it to your .env file or Vercel project settings.");
+}
+
+const { wallets } = getDefaultWallets();
 
 const config = createConfig({
-  chains: [sepolia],
+  wallets,
+  chains: [sonicTestnet],
   transports: {
-    [sepolia.id]: http(),
+    [sonicTestnet.id]: http(),
   },
   ssr: true,
 });
 
-function App() {
+const queryClient = new QueryClient();
+
+export function App() {
   return (
-    <WagmiConfig config={config}>
-      <RainbowKitProvider chains={[sepolia]}>
-        <Dashboard />
-      </RainbowKitProvider>
-    </WagmiConfig>
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <RainbowKitProvider>
+          <Router>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/app/*" element={<AppShell />} />
+            </Routes>
+          </Router>
+        </RainbowKitProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 }
-
-export default App;

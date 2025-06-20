@@ -1,0 +1,76 @@
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-header {
+  background-color: white;
+  border-bottom: 1px solid #EAECEF;
+  padding: 1rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--secondary-color);
+  text-decoration: none;
+}
+
+.beta-badge {
+  background-color: var(--accent-color);
+  color: var(--secondary-color);
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.app-nav {
+  background-color: #F7F9FC;
+  border-bottom: 1px solid #EAECEF;
+}
+
+.app-nav .container {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.app-nav a {
+  padding: 1rem 0.25rem;
+  color: #6B7280;
+  text-decoration: none;
+  font-weight: 600;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.app-nav a:hover {
+  color: var(--secondary-color);
+}
+
+.app-nav a.active {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+}
+
+.app-main {
+  flex-grow: 1;
+  padding: 2.5rem 0;
+} 
