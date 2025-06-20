@@ -17,7 +17,7 @@ The vS Vault operates on a simple, robust, and irreversible flow:
 
 **Trade / LP** – The user's `vS` tokens are a standard ERC-20, immediately usable across the DeFi ecosystem. They can be traded, provided as liquidity, or used as collateral.
 
-**Claim Vested (Battle-Hardened)** – The Vault exposes a public `claimVested` function. This function can be called by anyone (typically an automated keeper) to instruct the Vault to harvest all available underlying `S` tokens from the fNFTs it holds. To ensure scalability and prevent out-of-gas errors, this function operates on batches of NFTs.
+**Claim Vested (Battle-Hardened)** – The Vault exposes a public `claimVested` function. This function can be called by anyone (typically an automated keeper) to instruct the Vault to harvest all available underlying `S` tokens from the fNFTs it holds. To ensure scalability and prevent out-of-gas errors, this function operates on batches of NFTs. To guarantee liveness, the function also includes a protocol-level incentive, rewarding the caller with a small percentage of the vested tokens they successfully harvest.
 
 **Redeem** – At any time, a user can burn their `vS` tokens. In exchange, they receive a proportional share of all the underlying `S` tokens currently held by the Vault. This is the primary mechanism for realizing the underlying value.
 
@@ -26,8 +26,9 @@ The architecture is designed for security, simplicity, and scalability.
 
 ### [vSVault.sol](https://github.com/b1rdmania/vs-token-mvp/blob/main/src/vSVault.sol)
 - The core logic contract that permanently custodies all deposited fNFTs.
+- Deployed with a two-step initialization process for enhanced security: the owner first deploys the vault, then makes a separate, deliberate transaction to set the trusted fNFT contract address.
 - Mints `vS` tokens 1:1 against the total future value of a deposited fNFT.
-- Features a gas-efficient, batchable `claimVested` function to allow keepers to harvest vested tokens without hitting block gas limits.
+- Features a gas-efficient, batchable `claimVested` function to allow keepers to harvest vested tokens without hitting block gas limits. It also includes a built-in incentive to reward callers, creating a permissionless and self-sustaining automation layer.
 - Manages the redemption process, allowing `vS` holders to burn their tokens for a proportional share of the underlying asset.
 
 ### [vSToken.sol](https://github.com/b1rdmania/vs-token-mvp/blob/main/src/vSToken.sol)

@@ -14,7 +14,7 @@
 This protocol is engineered for maximum security, transparency, and decentralization. There are no admin keys, no upgradeability in V1, and no single points of failure.
 
 - **Immutable Contracts:** The core contracts (`vSVault.sol`, `vSToken.sol`) are built using OpenZeppelin standards and are non-upgradeable by design. What is deployed is final.
-- **Public, Incentivized Automation:** The harvesting of vested `S` tokens is not dependent on a centralized server. It's managed by a public, batchable `claimVested` function that can be called by anyone. This makes it ideal for decentralized keepers (like Chainlink Automation) and ensures the process is scalable and will never fail due to high gas costs.
+- **Public, Incentivized Automation:** The harvesting of vested `S` tokens is not dependent on a centralized server. It's managed by a public, batchable `claimVested` function that can be called by anyone. This makes it ideal for decentralized keepers (like Chainlink Automation) and ensures the process is scalable and will never fail due to high gas costs. A small, protocol-level incentive is paid to the caller, creating a truly permissionless and self-sustaining system.
 - **Transparent Data Layer:** All frontend data is served by a public, open-source Subgraph. The UI will explicitly state the freshness of the data, so users always know they are viewing verified, on-chain information.
 
 ## How It Works: The User Journey
@@ -25,14 +25,14 @@ This protocol is engineered for maximum security, transparency, and decentraliza
     - **Earn Deep Yield:** Provide liquidity to the incentivized `vS`/`S` pool to earn trading fees and rewards.
     - **Borrow Against Future Value:** Use `vS` as collateral on partner lending markets.
     This composability is the core of the **vS Flywheel**, turning locked assets into an engine for ecosystem-wide liquidity and growth.
-4.  **Claim Vested:** The Vault's public `claimVested` function is triggered periodically by a keeper, harvesting all newly vested `S` from the entire pool of fNFTs and storing them within the vault.
+4.  **Claim Vested:** The Vault's public `claimVested` function is triggered periodically by a keeper, harvesting all newly vested `S` from the entire pool of fNFTs and storing them within the vault. A small percentage of the harvested tokens is paid to the keeper as a reward, ensuring reliable operation.
 5.  **Redeem:** At any time, a user can burn their `vS` to withdraw their proportional share of the underlying `S` tokens held inside the vault.
 
 ## Smart Contract Architecture
 
 The entire system is comprised of two core, minimal contracts:
 
-- **[vSVault.sol](https://github.com/b1rdmania/vs-token-mvp/blob/main/src/vSVault.sol):** The core logic contract. It permanently custodies all deposited fNFTs and manages all minting and redemption logic. Its `claimVested` function is designed to be scalable and gas-efficient.
+- **[vSVault.sol](https://github.com/b1rdmania/vs-token-mvp/blob/main/src/vSVault.sol):** The core logic contract. It permanently custodies all deposited fNFTs and manages all minting and redemption logic. It is deployed using a safer two-step process where the trusted fNFT contract is set in a separate transaction. Its `claimVested` function is designed to be scalable, gas-efficient, and includes a built-in incentive to create a self-sustaining keeper ecosystem.
 - **[vSToken.sol](https://github.com/b1rdmania/vs-token-mvp/blob/main/src/vSToken.sol):** A standard OpenZeppelin ERC-20 token whose mint/burn functions are exclusively controlled by the `vSVault` contract.
 
 ## Technical Implementation Roadmap

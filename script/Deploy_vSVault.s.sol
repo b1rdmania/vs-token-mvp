@@ -28,13 +28,16 @@ contract Deploy_vSVault is Script {
         mockSToken.approve(address(mockSonicNFT), initialFunding);
         mockSonicNFT.fund(initialFunding);
         
-        // 5. Deploy vSVault, linking all contracts
-        vSVault vault = new vSVault(address(vsToken), address(mockSonicNFT), address(mockSToken));
+        // 5. Deploy vSVault
+        vSVault vault = new vSVault(address(vsToken), address(mockSToken));
 
-        // 6. Grant minting/burning rights from vSToken to the Vault
+        // 6. Set the trusted NFT contract on the vault
+        vault.setNFTContract(address(mockSonicNFT));
+
+        // 7. Grant minting/burning rights from vSToken to the Vault
         vsToken.transferOwnership(address(vault));
 
-        // 7. Mint a test NFT to the deployer
+        // 8. Mint a test NFT to the deployer
         // (1,000,000 tokens, vesting over 30 days)
         uint256 oneMillionTokens = 1_000_000 * 10**18;
         uint256 thirtyDays = 30 days;
