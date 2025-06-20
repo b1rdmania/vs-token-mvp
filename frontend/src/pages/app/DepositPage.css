@@ -5,8 +5,8 @@
 
 .page-description {
   text-align: center;
-  color: #ccc;
-  margin-top: -1.5rem;
+  color: #6c757d;
+  margin-top: -0.5rem;
   margin-bottom: 2rem;
 }
 
@@ -15,8 +15,8 @@
 }
 
 .dummy-data-banner {
-  background-color: #3e2723;
-  color: #ffccbc;
+  background-color: #fff3cd;
+  color: #664d03;
   padding: 1rem;
   border-radius: 8px;
   margin-bottom: 2rem;
@@ -32,6 +32,7 @@
 .nft-card {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
 }
 
 .nft-card h2 {
@@ -40,7 +41,7 @@
 }
 
 .nft-details {
-  flex-grow: 1;
+  flex-grow: 0;
   margin: 1.5rem 0;
 }
 
@@ -60,7 +61,7 @@
 }
 
 .penalty {
-  color: #ef5350;
+  color: #dc3545;
   font-weight: bold;
 }
 

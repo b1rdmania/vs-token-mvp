@@ -122,12 +122,19 @@
   color: #fff;
 }
 
-.data-freshness-notice {
+.page-description {
   text-align: center;
-  padding: 0.5rem 1rem;
-  background-color: transparent;
   color: #6c757d;
+  margin-top: -0.5rem;
+  margin-bottom: 2rem;
+}
+
+.data-freshness-notice {
+  background-color: #e9ecef;
+  color: #495057;
+  padding: 1rem;
   border-radius: 8px;
+  text-align: center;
   margin: -1rem auto 2rem auto;
   max-width: 800px;
   font-size: 0.9rem;
