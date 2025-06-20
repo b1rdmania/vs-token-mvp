@@ -130,13 +130,15 @@
 }
 
 .data-freshness-notice {
-  background-color: #e9ecef;
-  color: #495057;
+  background-color: #fff3cd;
+  color: #664d03;
   padding: 1rem;
   border-radius: 8px;
   text-align: center;
-  margin: -1rem auto 2rem auto;
+  margin-top: 2rem;
   max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
   font-size: 0.9rem;
 }
 
