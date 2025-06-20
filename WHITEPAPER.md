@@ -1,73 +1,58 @@
 # vS Vault: Technical Whitepaper
-*Version 1.0*
+Version 1.1 – Last updated 20 Jun 2025
 
-## 1. Abstract
+## 1. Why vS Vault Exists
+Sonic's airdrop locks 75 % of rewards in 9-month vesting NFTs. Great for supply discipline, terrible for users who want to move capital. Most will dump their 25 % liquid slice and forget Sonic. vS Vault unlocks the locked share without breaking the vest schedule—turning dead capital into tradable, yield-bearing liquidity.
 
-The vS Vault protocol is a decentralized application designed to unlock liquidity from vesting-wrapped NFTs, specifically focusing on the upcoming Sonic (S) token airdrop. Airdropped tokens are often distributed inside time-locked NFTs to facilitate a gradual release into the market. While this promotes network stability, it locks up significant capital for individual holders. vS Vault solves this by allowing users to deposit their vesting NFTs into a secure, non-custodial smart contract and mint `vS` tokens—a liquid ERC20 token that represents a claim on the underlying, vested portion of their deposit. This provides users with instant liquidity, enabling them to trade or participate in other DeFi activities while their original assets continue to vest as intended.
+## 2. At-a-Glance
+- Total fNFTs in Season-1: 90 M S
+- User action: deposit fNFT → receive 1:1 vS tokens
+- vS tokens: standard ERC-20, tradable, LP-able, lendable
+- Underlying S continues vesting; unlocked S streams to vS holders daily
 
-## 2. Core Concepts
+## 3. How the Flow Works
+Deposit – user sends fNFT to the Vault contract
+Mint – Vault mints equal vS balance to the user
+Trade / LP – user swaps or LPs vS/S to earn fees
+Stream – Vault auto-claims newly-unlocked S each day and distributes pro-rata to vS balances
+Redeem – when vest hits 100 %, user burns vS to withdraw remaining S (early redemption allowed but pays the same penalty curve baked into the fNFT)
 
-### 2.1. Vesting NFTs (fNFTs)
+## 4. Smart-Contract Anatomy
+### vSVault.sol
+- ERC-4626 compliant, owns all fNFTs
+- Reads vesting schedule, tracks claimable S
+- Auto-stream function anyone can trigger (gas refund)
 
-Vesting NFTs are non-fungible tokens that represent ownership of a principal amount of underlying assets (e.g., Sonic 'S' tokens) that unlock over a predefined period. These NFTs are non-transferable containers of future value. The core asset of the vS Vault protocol is interacting with these NFTs once they are deployed by the Sonic Foundation.
+### vSToken.sol
+- ERC-20 with EIP-2612 permits
+- Mint / burn controlled by the Vault only
 
-### 2.2. vS Token
+### PenaltyCurveLib.sol
+- Pure library replicating Sonic's linear burn formula for early exits
 
-The `vS` token is a standard ERC20 token that is minted by the vS Vault. It is a "stable-asset" backed 1:1 by the vested, claimable 'S' tokens held within the vault. The total supply of `vS` is dynamically controlled by the amount of vested 'S' tokens locked in the protocol, ensuring it is always fully backed.
+## 5. Fee Model (governance-tunable)
+- 0.15 % on mint
+- 0.15 % on burn
+- 0.05 % swap fee share from the vS/S pool
+- Optional 10 % skim on compounded yield
+- All fees: 50 % to LP gauge, 30 % to protocol treasury, 20 % to automatic $S buy-and-burn (default split).
 
-### 2.3. The Vault Contract
+## 6. Security & Audits
+- Built with OpenZeppelin templates, no owner functions, no upgradeability in V1
+- Audit booked with BlockSec, report live before airdrop launch (1 Jul 2025)
+- $25 k Immunefi bug bounty live from testnet day-one
 
-The Vault is the core smart contract of the protocol. It is responsible for:
--   Accepting deposits of vesting NFTs.
--   Calculating the currently vested and claimable portion of the underlying 'S' tokens for each deposited NFT.
--   Minting `vS` tokens to the depositor based on this vested value.
--   Allowing users to redeem `vS` tokens for the underlying 'S' tokens.
--   Managing the withdrawal of the original NFT once it has fully vested.
+## 7. Economic Impact for Sonic
+- Deep vS/S liquidity absorbs airdrop sell pressure
+- Locked capital becomes TVL, boosting headline metrics
+- Continuous swap volume drives fee burn, aligning with S token economics
+- More "things to do" on-chain keeps users active during the 9-month vest window
 
-## 3. Technical Architecture
+## 8. Launch Parameters (testnet → mainnet)
+- Testnet beta: contracts live, subgraph indexing, UI functional
+- Mainnet launch target: 1 Jul 2025 (before Season-1 claim portal opens)
+- Initial liquidity: 250 k S + 250 k vS seeded by team
+- Partner gauge incentives: 500 k S over first 30 days
 
-The vS Vault is a fully on-chain protocol built on the Sonic blockchain, comprised of smart contracts and a decentralized frontend.
-
-### 3.1. Smart Contracts
-
--   **`Vault.sol`**: The primary contract managing all deposits, minting, and logic. It will be initialized with the address of the official Sonic NFT contract upon mainnet deployment.
--   **`vSToken.sol`**: The ERC20 contract for the `vS` token. It grants minting rights exclusively to the `Vault.sol` contract.
--   **`MockSonicNFT.sol` (for MVP)**: A mock ERC721 contract that simulates the behavior of the official vesting NFTs for testnet development. It includes functions to define a vesting schedule (start date, duration, total amount) for each minted NFT.
-
-### 3.2. Frontend
-
-The frontend is a modern, responsive React application built with Vite.
--   **Wallet Integration**: Utilizes `wagmi` and `RainbowKit` for seamless wallet connection.
--   **Component Structure**: Key pages include a landing page, a deposit interface, a user dashboard to track vested/minted amounts, a trading page (future integration), and a liquidity pool page.
--   **On-Chain Interaction**: The frontend communicates directly with the Sonic blockchain; no centralized backend is required for core protocol functions.
-
-## 4. MVP Roadmap: Testnet to Mainnet
-
-### Step 1: MVP Build & Testnet Deployment (Current Phase)
-
-1.  **Develop `MockSonicNFT.sol`**: Create an ERC721 contract with a linear vesting function to simulate the upcoming Sonic NFTs.
-2.  **Deploy to Sonic Testnet**: Deploy the `Vault`, `vSToken`, and `MockSonicNFT` contracts.
-3.  **Mint Mock NFTs**: Distribute mock NFTs to test wallets.
-4.  **Frontend Integration**: Connect the dApp to the testnet contracts, enabling users to:
-    -   View their mock NFTs.
-    -   Deposit a mock NFT into the Vault.
-    -   See their vested progress on the dashboard.
-    -   Mint `vS` tokens against their vested balance.
-5.  **Test 1-Click Zap**: Implement the UI and mock integration for a "1-Click Zap" into a vS/S liquidity pool, in partnership with a DEX like Shadow.
-
-### Step 2: Pre-Launch (Mainnet Preparation)
-
-1.  **Security Audit**: Conduct a comprehensive, third-party security audit of all smart contracts (`Vault.sol`, `vSToken.sol`) to ensure user funds are secure.
-2.  **Official Integration**: Update the `Vault.sol` contract to replace the mock NFT address with the official Sonic Vesting NFT contract address.
-3.  **Frontend Polish**: Refine the user interface and experience based on feedback from testnet users.
-
-### Step 3: Mainnet Launch
-
-1.  **Deploy Contracts**: Deploy the audited and finalized smart contracts to the Sonic mainnet.
-2.  **Launch Frontend**: Push the final version of the frontend live.
-3.  **Liquidity Pool Seeding**: Work with our DEX partner (e.g., Shadow) to create the official vS/S liquidity pool.
-4.  **Launch Incentives**: Roll out liquidity mining programs and "boosted APR" models to encourage user participation and deepen liquidity.
-
-## 5. Conclusion
-
-The vS Vault protocol is poised to become a critical piece of infrastructure within the Sonic ecosystem. By providing day-one liquidity for airdrop recipients, it enhances capital efficiency and provides immediate utility for locked assets. The project's commitment to security, decentralization, and a seamless user experience will make it an indispensable tool for the Sonic community. 
+## 9. Get Involved
+Seed liquidity, integrate vS in your dApp, or review the code. 
