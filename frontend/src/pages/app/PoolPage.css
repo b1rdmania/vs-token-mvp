@@ -51,20 +51,6 @@
   color: #6B7280;
 }
 
-.pool-header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.pool-header .page-title {
-  margin-bottom: 0.5rem;
-}
-
-.pool-header .page-description {
-  font-size: 1.1rem;
-  color: #6c757d;
-}
-
 .pool-layout {
   display: grid;
   grid-template-columns: 2fr 1fr;

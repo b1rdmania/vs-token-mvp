@@ -20,9 +20,6 @@ export const DashboardPage: React.FC = () => {
   return (
     <div className="page-container">
       <h1 className="page-title">My Dashboard</h1>
-      <div className="data-freshness-notice">
-        <p>Balances reflect on-chain data from the public Subgraph. The vault streams new rewards approximately every 6 hours.</p>
-      </div>
 
       <div className="stats-row">
         <div className="content-card stat-card-dash">
@@ -79,6 +76,10 @@ export const DashboardPage: React.FC = () => {
         <button className="button-primary" disabled={data.unlockedToday <= 0}>
           Mint vS
         </button>
+      </div>
+
+      <div className="data-freshness-notice">
+        <p>Balances reflect on-chain data from the public Subgraph. The vault streams new rewards approximately every 6 hours.</p>
       </div>
     </div>
   );
