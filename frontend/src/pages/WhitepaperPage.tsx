@@ -62,7 +62,18 @@ export const WhitepaperPage: React.FC = () => {
           </section>
 
           <section>
-            <h2>5. Decentralized &amp; Battle-Hardened Architecture</h2>
+            <h2>5. Deep DeFi Composability &amp; The Flywheel Effect</h2>
+            <p><code>vS</code> is more than a liquid token; it's a foundational building block for the Sonic ecosystem. By converting locked fNFTs into a standard, permissionless ERC-20, vS Vault unlocks immediate composability with other DeFi protocols.</p>
+            <ul>
+                <li><strong>Lending &amp; Borrowing:</strong> <code>vS</code> can be listed as collateral on lending markets, allowing users to borrow against their vesting assets without selling.</li>
+                <li><strong>Yield Aggregation:</strong> Vaults and yield aggregators can build strategies on top of the core <code>vS</code>/S liquidity pool.</li>
+                <li><strong>The Flywheel Engine: The <code>vS</code>/S Pool:</strong> The heart of this ecosystem will be a deeply liquid <code>vS</code>/S pool, launching on our strategic partner, <strong>Shadow DEX</strong>. A significant portion of protocol incentives will be directed to this pool, creating a powerful flywheel.</li>
+            </ul>
+            <p>This model transforms static, vesting assets into a dynamic engine for ecosystem-wide liquidity and growth.</p>
+          </section>
+
+          <section>
+            <h2>6. Decentralized &amp; Battle-Hardened Architecture</h2>
             <p>The vS Vault is engineered for maximum uptime, security, and transparency, removing all centralized points of failure.</p>
             <ul>
                 <li><strong>Immutable by Design:</strong> The core contracts are non-upgradeable. The code deployed is final, ensuring predictable behavior and removing administrative risk.</li>
@@ -72,17 +83,6 @@ export const WhitepaperPage: React.FC = () => {
             </ul>
           </section>
 
-          <section>
-            <h2>6. Fee Model (governance-tunable)</h2>
-            <ul>
-              <li>0.15 % on mint</li>
-              <li>0.15 % on burn</li>
-              <li>0.05 % swap fee share from the <code>vS</code>/S pool</li>
-              <li>Optional 10 % skim on compounded yield</li>
-              <li>All fees: 50 % to LP gauge, 30 % to protocol treasury, 20 % to automatic <code>$S</code> buy-and-burn (default split).</li>
-            </ul>
-          </section>
-          
           <section>
             <h2>7. Security &amp; Audits</h2>
             <ul>
