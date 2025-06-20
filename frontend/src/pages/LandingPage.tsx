@@ -21,9 +21,17 @@ export const LandingPage: React.FC = () => {
             <p className="hero-subtitle">
               Deposit your vesting fNFT once, and as it vests, return to mint more vS tokens against its growing value. Unlock instant liquidity, trade, and participate in DeFi—all while your original rewards are securely locked.
             </p>
-            <Link to="/app" className="button-primary button-hero">
-              Launch App
-            </Link>
+            <div className="hero-cta">
+              <Link to="/app" className="button-primary button-hero">
+                Launch App
+              </Link>
+              <a href="https://github.com/b1rdmania/vs-token-mvp" target="_blank" rel="noopener noreferrer" className="button-secondary button-hero">
+                GitHub
+              </a>
+              <Link to="/whitepaper" className="button-secondary button-hero">
+                White Paper
+              </Link>
+            </div>
             <div className="hero-visual">
               <img src="https://placehold.co/800x200/F7F9FC/0D111C?text=fNFT+%E2%86%92+Vault+%E2%86%92+vS+%E2%86%92+DeFi" alt="vS Token Protocol Flow" />
             </div>
@@ -44,16 +52,6 @@ export const LandingPage: React.FC = () => {
               <h3>Zero Trust, Fully On-Chain</h3>
               <p>Your assets are secured in a non-custodial smart contract vault. All logic is transparent, on-chain, and built on open-source, audited principles.</p>
             </div>
-          </div>
-        </section>
-
-        <section className="github-cta-section">
-          <div className="container">
-            <h2>Explore the Code</h2>
-            <p>Our protocol is open-source. Inspect the contracts, fork the code, and see for yourself how it works.</p>
-            <a href="https://github.com/b1rdmania/vs-token-mvp" target="_blank" rel="noopener noreferrer" className="button-secondary">
-              View on GitHub
-            </a>
           </div>
         </section>
       </main>

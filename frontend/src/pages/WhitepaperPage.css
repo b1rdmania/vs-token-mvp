@@ -1,0 +1,57 @@
+.whitepaper-page .landing-header {
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 10;
+  border-bottom: 1px solid #EAECEF;
+}
+
+.whitepaper-page main {
+  padding-top: 2rem;
+  padding-bottom: 4rem;
+}
+
+.whitepaper-page .content-card {
+  background: white;
+  padding: 2rem 3rem;
+  border-radius: 16px;
+  border: 1px solid #EAECEF;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.whitepaper-page h1 {
+  margin-top: 0;
+}
+
+.whitepaper-page h2 {
+  border-bottom: 1px solid #EAECEF;
+  padding-bottom: 0.5rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.whitepaper-page .version {
+  margin-top: -1rem;
+  margin-bottom: 2rem;
+  opacity: 0.6;
+}
+
+.whitepaper-page p, .whitepaper-page li {
+  line-height: 1.7;
+  font-size: 1.1rem;
+}
+
+.whitepaper-page code {
+  background-color: #F7F9FC;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+}
+
+.whitepaper-page pre code {
+  display: block;
+  padding: 1rem;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+} 
