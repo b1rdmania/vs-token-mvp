@@ -70,12 +70,16 @@
 }
 
 .features-section {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2rem;
   padding: 4rem 0;
-  text-align: center;
   background-color: #F7F9FC;
+}
+
+.features-section .container {
+  display: flex;
+  gap: 2rem;
+  justify-content: space-between;
+  align-items: flex-start;
+  text-align: center;
 }
 
 .feature-card {
