@@ -30,29 +30,37 @@ Redeem – when vest hits 100 %, user burns vS to withdraw remaining S (early re
 ### [PenaltyCurveLib.sol](https://github.com/b1rdmania/vs-token-mvp/blob/main/src/PenaltyCurveLib.sol)
 - Pure library replicating Sonic's linear burn formula for early exits
 
-## 5. Fee Model (governance-tunable)
+## 5. Decentralized & Battle-Hardened Architecture
+The vS Vault is engineered for maximum uptime, security, and transparency, removing all centralized points of failure.
+
+- **Immutable by Design:** The core contracts are non-upgradeable. The code deployed is final, ensuring predictable behavior and removing administrative risk.
+- **Reliable Automation via Keepers:** The daily `auto-stream` function is not run from a private server. It is driven by a decentralized automation network (e.g., Chainlink Automation) that guarantees execution.
+- **Public Incentivization:** As a backstop, the `auto-stream` function includes a gas incentive, making it profitable for any public user or bot to trigger it. This ensures the protocol is self-healing and perpetually live.
+- **Transparent Data via Subgraph:** All data for the user interface is indexed from on-chain events via a public Subgraph. This guarantees that what you see is a direct and verifiable reflection of on-chain reality.
+
+## 6. Fee Model (governance-tunable)
 - 0.15 % on mint
 - 0.15 % on burn
 - 0.05 % swap fee share from the vS/S pool
 - Optional 10 % skim on compounded yield
 - All fees: 50 % to LP gauge, 30 % to protocol treasury, 20 % to automatic $S buy-and-burn (default split).
 
-## 6. Security & Audits
+## 7. Security & Audits
 - Built with [OpenZeppelin templates](https://github.com/b1rdmania/vs-token-mvp/tree/main/lib/openzeppelin-contracts/contracts), no owner functions, no upgradeability in V1
 - Audit booked with BlockSec, report live before airdrop launch (1 Jul 2025)
 - $25 k Immunefi bug bounty live from testnet day-one
 
-## 7. Economic Impact for Sonic
+## 8. Economic Impact for Sonic
 - Deep vS/S liquidity absorbs airdrop sell pressure
 - Locked capital becomes TVL, boosting headline metrics
 - Continuous swap volume drives fee burn, aligning with S token economics
 - More "things to do" on-chain keeps users active during the 9-month vest window
 
-## 8. Launch Parameters (testnet → mainnet)
+## 9. Launch Parameters (testnet → mainnet)
 - Testnet beta: contracts live, subgraph indexing, UI functional
 - Mainnet launch target: 1 Jul 2025 (before Season-1 claim portal opens)
 - Initial liquidity: 250 k S + 250 k vS seeded by team
 - Partner gauge incentives: 500 k S over first 30 days
 
-## 9. Get Involved
+## 10. Get Involved
 Seed liquidity, integrate vS in your dApp, or [review the code](https://github.com/b1rdmania/vs-token-mvp). 

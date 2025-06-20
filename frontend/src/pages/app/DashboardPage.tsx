@@ -19,6 +19,11 @@ export const DashboardPage: React.FC = () => {
 
   return (
     <div className="dashboard-page">
+      <h1 className="page-title">My Dashboard</h1>
+      <div className="data-freshness-notice">
+        <p>Balances reflect on-chain data from the public Subgraph. The vault streams new rewards approximately every 6 hours.</p>
+      </div>
+
       <div className="stats-row">
         <div className="stat-card-dash">
           <label>Total vS Balance</label>
