@@ -156,4 +156,34 @@
   padding: 0.75rem 2rem;
   border-radius: 8px;
   font-size: 1rem;
+}
+
+/* Add media queries for mobile responsiveness */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.5rem;
+  }
+
+  .hero-cta {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .features-section .container {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .feature-card {
+    width: 100%;
+  }
+
+  .hero-section {
+    padding: 4rem 0;
+  }
+
+  .hero-subtitle {
+    max-width: 100%;
+    padding: 0 1rem;
+  }
 } 
