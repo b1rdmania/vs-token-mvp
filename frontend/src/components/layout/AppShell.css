@@ -2,11 +2,10 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: #ffffff;
 }
 
 .app-header {
-  padding: 1rem 0;
+  padding: 1rem;
   background-color: #ffffff;
   border-bottom: 1px solid #dee2e6;
   position: sticky;
@@ -14,10 +13,13 @@
   z-index: 10;
 }
 
-.header-content {
+.header-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .logo-section {
@@ -31,112 +33,89 @@
   font-weight: 700;
   color: var(--secondary-color);
   text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .testnet-badge {
-    background-color: #e9ecef;
-    color: #495057;
-    font-size: 0.75rem;
-    font-weight: 700;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    align-self: center;
+  background-color: #e9ecef;
+  color: #495057;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
 }
 
-.app-nav {
-  background-color: #fff;
-  border-bottom: 1px solid #dee2e6;
-}
-
-.nav-container {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  padding: 0.5rem 1rem;
-}
-
-.nav-container a {
-  padding: 0.5rem 0;
-  text-decoration: none;
-}
-
-.hamburger-menu,
-.mobile-header-actions {
+.desktop-nav {
   display: none;
+}
+
+.desktop-nav a {
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  color: #6c757d;
+  font-weight: 500;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease-in-out;
+}
+
+.desktop-nav a.active,
+.desktop-nav a:hover {
+  color: #0d6efd;
+  border-bottom-color: #0d6efd;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hamburger-menu {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #212529;
+}
+
+.mobile-nav {
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  border-top: 1px solid #dee2e6;
+  padding: 1rem;
+}
+
+.mobile-nav a {
+  padding: 0.75rem 0;
+  text-decoration: none;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.mobile-nav a.active {
+  color: #0d6efd;
 }
 
 .app-main {
   flex-grow: 1;
-  padding: 1.5rem 1rem;
-}
-
-.app-main .container {
+  padding: 2rem 1rem;
   max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1rem;
-}
-
-.main-content {
-  flex-grow: 1;
-  padding: 1rem 1rem;
   width: 100%;
-  max-width: 1200px;
   margin: 0 auto;
 }
 
-.mobile-nav-links {
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
-  padding: 1.5rem 0;
-  border-bottom: 1px solid #dee2e6;
-  background-color: #ffffff;
-}
-
-.mobile-wallet-connect {
-    margin-top: 1rem;
-}
-
-@media (max-width: 768px) {
-  .desktop-header-actions {
+@media (min-width: 769px) {
+  .desktop-nav {
+    display: flex;
+    gap: 1rem;
+  }
+  .hamburger-menu {
     display: none;
   }
-
-  .hamburger-menu {
-    display: block;
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: #212529;
-  }
-
-  .app-nav {
-    display: none; /* Hide nav by default on mobile */
-  }
-
-  .app-nav.mobile-menu-open {
-    display: block; /* Show when menu is open */
-  }
-
-  .nav-container {
-    flex-direction: column;
-    align-items: center;
-    padding: 1.5rem 0;
-    gap: 1.5rem;
-  }
-
-  .mobile-header-actions {
-    display: block;
-    margin-top: 1rem;
-  }
-
-  .mobile-nav-links {
-    display: flex;
-  }
-  
-  .header-container {
-      justify-content: space-between;
+  .mobile-nav {
+    display: none;
   }
 } 

@@ -19,13 +19,7 @@ const navLinks = [
   { path: '/app/activity', label: 'Protocol Activity' },
 ];
 
-const navLinkStyles = ({ isActive }: { isActive: boolean }) => ({
-  borderBottom: isActive ? '2px solid #0d6efd' : '2px solid transparent',
-  color: isActive ? '#0d6efd' : '#6c757d',
-  fontWeight: '500',
-});
-
-export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AppShell: React.FC = () => {
   const location = useLocation();
   const { isConnected } = useAccount();
   const [isMenuOpen, setMenuOpen] = useState(false);
@@ -38,32 +32,35 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
             vS Vault
             <span className="testnet-badge">TESTNET BETA</span>
           </Link>
-          <div className="desktop-header-actions">
+          <nav className="desktop-nav">
+            {navLinks.map((link) => (
+              <NavLink key={link.path} to={link.path} className={({ isActive }) => (isActive ? 'active' : '')}>
+                {link.label}
+              </NavLink>
+            ))}
+          </nav>
+          <div className="header-actions">
             <ConnectButton />
+            <button className="hamburger-menu" onClick={() => setMenuOpen(!isMenuOpen)}>
+              &#9776;
+            </button>
           </div>
-          <button className="hamburger-menu" onClick={() => setMenuOpen(!isMenuOpen)}>
-            &#9776;
-          </button>
         </div>
+        {isMenuOpen && (
+          <nav className="mobile-nav">
+            {navLinks.map((link) => (
+              <NavLink
+                key={link.path}
+                to={link.path}
+                className={({ isActive }) => (isActive ? 'active' : '')}
+                onClick={() => setMenuOpen(false)}
+              >
+                {link.label}
+              </NavLink>
+            ))}
+          </nav>
+        )}
       </header>
-
-      <nav className={`app-nav ${isMenuOpen ? 'mobile-menu-open' : ''}`}>
-        <div className="nav-container">
-          {navLinks.map((link) => (
-            <NavLink
-              key={link.path}
-              to={link.path}
-              style={navLinkStyles}
-              onClick={() => setMenuOpen(false)}
-            >
-              {link.label}
-            </NavLink>
-          ))}
-          <div className="mobile-header-actions">
-            <ConnectButton />
-          </div>
-        </div>
-      </nav>
 
       <main className="app-main">
         <div className="container">
