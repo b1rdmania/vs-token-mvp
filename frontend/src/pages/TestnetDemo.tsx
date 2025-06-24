@@ -8,6 +8,10 @@ import '../styles/common.css';
 const DECAYFNFT_ADDRESS = '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512';
 const MOCKTOKEN_ADDRESS = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
 
+// Sonic Mainnet Demo addresses (to be filled after deploy)
+const DEMODECAYFNFT_ADDRESS = 'TODO_DEMODECAYFNFT_ADDRESS';
+const DEMOTOKEN_ADDRESS = 'TODO_DEMOTOKEN_ADDRESS';
+
 const decayfNFTAbi = DecayfNFTArtifact.abi;
 const mockTokenAbi = MockTokenArtifact.abi;
 
@@ -102,10 +106,10 @@ const TestnetDemo: React.FC = () => {
     <div className="page-container">
       <div className="community-banner" style={{marginBottom: 24, textAlign: 'center'}}>
         <span className="testnet-badge" style={{fontSize: '1rem', background: '#ffe066', color: '#856404', padding: '0.5rem 1.5rem', borderRadius: 8, fontWeight: 700, letterSpacing: 1}}>
-          COMMUNITY-DRIVEN TESTNET EXPERIMENT
+          SONIC MAINNET DEMO — PUBLIC, FOR DEMONSTRATION ONLY
         </span>
         <div style={{marginTop: 8, color: '#856404', fontWeight: 500}}>
-          Grassroots, open-source, and experimental. No incentives (yet)—just real DeFi for real users.
+          These NFTs and tokens are for demo purposes only. They have no real value. Anyone can mint and claim.
         </div>
       </div>
       <h1 className="page-title">DecayfNFT Testnet Demo</h1>
@@ -184,6 +188,12 @@ const TestnetDemo: React.FC = () => {
                 </table>
               </div>
             )}
+          </div>
+          <div className="content-card">
+            <h2>Get Demo Tokens</h2>
+            <button className="button-primary" onClick={() => {
+              // Implementation of getDemoTokens function
+            }}>Get Demo Tokens</button>
           </div>
         </>
       )}
