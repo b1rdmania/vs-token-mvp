@@ -81,4 +81,14 @@ contract DemoDecayfNFT is ERC721, Ownable {
     function getTotalAmount(uint256 tokenId) public view returns (uint256) {
         return vestingSchedules[tokenId].principalAmount;
     }
+
+    // Make NFTs non-transferable (soulbound): block all transfers except mint (from == address(0)) and burn (to == address(0))
+    function _update(address to, uint256 tokenId, address auth) internal override returns (address) {
+        address from = _ownerOf(tokenId);
+        // Only allow mint (from == 0) and burn (to == 0)
+        if (from != address(0) && to != address(0)) {
+            revert("Transfers disabled: soulbound NFT");
+        }
+        return super._update(to, tokenId, auth);
+    }
 } 
