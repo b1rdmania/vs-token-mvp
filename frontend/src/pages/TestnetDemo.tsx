@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ethers } from 'ethers';
+import { BrowserProvider } from 'ethers';
 import DecayfNFTArtifact from '../abis/DecayfNFT.json';
 import MockTokenArtifact from '../abis/MockToken.json';
 import '../styles/common.css';
@@ -12,8 +12,8 @@ const decayfNFTAbi = DecayfNFTArtifact.abi;
 const mockTokenAbi = MockTokenArtifact.abi;
 
 const TestnetDemo: React.FC = () => {
-  const [provider, setProvider] = useState<ethers.providers.Web3Provider | null>(null);
-  const [signer, setSigner] = useState<ethers.Signer | null>(null);
+  const [provider, setProvider] = useState<BrowserProvider | null>(null);
+  const [signer, setSigner] = useState<BrowserProvider | null>(null);
   const [account, setAccount] = useState<string>('');
   const [nfts, setNfts] = useState<any[]>([]);
   const [mintPrincipal, setMintPrincipal] = useState('');
@@ -22,7 +22,7 @@ const TestnetDemo: React.FC = () => {
 
   useEffect(() => {
     if ((window as any).ethereum) {
-      const prov = new ethers.providers.Web3Provider((window as any).ethereum);
+      const prov = new BrowserProvider((window as any).ethereum);
       setProvider(prov);
     }
   }, []);
