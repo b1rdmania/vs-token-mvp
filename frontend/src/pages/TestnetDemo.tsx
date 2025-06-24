@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserProvider } from 'ethers';
+import { useAccount, usePublicClient, useWalletClient } from 'wagmi';
+import { useConnectModal } from '@rainbow-me/rainbowkit';
 import DecayfNFTArtifact from '../abis/DecayfNFT.json';
 import MockTokenArtifact from '../abis/MockToken.json';
 import '../styles/common.css';
+import { ethers } from 'ethers';
 
 // TODO: Replace with actual deployed addresses
 const DECAYFNFT_ADDRESS = '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512';
@@ -16,33 +18,20 @@ const decayfNFTAbi = DecayfNFTArtifact.abi;
 const mockTokenAbi = MockTokenArtifact.abi;
 
 const TestnetDemo: React.FC = () => {
-  const [provider, setProvider] = useState<BrowserProvider | null>(null);
-  const [signer, setSigner] = useState<BrowserProvider | null>(null);
-  const [account, setAccount] = useState<string>('');
+  const { address: account, isConnected } = useAccount();
+  const { openConnectModal } = useConnectModal();
+  const publicClient = usePublicClient();
+  const { data: walletClient } = useWalletClient();
   const [nfts, setNfts] = useState<any[]>([]);
   const [mintPrincipal, setMintPrincipal] = useState('');
   const [mintDuration, setMintDuration] = useState('');
   const [status, setStatus] = useState<string>('');
 
-  useEffect(() => {
-    if ((window as any).ethereum) {
-      const prov = new BrowserProvider((window as any).ethereum);
-      setProvider(prov);
-    }
-  }, []);
-
-  const connectWallet = async () => {
-    if (!provider) return;
-    await provider.send('eth_requestAccounts', []);
-    const signer = provider.getSigner();
-    setSigner(signer);
-    setAccount(await signer.getAddress());
-  };
-
   // Fetch user's NFTs by scanning token IDs (for demo; TODO: use events/subgraph for scale)
   const fetchNFTs = async () => {
-    if (!signer || !account) return;
+    if (!walletClient || !account) return;
     setStatus('Fetching NFTs...');
+    const provider = new ethers.JsonRpcProvider(publicClient?.transport.url);
     const contract = new ethers.Contract(DECAYFNFT_ADDRESS, decayfNFTAbi, provider);
     const maxTokenId = 20; // TODO: Adjust as needed for demo
     const userNFTs: any[] = [];
@@ -67,15 +56,16 @@ const TestnetDemo: React.FC = () => {
   };
 
   useEffect(() => {
-    if (signer && account) fetchNFTs();
+    if (walletClient && account) fetchNFTs();
     // eslint-disable-next-line
-  }, [signer, account]);
+  }, [walletClient, account]);
 
   const handleMint = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!signer) return;
+    if (!walletClient || !account) return;
     setStatus('Minting...');
     try {
+      const signer = new ethers.Wallet(walletClient.account?.key as string, new ethers.JsonRpcProvider(publicClient?.transport.url));
       const contract = new ethers.Contract(DECAYFNFT_ADDRESS, decayfNFTAbi, signer);
       const tx = await contract.safeMint(account, mintPrincipal, mintDuration);
       await tx.wait();
@@ -89,9 +79,10 @@ const TestnetDemo: React.FC = () => {
   };
 
   const handleClaim = async (tokenId: number) => {
-    if (!signer) return;
+    if (!walletClient || !account) return;
     setStatus('Claiming...');
     try {
+      const signer = new ethers.Wallet(walletClient.account?.key as string, new ethers.JsonRpcProvider(publicClient?.transport.url));
       const contract = new ethers.Contract(DECAYFNFT_ADDRESS, decayfNFTAbi, signer);
       const tx = await contract.claimVestedTokens(tokenId);
       await tx.wait();
@@ -117,9 +108,9 @@ const TestnetDemo: React.FC = () => {
         <b>Testnet Only:</b> This page is for demo/testing and not part of the main app. It replicates the main app's look and feel for a seamless experience.<br/>
         <span style={{color: '#888'}}>Protocol fees may be enabled in the future to fund sustainable, community-driven development.</span>
       </div>
-      {!account ? (
+      {!isConnected ? (
         <div className="content-card" style={{ textAlign: 'center' }}>
-          <button className="button-primary" onClick={connectWallet}>Connect Wallet</button>
+          <button className="button-primary" onClick={openConnectModal}>Connect Wallet</button>
         </div>
       ) : (
         <>
