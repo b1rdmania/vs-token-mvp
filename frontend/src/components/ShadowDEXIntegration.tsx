@@ -3,7 +3,7 @@ import { ethers } from 'ethers';
 
 // Shadow DEX Router address on Sonic
 const SHADOW_ROUTER_ADDRESS = '0x1D368773735ee1E678950B7A97bcA2CafB330CDc';
-const POOL_ADDRESS = '0x85e6cee8ddac8426ebaa1f2191f5969774c5351e';
+const POOL_ADDRESS = '0x143f2acd325c1acd885b64644019f284c49ad330';
 
 interface ShadowDEXIntegrationProps {
   userAddress?: string;
@@ -96,18 +96,18 @@ const ShadowDEXIntegration: React.FC<ShadowDEXIntegrationProps> = ({
       </div>
 
       <div style={{ 
-        backgroundColor: '#fff3e0', 
+        backgroundColor: '#e8f5e8', 
         padding: '15px', 
         borderRadius: '8px', 
         marginBottom: '20px',
-        border: '1px solid #ffb74d'
+        border: '1px solid #4caf50'
       }}>
-        <h3 style={{ margin: '0 0 10px 0', color: '#f57c00' }}>⚠️ Pool Setup Required</h3>
-        <p style={{ margin: 0, fontSize: '14px', color: '#f57c00' }}>
-          <strong>Next step:</strong> Create a Shadow DEX pool with your D-vS and tS tokens to enable liquidity provision.
+        <h3 style={{ margin: '0 0 10px 0', color: '#2e7d32' }}>✅ Live Pool Active</h3>
+        <p style={{ margin: 0, fontSize: '14px', color: '#2e7d32' }}>
+          <strong>Great!</strong> Your D-vS/tS liquidity pool is live and ready for trading.
         </p>
         <div style={{ marginTop: '10px', fontSize: '12px', color: '#666' }}>
-          Suggested ratio: 1000 D-vS + 850 tS (15% discount)
+          Pool: {POOL_ADDRESS}
         </div>
       </div>
 
@@ -214,23 +214,23 @@ const ShadowDEXIntegration: React.FC<ShadowDEXIntegrationProps> = ({
           marginBottom: '15px'
         }}>
           <p style={{ margin: '0 0 10px 0', fontSize: '14px', color: '#666' }}>
-            <strong>Ready to create pool?</strong> Use Shadow DEX directly:
+            <strong>Manage your liquidity position:</strong>
           </p>
           <a 
-            href="https://www.shadow.so/liquidity/create"
+            href={`https://www.shadow.so/liquidity/manage/${POOL_ADDRESS}`}
             target="_blank"
             rel="noopener noreferrer"
             style={{
               display: 'inline-block',
               padding: '10px 20px',
-              backgroundColor: '#1976d2',
+              backgroundColor: '#4caf50',
               color: 'white',
               textDecoration: 'none',
               borderRadius: '6px',
               fontWeight: 'bold'
             }}
           >
-            Create Pool on Shadow DEX
+            Manage Pool on Shadow DEX
           </a>
         </div>
 
