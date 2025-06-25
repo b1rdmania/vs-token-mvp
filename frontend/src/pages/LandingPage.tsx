@@ -64,7 +64,7 @@ export const LandingPage: React.FC = () => {
             </a>
             <span style={{ margin: '0 8px' }}>|</span>
             <Link to="/TestnetDemo">
-              Testnet Demo
+              Demo
             </Link>
           </div>
           <p>&copy; {new Date().getFullYear()} vS Vault. All rights reserved.</p>
