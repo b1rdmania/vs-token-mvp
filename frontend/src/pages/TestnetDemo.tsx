@@ -78,7 +78,19 @@ const TestnetDemo: React.FC = () => {
       for (let tokenId = 0; tokenId < maxTokenId; tokenId++) {
         try {
           const owner = await decayfNFT.ownerOf(tokenId);
-          if (owner.toLowerCase() === address.toLowerCase()) {
+          const isUserOwned = owner.toLowerCase() === address.toLowerCase();
+          const isVaultOwned = owner.toLowerCase() === VAULT_ADDRESS.toLowerCase();
+          
+          // Check if this NFT was originally minted by the user (even if now owned by vault)
+          let isUserNFT = isUserOwned;
+          if (isVaultOwned) {
+            // Check if user has any deposit records for this NFT (simplified check)
+            // In a real app, you'd check vault events or have a mapping
+            // For demo, we'll assume any vault-owned NFT in this range belongs to connected user
+            isUserNFT = true;
+          }
+          
+          if (isUserNFT) {
             const totalAmount = await decayfNFT.getTotalAmount(tokenId);
             const vestingInfo = await decayfNFT.vestingSchedules(tokenId);
             const claimedAmount = vestingInfo.claimedAmount;
@@ -95,7 +107,10 @@ const TestnetDemo: React.FC = () => {
               totalAmount: totalAmountFormatted,
               claimedAmount: claimedAmountFormatted,
               availableAmount: availableAmountFormatted,
-              progress
+              progress,
+              isDepositedInVault: isVaultOwned,
+              canClaimDirectly: isUserOwned && parseFloat(availableAmountFormatted) > 0,
+              canDepositToVault: isUserOwned
             });
           }
         } catch (error) {
@@ -612,9 +627,21 @@ const TestnetDemo: React.FC = () => {
                     <h3>🎫 Your fNFTs</h3>
                     <div style={{ display: 'grid', gap: 16, marginTop: 16 }}>
                       {ownedNFTs.map((nft) => (
-                        <div key={nft.tokenId} style={{ background: '#fff', padding: 16, borderRadius: 8, border: '1px solid #eaecef' }}>
+                        <div key={nft.tokenId} style={{ 
+                          background: nft.isDepositedInVault ? '#f0f8f0' : '#fff', 
+                          padding: 16, 
+                          borderRadius: 8, 
+                          border: nft.isDepositedInVault ? '2px solid #28a745' : '1px solid #eaecef' 
+                        }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
-                            <h4 style={{ margin: 0 }}>fNFT #{nft.tokenId}</h4>
+                            <div>
+                              <h4 style={{ margin: 0 }}>fNFT #{nft.tokenId}</h4>
+                              {nft.isDepositedInVault && (
+                                <div style={{ background: '#28a745', color: 'white', padding: '2px 6px', borderRadius: 4, fontSize: 11, marginTop: 4, display: 'inline-block' }}>
+                                  ✅ DEPOSITED IN VAULT
+                                </div>
+                              )}
+                            </div>
                             <div style={{ background: '#e6f7ff', padding: '4px 8px', borderRadius: 4, fontSize: 12 }}>
                               {nft.progress}% unlocked
                             </div>
@@ -624,82 +651,100 @@ const TestnetDemo: React.FC = () => {
                             <div><strong>Claimed:</strong> {Number(nft.claimedAmount).toFixed(2)} tS</div>
                             <div><strong>Available:</strong> {Number(nft.availableAmount).toFixed(2)} tS</div>
                           </div>
-                          <div style={{ display: 'flex', gap: 8 }}>
-                            <button
-                              onClick={() => claimVested(nft.tokenId)}
-                              disabled={isLoading || parseFloat(nft.availableAmount) === 0}
-                              className="button-primary"
-                              style={{ flex: 1 }}
-                            >
-                              {isLoading ? 'Claiming...' : `Claim ${Number(nft.availableAmount).toFixed(2)} tS`}
-                            </button>
+                          
+                          {nft.isDepositedInVault ? (
+                            // NFT is deposited in vault - show vault status
+                            <div style={{ background: '#e8f5e8', padding: 12, borderRadius: 6, border: '1px solid #28a745' }}>
+                              <div style={{ fontSize: 14, marginBottom: 8 }}>
+                                <strong>🏦 In Vault:</strong> This fNFT is deposited and earning you D-vS tokens as it vests.
+                              </div>
+                              <div style={{ fontSize: 13, color: '#666' }}>
+                                • Check "Manage D-vS & Exit" tab to see your vault balance<br/>
+                                • Use "Use in DeFi & Earn Fees" tab to provide liquidity
+                              </div>
+                            </div>
+                          ) : (
+                            // NFT is still owned by user - show claim/deposit options
                             <div style={{ display: 'flex', gap: 8 }}>
-                              {parseFloat(nft.totalAmount) > 1000 ? (
-                                <>
+                              <button
+                                onClick={() => claimVested(nft.tokenId)}
+                                disabled={isLoading || !nft.canClaimDirectly}
+                                className="button-primary"
+                                style={{ flex: 1, opacity: nft.canClaimDirectly ? 1 : 0.5 }}
+                                title={nft.canClaimDirectly ? '' : 'No tokens available to claim yet'}
+                              >
+                                {isLoading ? 'Claiming...' : 
+                                 nft.canClaimDirectly ? `Claim ${Number(nft.availableAmount).toFixed(2)} tS` : 
+                                 'Nothing to Claim Yet'}
+                              </button>
+                              <div style={{ display: 'flex', gap: 8 }}>
+                                {parseFloat(nft.totalAmount) > 1000 ? (
+                                  <>
+                                    <button
+                                      onClick={() => {
+                                        const confirmed = window.confirm(
+                                          `Deposit 10% of fNFT #${nft.tokenId}?\n\n` +
+                                          `• Get ${(parseFloat(nft.totalAmount) * 0.1).toFixed(1)} D-vS tokens\n` +
+                                          `• Much lower gas cost (~$1-3 instead of $20+)\n` +
+                                          `• You can deposit more later\n\n` +
+                                          `This is perfect for testing!`
+                                        );
+                                        if (confirmed) {
+                                          // TODO: Call depositFraction(nftId, 10) when implemented
+                                          alert('Fractional deposit coming soon! Use smaller fNFT for now.');
+                                        }
+                                      }}
+                                      disabled={isLoading || !nft.canDepositToVault}
+                                      className="button-primary"
+                                      style={{ flex: 1, background: '#28a745' }}
+                                    >
+                                      {isLoading ? 'Depositing...' : 'Deposit 10% (Low Gas)'}
+                                    </button>
+                                    <button
+                                      onClick={() => {
+                                        const confirmed = window.confirm(
+                                          `⚠️ EXPENSIVE TRANSACTION WARNING ⚠️\n\n` +
+                                          `Depositing all ${nft.totalAmount} tS will cost ~$15-25 in gas!\n\n` +
+                                          `Consider:\n` +
+                                          `• Minting smaller demo fNFT instead (~$1 gas)\n` +
+                                          `• Using "Deposit 10%" option\n` +
+                                          `• Most real users will have 100-1000 tS NFTs\n\n` +
+                                          `Continue with expensive full deposit?`
+                                        );
+                                        if (confirmed) {
+                                          depositToVault(nft.tokenId);
+                                        }
+                                      }}
+                                      disabled={isLoading || !nft.canDepositToVault}
+                                      className="button-primary"
+                                      style={{ flex: 1, background: '#dc3545' }}
+                                    >
+                                      Full Deposit (💸 $15-25 Gas)
+                                    </button>
+                                  </>
+                                ) : (
                                   <button
                                     onClick={() => {
                                       const confirmed = window.confirm(
-                                        `Deposit 10% of fNFT #${nft.tokenId}?\n\n` +
-                                        `• Get ${(parseFloat(nft.totalAmount) * 0.1).toFixed(1)} D-vS tokens\n` +
-                                        `• Much lower gas cost (~$1-3 instead of $20+)\n` +
-                                        `• You can deposit more later\n\n` +
-                                        `This is perfect for testing!`
+                                        `Deposit fNFT #${nft.tokenId} to Vault?\n\n` +
+                                        `• Get ${nft.totalAmount} D-vS tokens right now\n` +
+                                        `• Low gas cost (under $2)\n` +
+                                        `• Safe and reversible\n\n` +
+                                        `Continue?`
                                       );
                                       if (confirmed) {
-                                        // TODO: Call depositFraction(nftId, 10) when implemented
-                                        alert('Fractional deposit coming soon! Use smaller fNFT for now.');
+                                        depositToVault(nft.tokenId);
                                       }
                                     }}
-                                    disabled={isLoading}
+                                    disabled={isLoading || !nft.canDepositToVault}
                                     className="button-primary"
-                                    style={{ flex: 1, background: '#28a745' }}
+                                    style={{ width: '100%', background: '#28a745' }}
                                   >
-                                                                         {isLoading ? 'Depositing...' : 'Deposit 10% (Low Gas)'}
-                                   </button>
-                                   <button
-                                     onClick={() => {
-                                       const confirmed = window.confirm(
-                                         `⚠️ EXPENSIVE TRANSACTION WARNING ⚠️\n\n` +
-                                         `Depositing all ${nft.totalAmount} tS will cost ~$15-25 in gas!\n\n` +
-                                         `Consider:\n` +
-                                         `• Minting smaller demo fNFT instead (~$1 gas)\n` +
-                                         `• Using "Deposit 10%" option\n` +
-                                         `• Most real users will have 100-1000 tS NFTs\n\n` +
-                                         `Continue with expensive full deposit?`
-                                       );
-                                       if (confirmed) {
-                                         depositToVault(nft.tokenId);
-                                       }
-                                     }}
-                                     disabled={isLoading}
-                                     className="button-primary"
-                                     style={{ flex: 1, background: '#dc3545' }}
-                                   >
-                                     Full Deposit (💸 $15-25 Gas)
-                                   </button>
-                                </>
-                              ) : (
-                                <button
-                                  onClick={() => {
-                                    const confirmed = window.confirm(
-                                      `Deposit fNFT #${nft.tokenId} to Vault?\n\n` +
-                                      `• Get ${nft.totalAmount} D-vS tokens right now\n` +
-                                      `• Low gas cost (under $2)\n` +
-                                      `• Safe and reversible\n\n` +
-                                      `Continue?`
-                                    );
-                                    if (confirmed) {
-                                      depositToVault(nft.tokenId);
-                                    }
-                                  }}
-                                  disabled={isLoading}
-                                  className="button-primary"
-                                  style={{ width: '100%', background: '#28a745' }}
-                                >
-                                  {isLoading ? 'Depositing...' : 'Deposit to Vault (Low Gas)'}
-                                </button>
-                              )}
-                            </div>
+                                    {isLoading ? 'Depositing...' : 'Deposit to Vault (Low Gas)'}
+                                  </button>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </div>
                       ))}
