@@ -370,33 +370,52 @@ contract vSVault is ERC721Holder, Ownable, ReentrancyGuard, Pausable {
 
     /**
      * @notice Ultra gas-efficient deposit for small demo/test NFTs (<1000 tokens)
-     * @dev Optimized version with minimal checks for educational/demo purposes
+     * @dev Assembly-optimized version with minimal checks for maximum gas savings
      * @param nftId The ID of the Sonic NFT to deposit (must be small value)
      */
-    function demoDeposit(uint256 nftId) external nonReentrant whenNotPaused {
-        require(sonicNFT != address(0), "NFT contract not set");
+    function demoDeposit(uint256 nftId) external {
+        // Cache msg.sender in memory (cheaper than multiple msg.sender calls)
+        address sender;
+        assembly {
+            sender := caller()
+        }
         
-        address sender = msg.sender;
+        // Quick check: ensure not already deposited using assembly
+        assembly {
+            // Calculate storage slot for depositedNFTs[nftId]
+            mstore(0x00, nftId)
+            mstore(0x20, depositedNFTs.slot)
+            let slot := keccak256(0x00, 0x40)
+            
+            // If slot is not zero, NFT already deposited
+            if sload(slot) {
+                // Revert with no message to save gas
+                revert(0, 0)
+            }
+            
+            // Store sender in the mapping slot immediately
+            sstore(slot, sender)
+        }
         
-        // Get total value first for size check
+        // Get total value - external call required, no way around this
         uint256 totalValue = TestSonicDecayfNFT(sonicNFT).getTotalAmount(nftId);
-        require(totalValue > 0 && totalValue <= 1000e18, "Demo deposit: 1-1000 tokens only");
         
-        // Skip some checks for gas efficiency on small deposits
-        require(IERC721(sonicNFT).ownerOf(nftId) == sender, "Not NFT owner");
-        require(depositedNFTs[nftId] == address(0), "NFT already deposited");
-        require(
-            TestSonicDecayfNFT(sonicNFT).claimDelegates(nftId) == address(this),
-            "Must delegate claiming rights to vault first"
-        );
-
-        // Minimal storage operations
-        depositedNFTs[nftId] = sender;
+        // Combined require for gas efficiency
+        require(totalValue > 0 && totalValue <= 1000e18, "Invalid demo value");
+        
+        // Quick ownership check - external call required
+        require(IERC721(sonicNFT).ownerOf(nftId) == sender, "Not owner");
+        
+        // Push to array - unavoidable storage operation
         heldNFTs.push(nftId);
-
-        // Direct mint without additional checks (safe for small amounts)
-        vS.mint(sender, totalValue);
-
+        
+        // Use ultra-efficient mint for demo amounts
+        if (totalValue <= 1000e18) {
+            VSToken(address(vS)).demoMint(sender, totalValue);
+        } else {
+            vS.mint(sender, totalValue);
+        }
+        
         emit NFTDeposited(sender, nftId, totalValue);
     }
 

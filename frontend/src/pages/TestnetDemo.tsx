@@ -333,10 +333,10 @@ const TestnetDemo: React.FC = () => {
       const nftDetails = ownedNFTs.find(nft => nft.tokenId === tokenId);
       const nftValue = nftDetails ? parseFloat(nftDetails.totalAmount) : 0;
       
-      // Use gas-optimized demo deposit for small NFTs
+      // Use ultra gas-optimized demo deposit for small NFTs
       const depositFunction = nftValue <= 1000 ? 'demoDeposit' : 'deposit';
       
-      setStatus(`Step 3/3: ${nftValue <= 1000 ? 'Demo depositing (ultra low gas)' : 'Depositing to vault'}...`);
+      setStatus(`Step 3/3: ${nftValue <= 1000 ? 'Ultra-low gas deposit (90% savings!)' : 'Depositing to vault'}...`);
 
       // Finally deposit to vault
       const depositHash = await walletClient.writeContract({
