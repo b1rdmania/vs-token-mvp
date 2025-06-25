@@ -22,9 +22,9 @@ const ShadowDEXIntegration: React.FC<ShadowDEXIntegrationProps> = ({
   const [tsAmount, setTsAmount] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [poolStats, setPoolStats] = useState({
-    tvl: '1,850',
+    tvl: '0',
     volume24h: '0',
-    apr: '15.0',
+    apr: 'TBD',
     userLpTokens: '0',
     userPoolShare: '0.00'
   });
@@ -95,41 +95,19 @@ const ShadowDEXIntegration: React.FC<ShadowDEXIntegrationProps> = ({
         </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
-        <div>
-          <h3>Pool Statistics</h3>
-          <div style={{ backgroundColor: '#f5f5f5', padding: '15px', borderRadius: '8px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <span>Total Value Locked:</span>
-              <strong>${poolStats.tvl}</strong>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <span>24h Volume:</span>
-              <strong>${poolStats.volume24h}</strong>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <span>Current APR:</span>
-              <strong style={{ color: '#4caf50' }}>{poolStats.apr}%</strong>
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <h3>Your Position</h3>
-          <div style={{ backgroundColor: '#f5f5f5', padding: '15px', borderRadius: '8px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <span>LP Tokens:</span>
-              <strong>{poolStats.userLpTokens}</strong>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <span>Pool Share:</span>
-              <strong>{poolStats.userPoolShare}%</strong>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <span>Est. Annual Rewards:</span>
-              <strong style={{ color: '#4caf50' }}>${projectedRewards}</strong>
-            </div>
-          </div>
+      <div style={{ 
+        backgroundColor: '#fff3e0', 
+        padding: '15px', 
+        borderRadius: '8px', 
+        marginBottom: '20px',
+        border: '1px solid #ffb74d'
+      }}>
+        <h3 style={{ margin: '0 0 10px 0', color: '#f57c00' }}>⚠️ Pool Setup Required</h3>
+        <p style={{ margin: 0, fontSize: '14px', color: '#f57c00' }}>
+          <strong>Next step:</strong> Create a Shadow DEX pool with your D-vS and tS tokens to enable liquidity provision.
+        </p>
+        <div style={{ marginTop: '10px', fontSize: '12px', color: '#666' }}>
+          Suggested ratio: 1000 D-vS + 850 tS (15% discount)
         </div>
       </div>
 
@@ -220,7 +198,7 @@ const ShadowDEXIntegration: React.FC<ShadowDEXIntegrationProps> = ({
               <strong>You will receive:</strong> LP tokens representing your share of the pool
             </div>
             <div style={{ marginBottom: '5px' }}>
-              <strong>Estimated Annual Rewards:</strong> ${projectedRewards} ({poolStats.apr}% APR)
+              <strong>Estimated Annual Rewards:</strong> Will depend on pool trading volume
             </div>
             <div>
               <strong>Pool Ratio:</strong> ~0.85 tS per D-vS (current market rate)
@@ -228,46 +206,55 @@ const ShadowDEXIntegration: React.FC<ShadowDEXIntegrationProps> = ({
           </div>
         )}
 
-        <button
-          onClick={handleAddLiquidity}
-          disabled={!userAddress || !dvsAmount || !tsAmount || isLoading || parseFloat(dvsAmount) > parseFloat(dvsBalance) || parseFloat(tsAmount) > parseFloat(tsBalance)}
-          style={{
-            width: '100%',
-            padding: '12px',
-            backgroundColor: !userAddress || !dvsAmount || !tsAmount || isLoading || parseFloat(dvsAmount) > parseFloat(dvsBalance) || parseFloat(tsAmount) > parseFloat(tsBalance) ? '#ccc' : '#4caf50',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            fontSize: '16px',
-            fontWeight: 'bold',
-            cursor: !userAddress || !dvsAmount || !tsAmount || isLoading || parseFloat(dvsAmount) > parseFloat(dvsBalance) || parseFloat(tsAmount) > parseFloat(tsBalance) ? 'not-allowed' : 'pointer'
-          }}
-        >
-          {isLoading ? 'Adding Liquidity...' : 'Add Liquidity & Start Earning'}
-        </button>
+        <div style={{ 
+          backgroundColor: '#f8f9fa', 
+          padding: '15px', 
+          borderRadius: '8px', 
+          textAlign: 'center',
+          marginBottom: '15px'
+        }}>
+          <p style={{ margin: '0 0 10px 0', fontSize: '14px', color: '#666' }}>
+            <strong>Ready to create pool?</strong> Use Shadow DEX directly:
+          </p>
+          <a 
+            href="https://www.shadow.so/liquidity/create"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-block',
+              padding: '10px 20px',
+              backgroundColor: '#1976d2',
+              color: 'white',
+              textDecoration: 'none',
+              borderRadius: '6px',
+              fontWeight: 'bold'
+            }}
+          >
+            Create Pool on Shadow DEX
+          </a>
+        </div>
 
         <div style={{ 
-          marginTop: '15px', 
           padding: '10px', 
           backgroundColor: '#e3f2fd', 
           borderRadius: '4px',
           fontSize: '12px',
           color: '#1565c0'
         }}>
-          <strong>💡 Pro Tip:</strong> Earn fees from every trade in the pool while keeping your future token value. 
-          It's like having your cake and eating it too!
+          <strong>Token Addresses:</strong><br/>
+          D-vS: 0x671B9634158A163521b029528b3Fd73EAefd6422<br/>
+          tS: 0x567a92ADA6a5D7d31b9e7aa410D868fa91Cd7b7C
         </div>
 
-        <div style={{ marginTop: '10px', fontSize: '12px', color: '#666', textAlign: 'center' }}>
-          Powered by{' '}
-          <a 
-            href={`https://www.shadow.so/liquidity/manage/${POOL_ADDRESS}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: '#1976d2', textDecoration: 'none' }}
-          >
-            Shadow DEX
-          </a>
+        <div style={{ 
+          marginTop: '15px', 
+          padding: '10px', 
+          backgroundColor: '#e8f5e8', 
+          borderRadius: '4px',
+          fontSize: '12px',
+          color: '#2e7d32'
+        }}>
+          <strong>💡 Pro Tip:</strong> Once the pool is created, you'll earn fees from every trade while keeping your future token value!
         </div>
       </div>
     </div>
