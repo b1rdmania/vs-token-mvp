@@ -231,6 +231,43 @@ contract vSVault is ERC721Holder, Ownable, ReentrancyGuard, Pausable {
     }
 
     /**
+     * @notice Simple redeem that only uses already-claimed tokens (LOW GAS)
+     * @dev Much cheaper gas option - only redeems from tokens already in vault
+     * @param amount The amount of vS tokens to burn.
+     */
+    function simpleRedeem(uint256 amount) external nonReentrant whenNotPaused {
+        require(amount > 0, "Cannot redeem 0");
+        require(vS.balanceOf(msg.sender) >= amount, "Insufficient vS balance");
+        
+        uint256 vsTotalSupply = vS.totalSupply();
+        require(vsTotalSupply > 0, "No vS tokens in circulation");
+        
+        // Only use existing balance in vault (no claiming during redemption)
+        uint256 availableBalance = IERC20(underlyingToken).balanceOf(address(this));
+        require(availableBalance > 0, "No tokens available - try claiming first");
+        
+        // Calculate proportional share of available balance
+        uint256 redeemableValue = (amount * availableBalance) / vsTotalSupply;
+        
+        // Calculate protocol fee
+        uint256 protocolFee = (redeemableValue * PROTOCOL_FEE_BPS) / 10_000;
+        uint256 userAmount = redeemableValue - protocolFee;
+        
+        // Burn user's vS tokens
+        vS.burn(msg.sender, amount);
+        
+        // Transfer protocol fee to treasury
+        if (protocolFee > 0 && protocolTreasury != address(0)) {
+            IERC20(underlyingToken).transfer(protocolTreasury, protocolFee);
+        }
+        
+        // Transfer tokens to user
+        IERC20(underlyingToken).transfer(msg.sender, userAmount);
+
+        emit Redeemed(msg.sender, amount, userAmount);
+    }
+
+    /**
      * @notice Emergency pause function for the owner
      */
     function pause() external onlyOwner {
