@@ -1,32 +1,46 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.20;
 
-import {Script} from "forge-std/Script.sol";
-import {DemoToken} from "../src/MockToken.sol";
-import {DemoDecayfNFT} from "../src/DecayfNFT.sol";
+import "forge-std/Script.sol";
+import {TestSonicToken} from "../src/MockToken.sol";
+import {TestSonicDecayfNFT} from "../src/DecayfNFT.sol";
+import {VSToken} from "../src/VSToken.sol";
+import {TestVault} from "../src/Vault.sol";
 
-contract DeployDemoDecayfNFT is Script {
-    function run() external returns (address, address) {
-        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
-        address deployer = vm.addr(deployerPrivateKey);
-        vm.startBroadcast(deployerPrivateKey);
+contract DeployDemo is Script {
+    function setUp() public {}
 
-        // 1. Deploy DemoToken (the underlying asset)
-        DemoToken demoToken = new DemoToken();
+    function run() public {
+        vm.startBroadcast();
 
-        // 2. Deploy DemoDecayfNFT, linking it to the underlying token
-        DemoDecayfNFT demoDecayfNFT = new DemoDecayfNFT(address(demoToken));
+        // Deploy Test Sonic token (tS)
+        TestSonicToken tS = new TestSonicToken();
+        console2.log("TestSonicToken (tS) deployed at:", address(tS));
 
-        // 3. Mint demo tokens to the deployer for faucet/testing
-        demoToken.mint(deployer, 1_000_000 ether);
+        // Deploy Test Sonic Vesting NFT (tS-fNFT)
+        TestSonicDecayfNFT fNFT = new TestSonicDecayfNFT(address(tS));
+        console2.log("TestSonicDecayfNFT (tS-fNFT) deployed at:", address(fNFT));
 
-        // 4. Fund the NFT contract with demo tokens for claims
-        demoToken.mint(address(demoDecayfNFT), 1_000_000 ether);
+        // Deploy Test vS token (tvS)
+        VSToken vS = new VSToken();
+        console2.log("VSToken (tvS) deployed at:", address(vS));
 
-        // 5. Mint a test NFT to the deployer (principal: 1000 DEMO, duration: 30 days)
-        demoDecayfNFT.safeMint(deployer, 1000 ether, 30 days);
+        // Deploy Vault
+        TestVault vault = new TestVault(address(tS));
+        console2.log("TestVault deployed at:", address(vault));
+
+        // Set fNFT and vS addresses in Vault
+        vault.setFNFT(address(fNFT));
+        vault.setVSToken(address(vS));
+
+        // Set Vault as minter in vS
+        vS.setMinter(address(vault));
+
+        // Fund Vault with tS tokens for redemptions
+        uint256 fundAmount = 1_000_000 * 1e18;
+        tS.mint(address(vault), fundAmount);
+        console2.log("Funded Vault with", fundAmount, "tS tokens");
 
         vm.stopBroadcast();
-        return (address(demoToken), address(demoDecayfNFT));
     }
 } 

@@ -3,14 +3,16 @@ import { useAccount, usePublicClient, useWalletClient } from 'wagmi';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import DecayfNFTArtifact from '../abis/DecayfNFT.json';
 import MockTokenArtifact from '../abis/MockToken.json';
+import vSVaultArtifact from '../abis/vSVault.json';
+import vSTokenArtifact from '../abis/vSToken.json';
 import '../styles/common.css';
 import { ethers } from 'ethers';
 
 // Sonic Mainnet Demo addresses
-const DECAYFNFT_ADDRESS = '0xf211764E896d2A8C42D73BfadbFdEA455E87C32d'; // TestSonicDecayfNFT (tS-fNFT)
-const MOCKTOKEN_ADDRESS = '0xe5d17D1Be55614b0a5356094DCd92Cf82E3D87De'; // TestSonicToken (tS)
-const VSTOKEN_ADDRESS = '0xF580fCC22499F813bD0225403735E94f45E1a25a'; // VSToken (tvS)
-const VAULT_ADDRESS = '0x22ee34ef29c7c070fBe4b8bC92A915F33Dd5cDcA'; // TestVault
+const DECAYFNFT_ADDRESS = '0xf211764E896d2A8C42D73BfadbFdEA455E87C32d';
+const MOCKTOKEN_ADDRESS = '0xe5d17D1Be55614b0a5356094DCd92Cf82E3D87De';
+const VSTOKEN_ADDRESS = '0xF580fCC22499F813bD0225403735E94f45E1a25a';
+const VAULT_ADDRESS = '0x22ee34ef29c7c070fBe4b8bC92A915F33Dd5cDcA';
 
 const explorerBase = 'https://sonicscan.io/address/';
 
@@ -44,196 +46,594 @@ function AddressRow({ label, address }: { label: string; address: string }) {
   );
 }
 
-const decayfNFTAbi = DecayfNFTArtifact.abi;
-const mockTokenAbi = MockTokenArtifact.abi;
-
-const Demo: React.FC = () => {
-  const { address: account, isConnected } = useAccount();
-  const { openConnectModal } = useConnectModal();
+const TestnetDemo: React.FC = () => {
+  const { address, isConnected } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
-  const [nfts, setNfts] = useState<any[]>([]);
-  const [tsBalance, setTsBalance] = useState('0');
-  const [tvsBalance, setTvsBalance] = useState('0');
-  const [status, setStatus] = useState<string>('');
-  const [mintPrincipal, setMintPrincipal] = useState('');
+  const { openConnectModal } = useConnectModal();
 
-  // Fetch user's NFTs and balances
-  const fetchNFTsAndBalances = async () => {
-    if (!walletClient || !account) return;
-    setStatus('Fetching your balances and NFTs...');
-    const provider = new ethers.JsonRpcProvider(publicClient?.transport.url);
-    const decayfNFT = new ethers.Contract(DECAYFNFT_ADDRESS, DecayfNFTArtifact.abi, provider);
-    const tsToken = new ethers.Contract(MOCKTOKEN_ADDRESS, MockTokenArtifact.abi, provider);
-    const vsToken = new ethers.Contract(VSTOKEN_ADDRESS, MockTokenArtifact.abi, provider);
-    // Fetch tS and tvS balances
-    const tsBal = await tsToken.balanceOf(account);
-    setTsBalance(ethers.formatUnits(tsBal, 18));
+  const [fNFTBalance, setFNFTBalance] = useState<string>('0');
+  const [underlyingBalance, setUnderlyingBalance] = useState<string>('0');
+  const [vsBalance, setVsBalance] = useState<string>('0');
+  const [vaultBalance, setVaultBalance] = useState<string>('0');
+  const [ownedNFTs, setOwnedNFTs] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [txHash, setTxHash] = useState<string>('');
+  const [activeTab, setActiveTab] = useState<'mint' | 'vault'>('mint');
+  const [status, setStatus] = useState<string>('');
+
+  const loadOwnedNFTs = async () => {
+    if (!address || !publicClient) return;
+    
     try {
-      const tvsBal = await vsToken.balanceOf(account);
-      setTvsBalance(ethers.formatUnits(tvsBal, 18));
-    } catch {}
-    // Fetch NFTs
-    const maxTokenId = 50;
-    const userNFTs: any[] = [];
-    for (let tokenId = 0; tokenId < maxTokenId; tokenId++) {
-      try {
-        const owner = await decayfNFT.ownerOf(tokenId);
-        if (owner.toLowerCase() === account.toLowerCase()) {
-          const vesting = await decayfNFT.vestingSchedules(tokenId);
-          userNFTs.push({
-            tokenId,
-            principal: Number(vesting.principalAmount.toString()),
-            claimed: Number(vesting.claimedAmount.toString()),
-            start: Number(vesting.vestingStart.toString()),
-            duration: Number(vesting.vestingDuration.toString()),
-          });
+      const provider = new ethers.JsonRpcProvider(publicClient?.transport.url);
+      const decayfNFT = new ethers.Contract(DECAYFNFT_ADDRESS, DecayfNFTArtifact.abi, provider);
+      
+      const userNFTs: any[] = [];
+      const maxTokenId = 100; // Check first 100 token IDs
+      
+      for (let tokenId = 0; tokenId < maxTokenId; tokenId++) {
+        try {
+          const owner = await decayfNFT.ownerOf(tokenId);
+          if (owner.toLowerCase() === address.toLowerCase()) {
+            const totalAmount = await decayfNFT.getTotalAmount(tokenId);
+            const claimedAmount = await decayfNFT.getClaimedAmount(tokenId);
+            const availableAmount = await decayfNFT.getVestedAmount(tokenId);
+            
+            const totalAmountFormatted = ethers.formatEther(totalAmount.toString());
+            const claimedAmountFormatted = ethers.formatEther(claimedAmount.toString());
+            const availableAmountFormatted = ethers.formatEther((availableAmount - claimedAmount).toString());
+            const progress = totalAmount > 0 ? Math.floor((Number(claimedAmount) / Number(totalAmount)) * 100) : 0;
+            
+            userNFTs.push({
+              tokenId,
+              totalAmount: totalAmountFormatted,
+              claimedAmount: claimedAmountFormatted,
+              availableAmount: availableAmountFormatted,
+              progress
+            });
+          }
+        } catch (error) {
+          // Token doesn't exist or not owned by user, continue
         }
-      } catch {}
+      }
+      
+      setOwnedNFTs(userNFTs);
+    } catch (error) {
+      console.error('Error loading owned NFTs:', error);
     }
-    setNfts(userNFTs);
-    setStatus('');
+  };
+
+  const loadBalances = async () => {
+    if (!address || !publicClient) return;
+
+    try {
+      // Get fNFT balance
+      const nftBalance = await publicClient.readContract({
+        address: DECAYFNFT_ADDRESS as `0x${string}`,
+        abi: DecayfNFTArtifact.abi,
+        functionName: 'balanceOf',
+        args: [address],
+      });
+      setFNFTBalance(nftBalance.toString());
+
+      // Get underlying token balance  
+      const tokenBalance = await publicClient.readContract({
+        address: MOCKTOKEN_ADDRESS as `0x${string}`,
+        abi: MockTokenArtifact.abi,
+        functionName: 'balanceOf',
+        args: [address],
+      });
+      setUnderlyingBalance(ethers.formatEther(tokenBalance.toString()));
+
+      // Get vS token balance
+      try {
+        const vsTokenBalance = await publicClient.readContract({
+          address: VSTOKEN_ADDRESS as `0x${string}`,
+          abi: vSTokenArtifact.abi,
+          functionName: 'balanceOf',
+          args: [address],
+        });
+        setVsBalance(ethers.formatEther(vsTokenBalance.toString()));
+      } catch (error) {
+        console.log('vS token not deployed yet or error reading balance');
+        setVsBalance('0');
+      }
+
+      // Get vault total assets
+      try {
+        const vaultAssets = await publicClient.readContract({
+          address: VAULT_ADDRESS as `0x${string}`,
+          abi: vSVaultArtifact.abi,
+          functionName: 'totalAssets',
+          args: [],
+        });
+        setVaultBalance(ethers.formatEther(vaultAssets.toString()));
+      } catch (error) {
+        console.log('Vault not deployed yet or error reading balance');
+        setVaultBalance('0');
+      }
+
+      // Get owned NFTs
+      await loadOwnedNFTs();
+    } catch (error) {
+      console.error('Error loading balances:', error);
+    }
   };
 
   useEffect(() => {
-    if (walletClient && account) fetchNFTsAndBalances();
-    // eslint-disable-next-line
-  }, [walletClient, account]);
+    if (isConnected && address) {
+      loadBalances();
+    }
+  }, [isConnected, address, publicClient]);
 
-  const handleFaucet = async () => {
-    if (!walletClient || !account) return;
+  const mintTokens = async () => {
+    if (!walletClient || !address) return;
+
+    setIsLoading(true);
     setStatus('Requesting tS from faucet...');
     try {
-      const provider = new ethers.JsonRpcProvider(publicClient?.transport.url);
-      const tsToken = new ethers.Contract(MOCKTOKEN_ADDRESS, MockTokenArtifact.abi, provider);
-      const tx = await tsToken.connect(walletClient).faucet();
-      await tx.wait();
+      const hash = await walletClient.writeContract({
+        address: MOCKTOKEN_ADDRESS as `0x${string}`,
+        abi: MockTokenArtifact.abi,
+        functionName: 'faucet',
+        args: [],
+      });
+
+      setTxHash(hash);
+      console.log('Faucet transaction sent:', hash);
+
+      // Wait for transaction confirmation
+      const receipt = await publicClient?.waitForTransactionReceipt({ hash });
+      console.log('Faucet confirmed:', receipt);
+
       setStatus('Faucet success! You received 1000 tS.');
-      fetchNFTsAndBalances();
-    } catch (err) {
+      // Reload balances
+      await loadBalances();
+    } catch (error) {
+      console.error('Error minting tokens:', error);
       setStatus('Faucet failed.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleMint = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!walletClient || !account) return;
+  const mintfNFT = async () => {
+    if (!walletClient || !address) return;
+
+    setIsLoading(true);
     setStatus('Minting your fNFT...');
     try {
       const provider = new ethers.JsonRpcProvider(publicClient?.transport.url);
       const tsToken = new ethers.Contract(MOCKTOKEN_ADDRESS, MockTokenArtifact.abi, provider);
-      // Approve tS for minting
-      const approveTx = await tsToken.connect(walletClient).approve(DECAYFNFT_ADDRESS, mintPrincipal);
-      await approveTx.wait();
-      const decayfNFT = new ethers.Contract(DECAYFNFT_ADDRESS, DecayfNFTArtifact.abi, provider);
-      const tx = await decayfNFT.connect(walletClient).safeMint(account, mintPrincipal, '23328000');
-      await tx.wait();
+      
+      // First approve the spending
+      const approveHash = await walletClient.writeContract({
+        address: MOCKTOKEN_ADDRESS as `0x${string}`,
+        abi: MockTokenArtifact.abi,
+        functionName: 'approve',
+        args: [DECAYFNFT_ADDRESS, ethers.parseEther('10000')],
+      });
+
+      console.log('Approval transaction sent:', approveHash);
+      await publicClient?.waitForTransactionReceipt({ hash: approveHash });
+
+      // Then mint the NFT
+      const mintHash = await walletClient.writeContract({
+        address: DECAYFNFT_ADDRESS as `0x${string}`,
+        abi: DecayfNFTArtifact.abi,
+        functionName: 'safeMint',
+        args: [address, ethers.parseEther('10000'), 23328000], // 9 months in seconds
+      });
+
+      setTxHash(mintHash);
+      console.log('Mint transaction sent:', mintHash);
+
+      // Wait for transaction confirmation
+      const receipt = await publicClient?.waitForTransactionReceipt({ hash: mintHash });
+      console.log('Mint confirmed:', receipt);
+
       setStatus('Minted! You now have a new fNFT.');
-      setMintPrincipal('');
-      fetchNFTsAndBalances();
-    } catch (err) {
+      // Reload balances and NFT data
+      await loadBalances();
+    } catch (error) {
+      console.error('Error minting fNFT:', error);
       setStatus('Mint failed.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleClaim = async (tokenId: number) => {
-    if (!walletClient || !account) return;
+  const claimVested = async (tokenId: number) => {
+    if (!walletClient || !address) return;
+
+    setIsLoading(true);
     setStatus('Claiming vested tS...');
     try {
-      const provider = new ethers.JsonRpcProvider(publicClient?.transport.url);
-      const decayfNFT = new ethers.Contract(DECAYFNFT_ADDRESS, DecayfNFTArtifact.abi, provider);
-      const tx = await decayfNFT.connect(walletClient).claimVestedTokens(tokenId);
-      await tx.wait();
+      const hash = await walletClient.writeContract({
+        address: DECAYFNFT_ADDRESS as `0x${string}`,
+        abi: DecayfNFTArtifact.abi,
+        functionName: 'claimVestedTokens',
+        args: [tokenId],
+      });
+
+      setTxHash(hash);
+      console.log('Claim transaction sent:', hash);
+
+      // Wait for transaction confirmation
+      const receipt = await publicClient?.waitForTransactionReceipt({ hash });
+      console.log('Claim confirmed:', receipt);
+
       setStatus('Claimed!');
-      fetchNFTsAndBalances();
-    } catch (err) {
+      // Reload balances and NFT data
+      await loadBalances();
+    } catch (error) {
+      console.error('Error claiming vested tokens:', error);
       setStatus('Claim failed.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Eli15 steps
+  const depositToVault = async (tokenId: number) => {
+    if (!walletClient || !address) return;
+
+    setIsLoading(true);
+    setStatus('Depositing to vault...');
+    try {
+      // First approve the vault to transfer the NFT
+      const approveHash = await walletClient.writeContract({
+        address: DECAYFNFT_ADDRESS as `0x${string}`,
+        abi: DecayfNFTArtifact.abi,
+        functionName: 'approve',
+        args: [VAULT_ADDRESS, tokenId],
+      });
+
+      console.log('Approval transaction sent:', approveHash);
+      await publicClient?.waitForTransactionReceipt({ hash: approveHash });
+
+      // Then deposit to vault
+      const depositHash = await walletClient.writeContract({
+        address: VAULT_ADDRESS as `0x${string}`,
+        abi: vSVaultArtifact.abi,
+        functionName: 'deposit',
+        args: [tokenId],
+      });
+
+      setTxHash(depositHash);
+      console.log('Deposit transaction sent:', depositHash);
+
+      // Wait for transaction confirmation
+      const receipt = await publicClient?.waitForTransactionReceipt({ hash: depositHash });
+      console.log('Deposit confirmed:', receipt);
+
+      setStatus('Deposited! You received vS tokens.');
+      // Reload balances and NFT data
+      await loadBalances();
+    } catch (error) {
+      console.error('Error depositing to vault:', error);
+      setStatus('Deposit failed.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const redeemFromVault = async (amount: string) => {
+    if (!walletClient || !address || !amount) return;
+
+    setIsLoading(true);
+    setStatus('Redeeming from vault...');
+    try {
+      const amountWei = ethers.parseEther(amount);
+      
+      const hash = await walletClient.writeContract({
+        address: VAULT_ADDRESS as `0x${string}`,
+        abi: vSVaultArtifact.abi,
+        functionName: 'redeem',
+        args: [amountWei],
+      });
+
+      setTxHash(hash);
+      console.log('Redeem transaction sent:', hash);
+
+      // Wait for transaction confirmation
+      const receipt = await publicClient?.waitForTransactionReceipt({ hash });
+      console.log('Redeem confirmed:', receipt);
+
+      setStatus('Redeemed! You received underlying tokens.');
+      // Reload balances
+      await loadBalances();
+    } catch (error) {
+      console.error('Error redeeming from vault:', error);
+      setStatus('Redeem failed.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const claimVaultVested = async () => {
+    if (!walletClient || !address) return;
+
+    setIsLoading(true);
+    setStatus('Claiming vault vested tokens...');
+    try {
+      const hash = await walletClient.writeContract({
+        address: VAULT_ADDRESS as `0x${string}`,
+        abi: vSVaultArtifact.abi,
+        functionName: 'claimVested',
+        args: [0, 10], // Claim first 10 NFTs
+      });
+
+      setTxHash(hash);
+      console.log('Vault claim transaction sent:', hash);
+
+      // Wait for transaction confirmation
+      const receipt = await publicClient?.waitForTransactionReceipt({ hash });
+      console.log('Vault claim confirmed:', receipt);
+
+      setStatus('Vault tokens claimed successfully!');
+      // Reload balances
+      await loadBalances();
+    } catch (error) {
+      console.error('Error claiming vault vested tokens:', error);
+      setStatus('Vault claim failed.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="page-container">
-      {/* Eli15 Explainer */}
+      {/* Header with explanation */}
       <div className="content-card" style={{ marginBottom: 16, background: '#fffbe6', border: '1px solid #ffe066', color: '#856404' }}>
-        <b>Note:</b> Because the FNFTs are not live from the Sonic AirDrop for this demo, you have to mint your own to see how the user flow works for the rest of the project.
+        <b>🏦 vS Vault Protocol - Complete Demo:</b> This demo showcases the full vS Vault functionality on Sonic mainnet. Mint fNFTs, deposit them into the vault for liquid vS tokens, and redeem your underlying assets.
       </div>
+
       <div className="content-card" style={{ marginBottom: 24, background: '#f7f9fc', border: '1px solid #eaecef' }}>
-        <h1 style={{ margin: 0, fontSize: 24, color: '#1F6BFF' }}>Sonic Mainnet Vesting Demo (Eli15)</h1>
-        <ol style={{ fontSize: 16, color: '#333', margin: '16px 0 0 0', paddingLeft: 24 }}>
-          <li><b>Get tS:</b> Click the faucet to get free Sonic tokens (tS) for testing.</li>
-          <li><b>Mint fNFT:</b> Lock your tS into a vesting NFT (fNFT). 25% is claimable now, 75% unlocks over 9 months.</li>
-          <li><b>Claim:</b> As time passes, claim your unlocked tS from your fNFT.</li>
-        </ol>
+        <h1 style={{ margin: 0, fontSize: 24, color: '#1F6BFF' }}>🏦 vS Vault Protocol Demo</h1>
         <div style={{ marginTop: 12, color: '#555', fontSize: 15 }}>
-          <b>What is this?</b> This is a real, live demo on Sonic mainnet. All tokens and NFTs are on-chain. Anyone can try it!
+          <b>How it works:</b>
+          <ol style={{ margin: '8px 0', paddingLeft: 20 }}>
+            <li><b>Get tS tokens:</b> Use the faucet to get demo tokens</li>
+            <li><b>Mint fNFTs:</b> Lock tokens into vesting NFTs</li>
+            <li><b>Deposit to Vault:</b> Get liquid vS tokens for your locked fNFTs</li>
+            <li><b>Trade or Hold:</b> Use vS tokens in DeFi or hold them</li>
+            <li><b>Redeem:</b> Burn vS tokens to get underlying assets</li>
+          </ol>
         </div>
       </div>
-      <div className="content-card" style={{ marginBottom: 24 }}>
-        <h2>Step 1: Get tS (Faucet)</h2>
-        <p>Click to get 1000 tS tokens for free. You need tS to mint an fNFT.</p>
-        <button className="button-primary" onClick={handleFaucet} disabled={!isConnected}>Get tS</button>
-        <div style={{ marginTop: 8, color: '#888' }}>Your tS balance: <b>{Number(tsBalance).toLocaleString()} tS</b></div>
-      </div>
-      <div className="content-card" style={{ marginBottom: 24 }}>
-        <h2>Step 2: Mint a Vesting NFT (fNFT)</h2>
-        <p>Lock your tS into a vesting NFT. 25% is claimable now, 75% unlocks over 9 months.</p>
-        <form onSubmit={handleMint} style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          <input
-            type="number"
-            className="form-input"
-            placeholder="Amount of tS to lock (e.g. 1000)"
-            value={mintPrincipal}
-            onChange={e => setMintPrincipal(e.target.value)}
-            min={1}
-            required
-            style={{ width: 220 }}
-          />
-          <button className="button-primary" type="submit" disabled={!isConnected || !mintPrincipal}>Mint fNFT</button>
-        </form>
-      </div>
-      <div className="content-card" style={{ marginBottom: 24 }}>
-        <h2>Step 3: Your fNFTs (Claim as they vest)</h2>
-        <p>Each fNFT unlocks tS over time. Click "Claim" to get your unlocked tokens.</p>
-        {nfts.length === 0 ? (
-          <div style={{ color: '#888' }}>You don't own any fNFTs yet.</div>
-        ) : (
-          <table className="activity-table" style={{ width: '100%', fontSize: 14, borderCollapse: 'collapse' }}>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Principal</th>
-                <th>Claimed</th>
-                <th>Start</th>
-                <th>Duration</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {nfts.map(nft => (
-                <tr key={nft.tokenId}>
-                  <td>{nft.tokenId}</td>
-                  <td>{Number(nft.principal).toLocaleString()} tS</td>
-                  <td>{Number(nft.claimed).toLocaleString()} tS</td>
-                  <td>{nft.start}</td>
-                  <td>{nft.duration}</td>
-                  <td>
-                    <button className="button-primary" onClick={() => handleClaim(nft.tokenId)} disabled={!isConnected}>Claim</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
-      {status && <div className="content-card" style={{ textAlign: 'center', color: '#007BFF' }}>Status: {status}</div>}
+
+      {!isConnected ? (
+        <div className="content-card" style={{ textAlign: 'center', padding: 40 }}>
+          <h2>Connect Your Wallet</h2>
+          <p>Connect your wallet to start testing the vS Vault Protocol</p>
+          <button onClick={openConnectModal} className="button-primary" style={{ padding: '12px 24px', fontSize: 16 }}>
+            Connect Wallet
+          </button>
+        </div>
+      ) : (
+        <>
+          <div className="content-card" style={{ marginBottom: 16 }}>
+            <h3>👤 Connected: {address?.slice(0, 6)}...{address?.slice(-4)}</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginTop: 16 }}>
+              <div style={{ background: '#f8f9fa', padding: 16, borderRadius: 8, border: '1px solid #eaecef' }}>
+                <h4 style={{ margin: '0 0 8px 0', color: '#666' }}>🎫 fNFTs Owned</h4>
+                <div style={{ fontSize: 20, fontWeight: 'bold' }}>{fNFTBalance}</div>
+              </div>
+              <div style={{ background: '#f8f9fa', padding: 16, borderRadius: 8, border: '1px solid #eaecef' }}>
+                <h4 style={{ margin: '0 0 8px 0', color: '#666' }}>💰 tS Balance</h4>
+                <div style={{ fontSize: 20, fontWeight: 'bold' }}>{Number(underlyingBalance).toFixed(2)}</div>
+              </div>
+              <div style={{ background: '#f8f9fa', padding: 16, borderRadius: 8, border: '1px solid #eaecef' }}>
+                <h4 style={{ margin: '0 0 8px 0', color: '#666' }}>⚡ vS Balance</h4>
+                <div style={{ fontSize: 20, fontWeight: 'bold' }}>{Number(vsBalance).toFixed(2)}</div>
+              </div>
+              <div style={{ background: '#f8f9fa', padding: 16, borderRadius: 8, border: '1px solid #eaecef' }}>
+                <h4 style={{ margin: '0 0 8px 0', color: '#666' }}>🏦 Vault Assets</h4>
+                <div style={{ fontSize: 20, fontWeight: 'bold' }}>{Number(vaultBalance).toFixed(2)}</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="content-card" style={{ marginBottom: 16 }}>
+            <div style={{ display: 'flex', gap: 8, borderBottom: '1px solid #eaecef', marginBottom: 16 }}>
+              <button 
+                style={{ 
+                  padding: '8px 16px', 
+                  border: 'none', 
+                  background: activeTab === 'mint' ? '#1F6BFF' : 'transparent',
+                  color: activeTab === 'mint' ? 'white' : '#666',
+                  borderRadius: '4px 4px 0 0',
+                  cursor: 'pointer'
+                }}
+                onClick={() => setActiveTab('mint')}
+              >
+                🎟️ Mint fNFTs
+              </button>
+              <button 
+                style={{ 
+                  padding: '8px 16px', 
+                  border: 'none', 
+                  background: activeTab === 'vault' ? '#1F6BFF' : 'transparent',
+                  color: activeTab === 'vault' ? 'white' : '#666',
+                  borderRadius: '4px 4px 0 0',
+                  cursor: 'pointer'
+                }}
+                onClick={() => setActiveTab('vault')}
+              >
+                🏦 Vault Operations
+              </button>
+            </div>
+
+            {activeTab === 'mint' && (
+              <>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16, marginBottom: 24 }}>
+                  <div style={{ background: '#f8f9fa', padding: 20, borderRadius: 8, border: '1px solid #eaecef' }}>
+                    <h3 style={{ margin: '0 0 12px 0' }}>🔥 Get Test Tokens</h3>
+                    <p style={{ margin: '0 0 16px 0' }}>Mint yourself 1,000 tS tokens for testing</p>
+                    <button
+                      onClick={mintTokens}
+                      disabled={isLoading}
+                      className="button-primary"
+                      style={{ width: '100%' }}
+                    >
+                      {isLoading ? 'Minting...' : 'Get 1,000 tS'}
+                    </button>
+                  </div>
+
+                  <div style={{ background: '#f8f9fa', padding: 20, borderRadius: 8, border: '1px solid #eaecef' }}>
+                    <h3 style={{ margin: '0 0 12px 0' }}>🎟️ Mint fNFT</h3>
+                    <p style={{ margin: '0 0 16px 0' }}>Create a new vesting NFT (10,000 tS, 9 months vesting)</p>
+                    <button
+                      onClick={mintfNFT}
+                      disabled={isLoading}
+                      className="button-primary"
+                      style={{ width: '100%' }}
+                    >
+                      {isLoading ? 'Minting...' : 'Mint fNFT'}
+                    </button>
+                  </div>
+                </div>
+
+                {ownedNFTs.length > 0 && (
+                  <div>
+                    <h3>🎫 Your fNFTs</h3>
+                    <div style={{ display: 'grid', gap: 16, marginTop: 16 }}>
+                      {ownedNFTs.map((nft) => (
+                        <div key={nft.tokenId} style={{ background: '#fff', padding: 16, borderRadius: 8, border: '1px solid #eaecef' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                            <h4 style={{ margin: 0 }}>fNFT #{nft.tokenId}</h4>
+                            <div style={{ background: '#e6f7ff', padding: '4px 8px', borderRadius: 4, fontSize: 12 }}>
+                              {nft.progress}% unlocked
+                            </div>
+                          </div>
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: 8, marginBottom: 16, fontSize: 14 }}>
+                            <div><strong>Total:</strong> {Number(nft.totalAmount).toFixed(2)} tS</div>
+                            <div><strong>Claimed:</strong> {Number(nft.claimedAmount).toFixed(2)} tS</div>
+                            <div><strong>Available:</strong> {Number(nft.availableAmount).toFixed(2)} tS</div>
+                          </div>
+                          <div style={{ display: 'flex', gap: 8 }}>
+                            <button
+                              onClick={() => claimVested(nft.tokenId)}
+                              disabled={isLoading || parseFloat(nft.availableAmount) === 0}
+                              className="button-primary"
+                              style={{ flex: 1 }}
+                            >
+                              {isLoading ? 'Claiming...' : `Claim ${Number(nft.availableAmount).toFixed(2)} tS`}
+                            </button>
+                            <button
+                              onClick={() => depositToVault(nft.tokenId)}
+                              disabled={isLoading}
+                              className="button-primary"
+                              style={{ flex: 1, background: '#28a745' }}
+                            >
+                              {isLoading ? 'Depositing...' : 'Deposit to Vault'}
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+
+            {activeTab === 'vault' && (
+              <div>
+                <div style={{ background: '#e6f7ff', padding: 16, borderRadius: 8, marginBottom: 24 }}>
+                  <h3 style={{ margin: '0 0 8px 0' }}>🏦 Vault Information</h3>
+                  <p style={{ margin: '0 0 12px 0' }}>The vault holds fNFTs and allows you to mint liquid vS tokens against their full future value.</p>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
+                    <div>
+                      <span style={{ color: '#666' }}>Your vS Balance:</span>
+                      <div style={{ fontSize: 18, fontWeight: 'bold' }}>{Number(vsBalance).toFixed(2)} vS</div>
+                    </div>
+                    <div>
+                      <span style={{ color: '#666' }}>Total Vault Assets:</span>
+                      <div style={{ fontSize: 18, fontWeight: 'bold' }}>{Number(vaultBalance).toFixed(2)} tS</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
+                  <div style={{ background: '#f8f9fa', padding: 20, borderRadius: 8, border: '1px solid #eaecef' }}>
+                    <h3 style={{ margin: '0 0 12px 0' }}>💰 Redeem vS Tokens</h3>
+                    <p style={{ margin: '0 0 16px 0' }}>Burn vS tokens to get your share of underlying tS tokens</p>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <input
+                        type="number"
+                        placeholder="Amount of vS to redeem"
+                        id="redeem-amount"
+                        step="0.1"
+                        max={vsBalance}
+                        style={{ flex: 1, padding: 8, border: '1px solid #ccc', borderRadius: 4 }}
+                      />
+                      <button
+                        onClick={() => {
+                          const input = document.getElementById('redeem-amount') as HTMLInputElement;
+                          redeemFromVault(input.value);
+                        }}
+                        disabled={isLoading || parseFloat(vsBalance) === 0}
+                        className="button-primary"
+                      >
+                        {isLoading ? 'Redeeming...' : 'Redeem'}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div style={{ background: '#f8f9fa', padding: 20, borderRadius: 8, border: '1px solid #eaecef' }}>
+                    <h3 style={{ margin: '0 0 12px 0' }}>⚡ Claim Vault Vested Tokens</h3>
+                    <p style={{ margin: '0 0 16px 0' }}>Anyone can call this to claim vested tokens from vault's fNFTs</p>
+                    <button
+                      onClick={claimVaultVested}
+                      disabled={isLoading}
+                      className="button-primary"
+                      style={{ width: '100%' }}
+                    >
+                      {isLoading ? 'Claiming...' : 'Claim Vault Vested'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {status && (
+            <div className="content-card" style={{ textAlign: 'center', background: '#e6f7ff', border: '1px solid #b3d9ff' }}>
+              <strong>Status:</strong> {status}
+            </div>
+          )}
+
+          {txHash && (
+            <div className="content-card" style={{ textAlign: 'center', background: '#f0f8f0', border: '1px solid #d1e7d1' }}>
+              <strong>Last Transaction:</strong>{' '}
+              <a
+                href={`https://sonicscan.io/tx/${txHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: '#1F6BFF', textDecoration: 'underline' }}
+              >
+                {txHash.slice(0, 10)}...{txHash.slice(-8)}
+              </a>
+            </div>
+          )}
+        </>
+      )}
+
       <footer style={{ marginTop: 48, textAlign: 'center', color: '#888', fontSize: 14 }}>
+        <div style={{ marginBottom: 16 }}>
+          <h4 style={{ margin: '0 0 8px 0', color: '#666' }}>Contract Addresses</h4>
+          <div style={{ display: 'grid', gap: 4, fontSize: 12, textAlign: 'left', maxWidth: 600, margin: '0 auto' }}>
+            <AddressRow label="fNFT" address={DECAYFNFT_ADDRESS} />
+            <AddressRow label="tS Token" address={MOCKTOKEN_ADDRESS} />
+            <AddressRow label="vS Token" address={VSTOKEN_ADDRESS} />
+            <AddressRow label="Vault" address={VAULT_ADDRESS} />
+          </div>
+        </div>
         <div style={{ marginBottom: 8 }}>
           <a href={`https://sonicscan.io/address/${VAULT_ADDRESS}`} target="_blank" rel="noopener noreferrer">View Vault on Sonic Explorer</a>
           {' | '}
           <a href="https://github.com/b1rdmania/vs-token-mvp" target="_blank" rel="noopener noreferrer">GitHub</a>
-          {' | '}
-          <a href="/docs" target="_blank" rel="noopener noreferrer">Docs</a>
         </div>
         <div>Sonic Mainnet &copy; {new Date().getFullYear()}</div>
       </footer>
@@ -241,4 +641,4 @@ const Demo: React.FC = () => {
   );
 };
 
-export default Demo; 
+export default TestnetDemo; 
