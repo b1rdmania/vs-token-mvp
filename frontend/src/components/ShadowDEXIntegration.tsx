@@ -241,9 +241,9 @@ const ShadowDEXIntegration: React.FC<ShadowDEXIntegrationProps> = ({
           fontSize: '12px',
           color: '#1565c0'
         }}>
-          <strong>Token Addresses:</strong><br/>
-          D-vS: 0x671B9634158A163521b029528b3Fd73EAefd6422<br/>
-          tS: 0x567a92ADA6a5D7d31b9e7aa410D868fa91Cd7b7C
+          <strong>Token Addresses (Gas-Optimized):</strong><br/>
+          D-vS: 0x2649125B1a683e3448F2BB15425AcD83aa2dfd35<br/>
+          tS: 0x16e5294Cc116819BfB79752C238a74c9f83a35f9
         </div>
 
         <div style={{ 
