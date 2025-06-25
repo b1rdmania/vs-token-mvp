@@ -5,7 +5,7 @@ import "forge-std/Script.sol";
 import {TestSonicToken} from "../src/MockToken.sol";
 import {TestSonicDecayfNFT} from "../src/DecayfNFT.sol";
 import {VSToken} from "../src/VSToken.sol";
-import {TestVault} from "../src/Vault.sol";
+import {vSVault} from "../src/vSVault.sol";
 
 contract DeployDemo is Script {
     function setUp() public {}
@@ -25,21 +25,24 @@ contract DeployDemo is Script {
         VSToken vS = new VSToken();
         console2.log("VSToken (tvS) deployed at:", address(vS));
 
-        // Deploy Vault
-        TestVault vault = new TestVault(address(tS));
-        console2.log("TestVault deployed at:", address(vault));
+        // Deploy Vault with deployer as treasury
+        address deployer = msg.sender;
+        vSVault vault = new vSVault(address(vS), address(tS), deployer);
+        console2.log("vSVault deployed at:", address(vault));
 
-        // Set fNFT and vS addresses in Vault
-        vault.setFNFT(address(fNFT));
-        vault.setVSToken(address(vS));
+        // Set fNFT contract in Vault
+        vault.setNFTContract(address(fNFT));
 
-        // Set Vault as minter in vS
+        // Set Vault as minter in vS and transfer ownership
         vS.setMinter(address(vault));
+        vS.transferOwnership(address(vault));
 
-        // Fund Vault with tS tokens for redemptions
+        // Fund fNFT contract for vesting payouts
         uint256 fundAmount = 1_000_000 * 1e18;
-        tS.mint(address(vault), fundAmount);
-        console2.log("Funded Vault with", fundAmount, "tS tokens");
+        tS.mint(deployer, fundAmount);
+        tS.approve(address(fNFT), fundAmount);
+        fNFT.fund(fundAmount);
+        console2.log("Funded fNFT contract with", fundAmount, "tS tokens");
 
         vm.stopBroadcast();
     }

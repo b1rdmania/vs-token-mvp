@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { WagmiProvider, createConfig, http } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RainbowKitProvider, getDefaultWallets } from '@rainbow-me/rainbowkit';
-import { sonicTestnet } from './config/chains';
+import { sonicMainnet } from './config/chains';
 import { AppShell } from './components/layout/AppShell';
 import { LandingPage } from './pages/LandingPage';
 import { WhitepaperPage } from './pages/WhitepaperPage';
@@ -21,9 +21,9 @@ const { wallets } = getDefaultWallets();
 
 const config = createConfig({
   wallets,
-  chains: [sonicTestnet],
+  chains: [sonicMainnet],
   transports: {
-    [sonicTestnet.id]: http(),
+    [sonicMainnet.id]: http(),
   },
   ssr: true,
 });

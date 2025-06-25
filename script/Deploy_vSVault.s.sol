@@ -28,8 +28,8 @@ contract Deploy_vSVault is Script {
         mockSToken.approve(address(mockSonicNFT), initialFunding);
         mockSonicNFT.fund(initialFunding);
         
-        // 5. Deploy vSVault
-        vSVault vault = new vSVault(address(vsToken), address(mockSToken));
+        // 5. Deploy vSVault (deployer address as treasury)
+        vSVault vault = new vSVault(address(vsToken), address(mockSToken), deployer);
 
         // 6. Set the trusted NFT contract on the vault
         vault.setNFTContract(address(mockSonicNFT));

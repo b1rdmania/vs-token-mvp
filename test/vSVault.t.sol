@@ -30,7 +30,7 @@ contract VaultTest is Test {
         underlyingToken = new TestSonicToken();
         vsToken = new VSToken();
         nftContract = new TestSonicDecayfNFT(address(underlyingToken));
-        vault = new vSVault(address(vsToken), address(underlyingToken));
+        vault = new vSVault(address(vsToken), address(underlyingToken), owner);
         
         // Setup vault
         vault.setNFTContract(address(nftContract));
@@ -52,13 +52,16 @@ contract VaultTest is Test {
         vm.stopPrank();
         
         vm.startPrank(user1);
-        // Approve and deposit NFT
-        nftContract.approve(address(vault), 0);
+        // Delegate claiming rights to vault and deposit
+        nftContract.setClaimDelegate(0, address(vault));
         vault.deposit(0);
         
         // Check vS tokens minted
         assertEq(vsToken.balanceOf(user1), NFT_AMOUNT);
-        assertEq(nftContract.ownerOf(0), address(vault));
+        // NFT still owned by user1 (soulbound), but vault manages it
+        assertEq(nftContract.ownerOf(0), user1);
+        // Verify vault tracks the deposit
+        assertEq(vault.depositedNFTs(0), user1);
         vm.stopPrank();
     }
     
@@ -69,14 +72,14 @@ contract VaultTest is Test {
         vm.stopPrank();
         
         vm.startPrank(user1);
-        nftContract.approve(address(vault), 0);
+        nftContract.setClaimDelegate(0, address(vault));
         vault.deposit(0);
         vm.stopPrank();
         
         // Fast forward time to allow vesting
         vm.warp(block.timestamp + 15 days); // 50% vested
         
-        // Claim vested tokens
+        // Claim vested tokens (anyone can call this)
         uint256 initialBalance = underlyingToken.balanceOf(address(vault));
         vault.claimVested(0, 1);
         
@@ -91,7 +94,7 @@ contract VaultTest is Test {
         vm.stopPrank();
         
         vm.startPrank(user1);
-        nftContract.approve(address(vault), 0);
+        nftContract.setClaimDelegate(0, address(vault));
         vault.deposit(0);
         vm.stopPrank();
         
@@ -99,7 +102,6 @@ contract VaultTest is Test {
         vm.warp(block.timestamp + 15 days);
         vault.claimVested(0, 1);
         
-        uint256 vaultBalance = underlyingToken.balanceOf(address(vault));
         uint256 redeemAmount = NFT_AMOUNT / 2;
         
         vm.startPrank(user1);
@@ -113,7 +115,7 @@ contract VaultTest is Test {
     }
     
     function testCannotDepositWithoutNFTContract() public {
-        vSVault newVault = new vSVault(address(vsToken), address(underlyingToken));
+        vSVault newVault = new vSVault(address(vsToken), address(underlyingToken), owner);
         
         vm.expectRevert("NFT contract not set");
         newVault.deposit(0);
@@ -138,7 +140,7 @@ contract VaultTest is Test {
         vm.stopPrank();
         
         vm.startPrank(user1);
-        nftContract.approve(address(vault), 0);
+        nftContract.setClaimDelegate(0, address(vault));
         vault.deposit(0);
         vm.stopPrank();
         
@@ -151,8 +153,49 @@ contract VaultTest is Test {
         vault.claimVested(0, 1);
         uint256 finalKeeperBalance = underlyingToken.balanceOf(user2);
         
-        // Keeper should receive incentive
+        // Keeper should receive incentive (0.05% of claimed amount)
         assertGt(finalKeeperBalance, initialKeeperBalance);
+        vm.stopPrank();
+    }
+    
+    function testProtocolFee() public {
+        // Setup: deposit NFT and claim some tokens
+        vm.startPrank(owner);
+        nftContract.safeMint(user1, NFT_AMOUNT, VESTING_DURATION);
+        vm.stopPrank();
+        
+        vm.startPrank(user1);
+        nftContract.setClaimDelegate(0, address(vault));
+        vault.deposit(0);
+        vm.stopPrank();
+        
+        // Fast forward and claim
+        vm.warp(block.timestamp + 15 days);
+        vault.claimVested(0, 1);
+        
+        uint256 redeemAmount = NFT_AMOUNT / 2;
+        
+        vm.startPrank(user1);
+        uint256 initialTreasuryBalance = underlyingToken.balanceOf(owner); // owner is treasury
+        uint256 initialUserBalance = underlyingToken.balanceOf(user1);
+        
+        vault.redeem(redeemAmount);
+        
+        uint256 finalTreasuryBalance = underlyingToken.balanceOf(owner);
+        uint256 finalUserBalance = underlyingToken.balanceOf(user1);
+        
+        // Protocol should receive 1% fee in underlying tokens
+        uint256 treasuryGain = finalTreasuryBalance - initialTreasuryBalance;
+        uint256 userGain = finalUserBalance - initialUserBalance;
+        
+        assertGt(treasuryGain, 0); // Treasury should receive fees
+        assertGt(userGain, 0); // User should receive underlying tokens
+        
+        // Fee should be approximately 1% of total redemption
+        uint256 totalRedeemed = treasuryGain + userGain;
+        uint256 expectedFee = (totalRedeemed * 100) / 10_000; // 1%
+        assertApproxEqRel(treasuryGain, expectedFee, 0.01e18); // Within 1% tolerance
+        
         vm.stopPrank();
     }
 } 

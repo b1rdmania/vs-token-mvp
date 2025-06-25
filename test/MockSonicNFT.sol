@@ -17,6 +17,9 @@ contract MockSonicNFT is ERC721, Ownable {
     }
 
     mapping(uint256 => VestingInfo) public vestingSchedules;
+    
+    // Allow delegation of claiming rights to vaults
+    mapping(uint256 => address) public claimDelegates;
 
     constructor(address _underlyingToken) ERC721("Mock Sonic NFT", "mSNFT") Ownable(msg.sender) {
         underlyingToken = IERC20(_underlyingToken);
@@ -51,17 +54,57 @@ contract MockSonicNFT is ERC721, Ownable {
         return (schedule.principalAmount * elapsedTime) / schedule.vestingDuration;
     }
 
-    function claimVestedTokens(uint256 tokenId) external returns (uint256) {
+    function claimable(uint256 tokenId) public view returns (uint256) {
         VestingInfo storage schedule = vestingSchedules[tokenId];
         uint256 totalVested = getVestedAmount(tokenId);
-        uint256 claimable = totalVested - schedule.claimedAmount;
+        if (totalVested <= schedule.claimedAmount) {
+            return 0;
+        }
+        return totalVested - schedule.claimedAmount;
+    }
 
-        if (claimable > 0) {
-            schedule.claimedAmount += claimable;
-            underlyingToken.transfer(msg.sender, claimable);
+    /**
+     * @notice Delegate claiming rights for a specific NFT to another address (e.g., vault)
+     * @param tokenId The NFT to delegate
+     * @param delegate The address that can claim on behalf of the owner (address(0) to revoke)
+     */
+    function setClaimDelegate(uint256 tokenId, address delegate) external {
+        require(ownerOf(tokenId) == msg.sender, "Only owner can delegate");
+        claimDelegates[tokenId] = delegate;
+    }
+
+    function claimVestedTokens(uint256 tokenId) external returns (uint256) {
+        address nftOwner = ownerOf(tokenId);
+        address delegate = claimDelegates[tokenId];
+        
+        // Allow either the owner or their delegate to claim
+        require(msg.sender == nftOwner || msg.sender == delegate, "Not authorized to claim");
+        
+        VestingInfo storage schedule = vestingSchedules[tokenId];
+        uint256 claimableAmount = claimable(tokenId);
+
+        if (claimableAmount > 0) {
+            schedule.claimedAmount += claimableAmount;
+            
+            // If delegate is claiming, send tokens to the delegate (vault)
+            // If owner is claiming, send to owner
+            address recipient = (msg.sender == delegate && delegate != address(0)) ? delegate : nftOwner;
+            underlyingToken.transfer(recipient, claimableAmount);
         }
 
-        return claimable;
+        return claimableAmount;
+    }
+
+    // Make NFTs soulbound (non-transferable) like real Sonic fNFTs
+    function _update(address to, uint256 tokenId, address auth) internal override returns (address) {
+        address from = _ownerOf(tokenId);
+        
+        // Allow minting (from == address(0)) but prevent transfers
+        if (from != address(0) && to != address(0)) {
+            revert("Transfers disabled: soulbound NFT");
+        }
+        
+        return super._update(to, tokenId, auth);
     }
 
     function getTotalAmount(uint256 tokenId) public view returns (uint256) {
