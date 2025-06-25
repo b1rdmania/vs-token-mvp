@@ -403,34 +403,19 @@ const TestnetDemo: React.FC = () => {
 
   return (
     <div className="page-container">
-      {/* Header with explanation */}
-      <div className="content-card" style={{ marginBottom: 16, background: '#fffbe6', border: '1px solid #ffe066', color: '#856404' }}>
-        <b>🏦 vS Vault Protocol - Complete Demo:</b> This demo showcases the full vS Vault functionality on Sonic mainnet. Mint fNFTs, deposit them into the vault for liquid vS tokens, and redeem your underlying assets.
-      </div>
-
-      <div className="content-card" style={{ marginBottom: 24, background: '#f7f9fc', border: '1px solid #eaecef' }}>
-        <h1 style={{ margin: 0, fontSize: 24, color: '#1F6BFF' }}>🏦 vS Vault Protocol Demo</h1>
-        <div style={{ marginTop: 12, color: '#555', fontSize: 15 }}>
-          <div style={{ background: '#fff3cd', padding: 16, borderRadius: 8, marginBottom: 16, border: '1px solid #ffeaa7' }}>
-            <h3 style={{ margin: '0 0 12px 0', color: '#d68910' }}>💰 The Sonic Airdrop Problem</h3>
-            <p style={{ margin: '0 0 8px 0' }}>
-              <b>Sonic airdrops give you fNFTs</b> - these are "future NFTs" that unlock Sonic tokens slowly over 9 months. 
-              You can't sell them, trade them, or use them in DeFi. <b>They're locked until they vest.</b>
-            </p>
+      {/* Clean Header */}
+      <div className="content-card" style={{ marginBottom: 24, background: '#f8f9fa', border: '1px solid #e9ecef' }}>
+        <h1 style={{ margin: '0 0 16px 0', fontSize: 28, color: '#1F6BFF' }}>🏦 vS Vault Protocol Demo</h1>
+        <p style={{ margin: '0 0 16px 0', fontSize: 16, color: '#555' }}>
+          <strong>Turn locked fNFTs into productive DeFi assets.</strong> Deposit your vesting Sonic fNFTs to get liquid D-vS tokens immediately, 
+          then use them to earn fees in liquidity pools while maintaining exposure to your future vesting value.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 16 }}>
+          <div style={{ background: '#e3f2fd', padding: 12, borderRadius: 6, border: '1px solid #90caf9' }}>
+            <strong>💰 The Problem:</strong> Your fNFT locks 10,000 tS for 9 months - unusable in DeFi
           </div>
-          
-          <div style={{ background: '#d1f2eb', padding: 16, borderRadius: 8, marginBottom: 16, border: '1px solid #7dcea0' }}>
-            <h3 style={{ margin: '0 0 12px 0', color: '#0e6b0e' }}>🔓 Our Solution: Instant Liquidity</h3>
-            <ol style={{ margin: '0 0 12px 0', paddingLeft: 20 }}>
-              <li><b>Deposit your fNFT:</b> Put your locked airdrop into our vault <i>(locked forever)</i></li>
-              <li><b>Get D-vS tokens instantly:</b> Receive liquid tokens worth your <b>full future value</b></li>
-              <li><b>Trade immediately:</b> Swap D-vS for Sonic tokens anytime - no waiting!</li>
-              <li><b>Or keep earning:</b> Return weekly to claim more D-vS as your airdrop unlocks</li>
-            </ol>
-            <div style={{ background: '#a9dfbf', padding: 8, borderRadius: 4, fontSize: 14 }}>
-              <b>🎯 Key:</b> Your fNFT gets locked forever, but you get liquid D-vS tokens representing its value. 
-              Sell immediately at a discount, or wait for full vesting value.
-            </div>
+          <div style={{ background: '#e8f5e8', padding: 12, borderRadius: 6, border: '1px solid #81c784' }}>
+            <strong>🚀 Our Solution:</strong> Get liquid D-vS tokens instantly, earn fees while vesting
           </div>
         </div>
       </div>
@@ -445,68 +430,73 @@ const TestnetDemo: React.FC = () => {
         </div>
       ) : (
         <>
+          {/* Status Dashboard */}
           <div className="content-card" style={{ marginBottom: 16 }}>
-            <h3>👤 Connected: {address?.slice(0, 6)}...{address?.slice(-4)}</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginTop: 16 }}>
-              <div style={{ background: '#f8f9fa', padding: 16, borderRadius: 8, border: '1px solid #eaecef' }}>
-                <h4 style={{ margin: '0 0 8px 0', color: '#666' }}>🎫 fNFTs Owned</h4>
-                <div style={{ fontSize: 20, fontWeight: 'bold' }}>{fNFTBalance}</div>
+            <h3 style={{ margin: '0 0 16px 0' }}>📊 Your Assets</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16 }}>
+              <div style={{ background: '#fff3e0', padding: 16, borderRadius: 8, border: '1px solid #ffcc02', textAlign: 'center' }}>
+                <div style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>fNFTs Owned</div>
+                <div style={{ fontSize: 24, fontWeight: 'bold', color: '#f57c00' }}>{fNFTBalance}</div>
               </div>
-              <div style={{ background: '#f8f9fa', padding: 16, borderRadius: 8, border: '1px solid #eaecef' }}>
-                <h4 style={{ margin: '0 0 8px 0', color: '#666' }}>💰 tS Balance</h4>
-                <div style={{ fontSize: 20, fontWeight: 'bold' }}>{Number(underlyingBalance).toFixed(2)}</div>
+              <div style={{ background: '#e3f2fd', padding: 16, borderRadius: 8, border: '1px solid #2196f3', textAlign: 'center' }}>
+                <div style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>tS Balance</div>
+                <div style={{ fontSize: 24, fontWeight: 'bold', color: '#1976d2' }}>{Number(underlyingBalance).toFixed(0)}</div>
               </div>
-              <div style={{ background: '#f8f9fa', padding: 16, borderRadius: 8, border: '1px solid #eaecef' }}>
-                <h4 style={{ margin: '0 0 8px 0', color: '#666' }}>⚡ vS Balance</h4>
-                <div style={{ fontSize: 20, fontWeight: 'bold' }}>{Number(vsBalance).toFixed(2)}</div>
+              <div style={{ background: '#e8f5e8', padding: 16, borderRadius: 8, border: '1px solid #4caf50', textAlign: 'center' }}>
+                <div style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>D-vS Balance</div>
+                <div style={{ fontSize: 24, fontWeight: 'bold', color: '#2e7d32' }}>{Number(vsBalance).toFixed(0)}</div>
               </div>
-              <div style={{ background: '#f8f9fa', padding: 16, borderRadius: 8, border: '1px solid #eaecef' }}>
-                <h4 style={{ margin: '0 0 8px 0', color: '#666' }}>🏦 Vault Assets</h4>
-                <div style={{ fontSize: 20, fontWeight: 'bold' }}>{Number(vaultBalance).toFixed(2)}</div>
+              <div style={{ background: '#f3e5f5', padding: 16, borderRadius: 8, border: '1px solid #9c27b0', textAlign: 'center' }}>
+                <div style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>Vault Assets</div>
+                <div style={{ fontSize: 24, fontWeight: 'bold', color: '#7b1fa2' }}>{Number(vaultBalance).toFixed(0)}</div>
               </div>
             </div>
           </div>
 
+          {/* Main Tabs */}
           <div className="content-card" style={{ marginBottom: 16 }}>
             <div style={{ display: 'flex', gap: 8, borderBottom: '1px solid #eaecef', marginBottom: 16 }}>
               <button 
                 style={{ 
-                  padding: '8px 16px', 
+                  padding: '12px 20px', 
                   border: 'none', 
                   background: activeTab === 'mint' ? '#1F6BFF' : 'transparent',
                   color: activeTab === 'mint' ? 'white' : '#666',
-                  borderRadius: '4px 4px 0 0',
-                  cursor: 'pointer'
+                  borderRadius: '8px 8px 0 0',
+                  cursor: 'pointer',
+                  fontWeight: activeTab === 'mint' ? 'bold' : 'normal'
                 }}
                 onClick={() => setActiveTab('mint')}
               >
-                🎟️ Mint fNFTs
+                🎯 Step 1: Get Assets
               </button>
               <button 
                 style={{ 
-                  padding: '8px 16px', 
+                  padding: '12px 20px', 
                   border: 'none', 
                   background: activeTab === 'vault' ? '#1F6BFF' : 'transparent',
                   color: activeTab === 'vault' ? 'white' : '#666',
-                  borderRadius: '4px 4px 0 0',
-                  cursor: 'pointer'
+                  borderRadius: '8px 8px 0 0',
+                  cursor: 'pointer',
+                  fontWeight: activeTab === 'vault' ? 'bold' : 'normal'
                 }}
                 onClick={() => setActiveTab('vault')}
               >
-                🏦 Vault Operations
+                🏦 Step 2: Vault Operations
               </button>
               <button 
                 style={{ 
-                  padding: '8px 16px', 
+                  padding: '12px 20px', 
                   border: 'none', 
                   background: activeTab === 'trade' ? '#1F6BFF' : 'transparent',
                   color: activeTab === 'trade' ? 'white' : '#666',
-                  borderRadius: '4px 4px 0 0',
-                  cursor: 'pointer'
+                  borderRadius: '8px 8px 0 0',
+                  cursor: 'pointer',
+                  fontWeight: activeTab === 'trade' ? 'bold' : 'normal'
                 }}
                 onClick={() => setActiveTab('trade')}
               >
-                💰 Earn Fees
+                💰 Step 3: Earn Fees
               </button>
             </div>
 
@@ -570,13 +560,13 @@ const TestnetDemo: React.FC = () => {
                               onClick={() => {
                                 const confirmed = window.confirm(
                                   `Deposit fNFT #${nft.tokenId} to Vault?\n\n` +
-                                  `What happens:\n` +
-                                  `• You keep your fNFT in your wallet\n` +
-                                  `• Vault gets delegation rights to claim future tokens\n` +
-                                  `• You receive ${nft.totalAmount} D-vS tokens immediately\n` +
-                                  `• You can redeem D-vS for tS tokens as fNFT vests\n\n` +
-                                  `This action is REVERSIBLE via vault redemption.\n\n` +
-                                  `Proceed?`
+                                  `Simple explanation:\n` +
+                                  `• Your fNFT stays in your wallet (still yours!)\n` +
+                                  `• You get ${nft.totalAmount} D-vS tokens right now\n` +
+                                  `• Use D-vS tokens however you want\n` +
+                                  `• You can still get tS tokens as your fNFT unlocks\n\n` +
+                                  `This is safe and reversible!\n\n` +
+                                  `Continue?`
                                 );
                                 if (confirmed) {
                                   depositToVault(nft.tokenId);
@@ -600,10 +590,10 @@ const TestnetDemo: React.FC = () => {
             {activeTab === 'vault' && (
               <div>
                 <div style={{ background: '#e6f7ff', padding: 16, borderRadius: 8, marginBottom: 24 }}>
-                  <h3 style={{ margin: '0 0 8px 0' }}>🏦 Vault Information</h3>
-                  <p style={{ margin: '0 0 8px 0' }}>The vault holds delegation rights to your fNFTs and mints liquid D-vS tokens against their full future value.</p>
+                  <h3 style={{ margin: '0 0 8px 0' }}>🏦 How the Vault Works</h3>
+                  <p style={{ margin: '0 0 8px 0' }}>Think of it like a bank: you deposit your fNFT, get liquid D-vS tokens to spend immediately, and can still collect your original tS tokens as they unlock.</p>
                   <div style={{ background: '#d1f2eb', padding: 12, borderRadius: 6, border: '1px solid #7dcea0', fontSize: 14 }}>
-                    <strong>✅ Safe:</strong> Vault operations are <strong>reversible</strong> - you can redeem D-vS for tS tokens as your fNFT vests
+                    <strong>✅ Safe:</strong> You can always exchange your D-vS tokens back for tS tokens. Nothing is lost forever!
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
                     <div>
@@ -619,8 +609,8 @@ const TestnetDemo: React.FC = () => {
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
                   <div style={{ background: '#f8f9fa', padding: 20, borderRadius: 8, border: '1px solid #eaecef' }}>
-                                      <h3 style={{ margin: '0 0 12px 0' }}>💰 Redeem D-vS Tokens</h3>
-                  <p style={{ margin: '0 0 16px 0' }}>Burn D-vS tokens to get your share of underlying tS tokens</p>
+                    <h3 style={{ margin: '0 0 12px 0' }}>💰 Exchange D-vS for tS</h3>
+                    <p style={{ margin: '0 0 16px 0' }}>Trade your D-vS tokens back for real tS tokens (proportional to what's unlocked)</p>
                     <div style={{ display: 'flex', gap: 8 }}>
                       <input
                         type="number"
@@ -644,8 +634,8 @@ const TestnetDemo: React.FC = () => {
                   </div>
 
                   <div style={{ background: '#f8f9fa', padding: 20, borderRadius: 8, border: '1px solid #eaecef' }}>
-                    <h3 style={{ margin: '0 0 12px 0' }}>⚡ Claim Vault Vested Tokens</h3>
-                    <p style={{ margin: '0 0 16px 0' }}>Anyone can call this to claim vested tokens from vault's fNFTs</p>
+                    <h3 style={{ margin: '0 0 12px 0' }}>⚡ Update Vault Balance</h3>
+                    <p style={{ margin: '0 0 16px 0' }}>Collect newly unlocked tS tokens from the vault's fNFTs (anyone can do this)</p>
                     <button
                       onClick={claimVaultVested}
                       disabled={isLoading}
@@ -712,228 +702,6 @@ const TestnetDemo: React.FC = () => {
               </a>
             </div>
           )}
-
-          <div className="demo-cards">
-            <div className="demo-card problem">
-              <div className="problem-badge">�� THE PROBLEM</div>
-              <h3>Your Sonic Airdrop is Locked Forever</h3>
-              <div className="nft-display">
-                <div className="nft-card locked">
-                  <div className="nft-header">
-                    <span className="nft-title">fNFT #{ownedNFTs.length > 0 ? ownedNFTs[0].tokenId : '...'}</span>
-                    <span className="locked-badge">🔒 LOCKED</span>
-                  </div>
-                  <div className="nft-stats">
-                    <div className="stat">
-                      <span className="label">Total Value</span>
-                      <span className="value">{ownedNFTs.length > 0 ? ownedNFTs[0].totalAmount : '0.0'} tS</span>
-                    </div>
-                    <div className="stat">
-                      <span className="label">Available Now</span>
-                      <span className="value">{ownedNFTs.length > 0 ? ownedNFTs[0].claimedAmount : '0.0'} tS</span>
-                    </div>
-                    <div className="stat">
-                      <span className="label">Still Locked</span>
-                      <span className="value red">{ownedNFTs.length > 0 ? (Number(ownedNFTs[0].totalAmount) - Number(ownedNFTs[0].claimedAmount)).toFixed(2) : '0.0'} tS</span>
-                    </div>
-                    <div className="stat">
-                      <span className="label">Vesting Period</span>
-                      <span className="value">9 months remaining</span>
-                    </div>
-                  </div>
-                  <div className="nft-actions">
-                    <button 
-                      onClick={() => claimVested(ownedNFTs[0].tokenId)}
-                      disabled={ownedNFTs.length === 0 || parseFloat(ownedNFTs[0].claimedAmount) === 0}
-                      className={`action-btn ${ownedNFTs.length === 0 || parseFloat(ownedNFTs[0].claimedAmount) === 0 ? 'disabled' : 'claim'}`}
-                    >
-                      {ownedNFTs.length === 0 ? 'Loading...' : isLoading ? 'Claiming...' : `Claim ${ownedNFTs[0].claimedAmount} tS`}
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div className="problem-explanation">
-                <p><strong>You can't sell, transfer, or use your fNFT as collateral.</strong></p>
-                <p>Your {ownedNFTs.length > 0 ? ownedNFTs[0].totalAmount : '0.0'} tS is stuck for 9 months!</p>
-              </div>
-            </div>
-
-            <div className="demo-card solution">
-              <div className="solution-badge">✨ THE SOLUTION</div>
-              <h3>Unlock Liquidity with vS Protocol</h3>
-              
-              {/* Current Status Display */}
-              <div style={{ 
-                background: '#f8f9fa', 
-                padding: '16px', 
-                borderRadius: '8px', 
-                marginBottom: '20px',
-                border: '1px solid #e9ecef'
-              }}>
-                <div style={{ 
-                  display: 'grid', 
-                  gridTemplateColumns: 'repeat(3, 1fr)', 
-                  gap: '16px' 
-                }}>
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>D-vS Balance</div>
-                    <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#2e7d32' }}>{Number(vsBalance).toFixed(2)} D-vS</div>
-                  </div>
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>tS Balance</div>
-                    <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#1976d2' }}>{Number(underlyingBalance).toFixed(2)} tS</div>
-                  </div>
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>fNFTs Owned</div>
-                    <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#f57c00' }}>{fNFTBalance}</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Step 1: Get Started */}
-              <div className="solution-step">
-                <div className="step-number">1</div>
-                <div className="step-content">
-                  <h4>Get Test Assets</h4>
-                  <p>Start by getting tS tokens and minting an fNFT to test with</p>
-                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                    <button 
-                      onClick={mintTokens}
-                      disabled={isLoading}
-                      style={{
-                        padding: '8px 16px',
-                        backgroundColor: isLoading ? '#ccc' : '#1976d2',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: isLoading ? 'not-allowed' : 'pointer',
-                        fontSize: '14px'
-                      }}
-                    >
-                      {isLoading ? 'Minting...' : 'Get 1,000 tS'}
-                    </button>
-                    <button 
-                      onClick={mintfNFT}
-                      disabled={isLoading}
-                      style={{
-                        padding: '8px 16px',
-                        backgroundColor: isLoading ? '#ccc' : '#f57c00',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: isLoading ? 'not-allowed' : 'pointer',
-                        fontSize: '14px'
-                      }}
-                    >
-                      {isLoading ? 'Minting...' : 'Mint fNFT'}
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Step 2: Deposit */}
-              <div className="solution-step">
-                <div className="step-number">2</div>
-                <div className="step-content">
-                  <h4>Deposit Your fNFT</h4>
-                  <p>Delegate your fNFT to the vault and get liquid D-vS tokens representing the full future value</p>
-                  <div className="vault-action">
-                    <button 
-                      onClick={() => ownedNFTs.length > 0 && depositToVault(ownedNFTs[0].tokenId)}
-                      disabled={ownedNFTs.length === 0 || isLoading}
-                      className={`action-btn ${ownedNFTs.length === 0 || isLoading ? 'disabled' : 'deposit'}`}
-                    >
-                      {ownedNFTs.length === 0 ? 'Need fNFT First' : isLoading ? 'Depositing...' : 'Deposit fNFT & Get D-vS'}
-                    </button>
-                    {Number(vsBalance) > 0 && (
-                      <div className="success-message">
-                        ✅ Got {Number(vsBalance).toFixed(2)} D-vS tokens! Your fNFT future value is now liquid.
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Step 3: Earn Fees */}
-              <div className="solution-step">
-                <div className="step-number">3</div>
-                <div className="step-content">
-                  <h4>Provide Liquidity & Earn Fees</h4>
-                  <p>Add your D-vS + tS to the Shadow DEX pool to earn trading fees while keeping future value</p>
-                  <div style={{ 
-                    background: '#e8f5e8', 
-                    padding: '16px', 
-                    borderRadius: '8px', 
-                    border: '1px solid #4caf50' 
-                  }}>
-                    <div style={{ textAlign: 'center', marginBottom: '12px' }}>
-                      <div style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '4px' }}>🌑 Shadow DEX Pool</div>
-                      <div style={{ fontSize: '14px', color: '#666' }}>D-vS / tS Liquidity</div>
-                    </div>
-                    <div style={{ 
-                      display: 'flex', 
-                      justifyContent: 'center', 
-                      gap: '24px', 
-                      marginBottom: '16px' 
-                    }}>
-                      <div style={{ textAlign: 'center' }}>
-                        <div style={{ fontSize: '12px', color: '#666' }}>APR</div>
-                        <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#4caf50' }}>15.0%</div>
-                      </div>
-                      <div style={{ textAlign: 'center' }}>
-                        <div style={{ fontSize: '12px', color: '#666' }}>TVL</div>
-                        <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#4caf50' }}>$1,850</div>
-                      </div>
-                    </div>
-                    <div style={{ textAlign: 'center', marginBottom: '12px' }}>
-                      <button 
-                        onClick={() => setActiveTab('trade')}
-                        disabled={Number(vsBalance) === 0 || Number(underlyingBalance) === 0}
-                        style={{
-                          padding: '10px 16px',
-                          backgroundColor: Number(vsBalance) === 0 || Number(underlyingBalance) === 0 ? '#ccc' : '#4caf50',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: Number(vsBalance) === 0 || Number(underlyingBalance) === 0 ? 'not-allowed' : 'pointer',
-                          fontSize: '14px',
-                          fontWeight: 'bold'
-                        }}
-                      >
-                        {Number(vsBalance) === 0 || Number(underlyingBalance) === 0 ? 'Need D-vS & tS Tokens' : 'Add Liquidity & Earn Fees'}
-                      </button>
-                    </div>
-                    <div style={{ fontSize: '12px', color: '#2e7d32' }}>
-                      <div style={{ marginBottom: '2px' }}>✅ Keep your future vesting value</div>
-                      <div style={{ marginBottom: '2px' }}>💰 Earn fees from all trades</div>
-                      <div>🎁 Potential bonus rewards</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Step 4: Alternative - Redeem Over Time */}
-              <div className="solution-step">
-                <div className="step-number">4</div>
-                <div className="step-content">
-                  <h4>Alternative: Redeem Over Time</h4>
-                  <p>Keep your D-vS tokens and redeem them gradually as the underlying fNFT vests</p>
-                  <div className="redeem-option">
-                    <button 
-                      onClick={() => Number(vsBalance) > 0 && redeemFromVault(Math.min(Number(vsBalance), 100).toString())}
-                      disabled={Number(vsBalance) === 0 || isLoading}
-                      className={`action-btn ${Number(vsBalance) === 0 || isLoading ? 'disabled' : 'redeem'}`}
-                    >
-                      {Number(vsBalance) === 0 ? 'Need D-vS Tokens' : isLoading ? 'Redeeming...' : `Redeem Some D-vS`}
-                    </button>
-                    <p className="redeem-note">
-                      Redeem your D-vS tokens 1:1 for vested tS as the underlying fNFT unlocks over time
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </>
       )}
 

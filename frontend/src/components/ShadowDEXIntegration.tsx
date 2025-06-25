@@ -88,10 +88,10 @@ const ShadowDEXIntegration: React.FC<ShadowDEXIntegrationProps> = ({
         marginBottom: '20px',
         border: '1px solid #4caf50'
       }}>
-        <h3 style={{ margin: '0 0 10px 0', color: '#2e7d32' }}>💰 Earn Trading Fees & Rewards</h3>
+        <h3 style={{ margin: '0 0 10px 0', color: '#2e7d32' }}>💰 Earn Money While You Wait</h3>
         <p style={{ margin: 0, fontSize: '14px', color: '#2e7d32' }}>
-          Add your D-vS tokens to the liquidity pool to earn fees from every trade! 
-          Your tokens stay productive while maintaining exposure to future vesting value.
+          Add your tokens to the pool to earn fees from every trade! 
+          Your tokens stay productive while keeping your future vesting value.
         </p>
       </div>
 
@@ -254,8 +254,8 @@ const ShadowDEXIntegration: React.FC<ShadowDEXIntegrationProps> = ({
           fontSize: '12px',
           color: '#1565c0'
         }}>
-          <strong>💡 Pro Tip:</strong> By providing liquidity, you earn a share of all trading fees plus potential bonus rewards. 
-          Your D-vS tokens remain productive while you maintain exposure to the underlying fNFT's vesting value!
+          <strong>💡 Pro Tip:</strong> Earn fees from every trade in the pool while keeping your future token value. 
+          It's like having your cake and eating it too!
         </div>
 
         <div style={{ marginTop: '10px', fontSize: '12px', color: '#666', textAlign: 'center' }}>
