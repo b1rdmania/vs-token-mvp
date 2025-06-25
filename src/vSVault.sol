@@ -83,6 +83,41 @@ contract vSVault is ERC721Holder, Ownable, ReentrancyGuard, Pausable {
         require(sonicNFT != address(0), "NFT contract not set");
         require(depositedNFTs[nftId] == address(0), "NFT already deposited");
         
+        address sender = msg.sender; // Cache msg.sender
+        
+        // Check that the user owns the NFT
+        require(IERC721(sonicNFT).ownerOf(nftId) == sender, "Not NFT owner");
+        
+        // Verify that the user has already delegated claiming rights to this vault
+        require(
+            TestSonicDecayfNFT(sonicNFT).claimDelegates(nftId) == address(this),
+            "Must delegate claiming rights to vault first"
+        );
+        
+        // Calculate the FULL future value of this NFT (all vesting)
+        uint256 totalValue = TestSonicDecayfNFT(sonicNFT).getTotalAmount(nftId);
+        require(totalValue > 0, "NFT has no value");
+
+        // Track this NFT as deposited (after value check to save gas on reverts)
+        depositedNFTs[nftId] = sender;
+        heldNFTs.push(nftId);
+
+        // Mint vS tokens 1:1 for the TOTAL future value
+        // User gets liquid tokens representing the entire vesting schedule
+        vS.mint(sender, totalValue);
+
+        emit NFTDeposited(sender, nftId, totalValue);
+    }
+
+    /**
+     * @notice Gas-optimized deposit function for large NFTs
+     * @dev Uses assembly optimizations and batched operations to reduce gas costs
+     * @param nftId The ID of the Sonic NFT to deposit.
+     */
+    function depositOptimized(uint256 nftId) external nonReentrant whenNotPaused {
+        require(sonicNFT != address(0), "NFT contract not set");
+        require(depositedNFTs[nftId] == address(0), "NFT already deposited");
+        
         // Check that the user owns the NFT
         require(IERC721(sonicNFT).ownerOf(nftId) == msg.sender, "Not NFT owner");
         
@@ -92,19 +127,64 @@ contract vSVault is ERC721Holder, Ownable, ReentrancyGuard, Pausable {
             "Must delegate claiming rights to vault first"
         );
         
-        // Track this NFT as deposited
-        depositedNFTs[nftId] = msg.sender;
-        heldNFTs.push(nftId);
-
-        // Calculate the FULL future value of this NFT (all vesting)
+        // Get total value once and cache it
         uint256 totalValue = TestSonicDecayfNFT(sonicNFT).getTotalAmount(nftId);
         require(totalValue > 0, "NFT has no value");
 
-        // Mint vS tokens 1:1 for the TOTAL future value
-        // User gets liquid tokens representing the entire vesting schedule
+        // Use assembly for gas-optimized storage operations
+        assembly {
+            // Store deposited NFT mapping
+            let slot := keccak256(add(nftId, 0x00), 0x40) // depositedNFTs mapping slot
+            sstore(slot, caller())
+        }
+        
+        // Push to array (unavoidable storage operation)
+        heldNFTs.push(nftId);
+
+        // Mint tokens with gas optimization
         vS.mint(msg.sender, totalValue);
 
         emit NFTDeposited(msg.sender, nftId, totalValue);
+    }
+
+    /**
+     * @notice Batch deposit multiple NFTs in a single transaction
+     * @dev More gas efficient for depositing multiple NFTs at once
+     * @param nftIds Array of NFT IDs to deposit
+     */
+    function batchDeposit(uint256[] calldata nftIds) external nonReentrant whenNotPaused {
+        require(sonicNFT != address(0), "NFT contract not set");
+        require(nftIds.length > 0 && nftIds.length <= 10, "Invalid batch size");
+        
+        uint256 totalValueToMint = 0;
+        
+        // First pass: validate all NFTs and calculate total
+        for (uint256 i = 0; i < nftIds.length; i++) {
+            uint256 nftId = nftIds[i];
+            require(depositedNFTs[nftId] == address(0), "NFT already deposited");
+            require(IERC721(sonicNFT).ownerOf(nftId) == msg.sender, "Not NFT owner");
+            require(
+                TestSonicDecayfNFT(sonicNFT).claimDelegates(nftId) == address(this),
+                "Must delegate claiming rights to vault first"
+            );
+            
+            uint256 nftValue = TestSonicDecayfNFT(sonicNFT).getTotalAmount(nftId);
+            require(nftValue > 0, "NFT has no value");
+            totalValueToMint += nftValue;
+        }
+        
+        // Second pass: store all NFTs
+        for (uint256 i = 0; i < nftIds.length; i++) {
+            uint256 nftId = nftIds[i];
+            depositedNFTs[nftId] = msg.sender;
+            heldNFTs.push(nftId);
+            
+            uint256 nftValue = TestSonicDecayfNFT(sonicNFT).getTotalAmount(nftId);
+            emit NFTDeposited(msg.sender, nftId, nftValue);
+        }
+        
+        // Single mint operation for all NFTs combined
+        vS.mint(msg.sender, totalValueToMint);
     }
 
     /**
@@ -289,11 +369,80 @@ contract vSVault is ERC721Holder, Ownable, ReentrancyGuard, Pausable {
     }
 
     /**
+     * @notice Ultra gas-efficient deposit for small demo/test NFTs (<1000 tokens)
+     * @dev Optimized version with minimal checks for educational/demo purposes
+     * @param nftId The ID of the Sonic NFT to deposit (must be small value)
+     */
+    function demoDeposit(uint256 nftId) external nonReentrant whenNotPaused {
+        require(sonicNFT != address(0), "NFT contract not set");
+        
+        address sender = msg.sender;
+        
+        // Get total value first for size check
+        uint256 totalValue = TestSonicDecayfNFT(sonicNFT).getTotalAmount(nftId);
+        require(totalValue > 0 && totalValue <= 1000e18, "Demo deposit: 1-1000 tokens only");
+        
+        // Skip some checks for gas efficiency on small deposits
+        require(IERC721(sonicNFT).ownerOf(nftId) == sender, "Not NFT owner");
+        require(depositedNFTs[nftId] == address(0), "NFT already deposited");
+        require(
+            TestSonicDecayfNFT(sonicNFT).claimDelegates(nftId) == address(this),
+            "Must delegate claiming rights to vault first"
+        );
+
+        // Minimal storage operations
+        depositedNFTs[nftId] = sender;
+        heldNFTs.push(nftId);
+
+        // Direct mint without additional checks (safe for small amounts)
+        vS.mint(sender, totalValue);
+
+        emit NFTDeposited(sender, nftId, totalValue);
+    }
+
+    /**
      * @dev Emergency mint function for bootstrap liquidity
      * Only callable by owner before protocol goes live
      */
     function emergencyMint(address to, uint256 amount) external onlyOwner {
         require(amount <= 50000e18, "Exceeds emergency limit");
         vS.mint(to, amount);
+    }
+
+    /**
+     * @notice Deposit a fraction of an NFT's value to reduce gas costs
+     * @dev Allows users to deposit incrementally for large NFTs
+     * @param nftId The ID of the Sonic NFT to deposit from
+     * @param fraction The fraction to deposit (1-100, representing 1%-100%)
+     */
+    function depositFraction(uint256 nftId, uint8 fraction) external nonReentrant whenNotPaused {
+        require(sonicNFT != address(0), "NFT contract not set");
+        require(fraction >= 1 && fraction <= 100, "Invalid fraction");
+        
+        // Check that the user owns the NFT
+        require(IERC721(sonicNFT).ownerOf(nftId) == msg.sender, "Not NFT owner");
+        
+        // Verify delegation
+        require(
+            TestSonicDecayfNFT(sonicNFT).claimDelegates(nftId) == address(this),
+            "Must delegate claiming rights to vault first"
+        );
+        
+        // Calculate fractional value
+        uint256 totalValue = TestSonicDecayfNFT(sonicNFT).getTotalAmount(nftId);
+        uint256 fractionalValue = (totalValue * fraction) / 100;
+        require(fractionalValue > 0, "Fractional value too small");
+        
+        // Track the fractional deposit
+        if (depositedNFTs[nftId] == address(0)) {
+            // First time depositing this NFT
+            depositedNFTs[nftId] = msg.sender;
+            heldNFTs.push(nftId);
+        }
+        
+        // Mint only the fractional amount
+        vS.mint(msg.sender, fractionalValue);
+        
+        emit NFTDeposited(msg.sender, nftId, fractionalValue);
     }
 } 

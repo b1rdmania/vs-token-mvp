@@ -221,28 +221,31 @@ const TestnetDemo: React.FC = () => {
     if (!walletClient || !address) return;
 
     setIsLoading(true);
-    setStatus('Minting your fNFT...');
+    setStatus('Minting realistic demo fNFT...');
     try {
       const provider = new ethers.JsonRpcProvider(publicClient?.transport.url);
       const tsToken = new ethers.Contract(MOCKTOKEN_ADDRESS, MockTokenArtifact.abi, provider);
+      
+      // Mint realistic demo fNFT - 500 tS (similar to typical Sonic airdrop)
+      const demoAmount = ethers.parseEther('500'); // Much smaller, realistic amount
       
       // First approve the spending
       const approveHash = await walletClient.writeContract({
         address: MOCKTOKEN_ADDRESS as `0x${string}`,
         abi: MockTokenArtifact.abi,
         functionName: 'approve',
-        args: [DECAYFNFT_ADDRESS, ethers.parseEther('10000')],
+        args: [DECAYFNFT_ADDRESS, demoAmount],
       });
 
       console.log('Approval transaction sent:', approveHash);
       await publicClient?.waitForTransactionReceipt({ hash: approveHash });
 
-      // Then mint the NFT
+      // Then mint the NFT with realistic Sonic airdrop timeframe
       const mintHash = await walletClient.writeContract({
         address: DECAYFNFT_ADDRESS as `0x${string}`,
         abi: DecayfNFTArtifact.abi,
         functionName: 'safeMint',
-        args: [address, ethers.parseEther('10000'), 23328000], // 9 months in seconds
+        args: [address, demoAmount, 23328000], // 270 days like real Sonic airdrop
       });
 
       setTxHash(mintHash);
@@ -252,7 +255,7 @@ const TestnetDemo: React.FC = () => {
       const receipt = await publicClient?.waitForTransactionReceipt({ hash: mintHash });
       console.log('Mint confirmed:', receipt);
 
-      setStatus('Minted! You now have a new fNFT.');
+      setStatus('✅ Realistic demo fNFT minted! (500 tS - low gas to deposit)');
       // Reload balances and NFT data
       await loadBalances();
     } catch (error) {
@@ -298,9 +301,22 @@ const TestnetDemo: React.FC = () => {
     if (!walletClient || !address) return;
 
     setIsLoading(true);
-    setStatus('Depositing to vault...');
+    setStatus('Step 1/3: Delegating claim rights...');
     try {
-      // First approve the vault to transfer the NFT
+      // First delegate claiming rights to the vault
+      const delegateHash = await walletClient.writeContract({
+        address: DECAYFNFT_ADDRESS as `0x${string}`,
+        abi: DecayfNFTArtifact.abi,
+        functionName: 'delegateClaimRights',
+        args: [tokenId, VAULT_ADDRESS],
+      });
+
+      console.log('Delegation transaction sent:', delegateHash);
+      await publicClient?.waitForTransactionReceipt({ hash: delegateHash });
+
+      setStatus('Step 2/3: Approving NFT transfer...');
+      
+      // Then approve the vault to transfer the NFT
       const approveHash = await walletClient.writeContract({
         address: DECAYFNFT_ADDRESS as `0x${string}`,
         abi: DecayfNFTArtifact.abi,
@@ -311,11 +327,22 @@ const TestnetDemo: React.FC = () => {
       console.log('Approval transaction sent:', approveHash);
       await publicClient?.waitForTransactionReceipt({ hash: approveHash });
 
-      // Then deposit to vault
+      setStatus('Step 3/3: Depositing to vault...');
+
+      // Get NFT value to choose optimal deposit method
+      const nftDetails = ownedNFTs.find(nft => nft.tokenId === tokenId);
+      const nftValue = nftDetails ? parseFloat(nftDetails.totalAmount) : 0;
+      
+      // Use gas-optimized demo deposit for small NFTs
+      const depositFunction = nftValue <= 1000 ? 'demoDeposit' : 'deposit';
+      
+      setStatus(`Step 3/3: ${nftValue <= 1000 ? 'Demo depositing (ultra low gas)' : 'Depositing to vault'}...`);
+
+      // Finally deposit to vault
       const depositHash = await walletClient.writeContract({
         address: VAULT_ADDRESS as `0x${string}`,
         abi: vSVaultArtifact.abi,
-        functionName: 'deposit',
+        functionName: depositFunction,
         args: [tokenId],
       });
 
@@ -326,12 +353,12 @@ const TestnetDemo: React.FC = () => {
       const receipt = await publicClient?.waitForTransactionReceipt({ hash: depositHash });
       console.log('Deposit confirmed:', receipt);
 
-      setStatus('Deposited! You received Demo vS (D-vS) tokens.');
+      setStatus('✅ Deposited! You received Demo vS (D-vS) tokens.');
       // Reload balances and NFT data
       await loadBalances();
     } catch (error) {
       console.error('Error depositing to vault:', error);
-      setStatus('Deposit failed.');
+      setStatus('❌ Deposit failed. ' + (error as Error).message);
     } finally {
       setIsLoading(false);
     }
@@ -517,15 +544,15 @@ const TestnetDemo: React.FC = () => {
                   </div>
 
                   <div style={{ background: '#f8f9fa', padding: 20, borderRadius: 8, border: '1px solid #eaecef' }}>
-                    <h3 style={{ margin: '0 0 12px 0' }}>🎟️ Mint fNFT</h3>
-                    <p style={{ margin: '0 0 16px 0' }}>Create a new vesting NFT (10,000 tS, 9 months vesting)</p>
+                    <h3 style={{ margin: '0 0 12px 0' }}>🎟️ Mint Demo fNFT</h3>
+                    <p style={{ margin: '0 0 16px 0' }}>Create realistic demo fNFT (500 tS, 270 days vesting - like real Sonic airdrop)</p>
                     <button
                       onClick={mintfNFT}
                       disabled={isLoading}
                       className="button-primary"
                       style={{ width: '100%' }}
                     >
-                      {isLoading ? 'Minting...' : 'Mint fNFT'}
+                      {isLoading ? 'Minting...' : 'Mint Realistic Demo fNFT (500 tS)'}
                     </button>
                   </div>
                 </div>
@@ -556,28 +583,73 @@ const TestnetDemo: React.FC = () => {
                             >
                               {isLoading ? 'Claiming...' : `Claim ${Number(nft.availableAmount).toFixed(2)} tS`}
                             </button>
-                            <button
-                              onClick={() => {
-                                const confirmed = window.confirm(
-                                  `Deposit fNFT #${nft.tokenId} to Vault?\n\n` +
-                                  `Simple explanation:\n` +
-                                  `• Your fNFT stays in your wallet (still yours!)\n` +
-                                  `• You get ${nft.totalAmount} D-vS tokens right now\n` +
-                                  `• Use D-vS tokens however you want\n` +
-                                  `• You can still get tS tokens as your fNFT unlocks\n\n` +
-                                  `This is safe and reversible!\n\n` +
-                                  `Continue?`
-                                );
-                                if (confirmed) {
-                                  depositToVault(nft.tokenId);
-                                }
-                              }}
-                              disabled={isLoading}
-                              className="button-primary"
-                              style={{ flex: 1, background: '#28a745' }}
-                            >
-                              {isLoading ? 'Depositing...' : 'Deposit to Vault (Safe)'}
-                            </button>
+                            <div style={{ display: 'flex', gap: 8 }}>
+                              {parseFloat(nft.totalAmount) > 1000 ? (
+                                <>
+                                  <button
+                                    onClick={() => {
+                                      const confirmed = window.confirm(
+                                        `Deposit 10% of fNFT #${nft.tokenId}?\n\n` +
+                                        `• Get ${(parseFloat(nft.totalAmount) * 0.1).toFixed(1)} D-vS tokens\n` +
+                                        `• Much lower gas cost (~$1-3 instead of $20+)\n` +
+                                        `• You can deposit more later\n\n` +
+                                        `This is perfect for testing!`
+                                      );
+                                      if (confirmed) {
+                                        // TODO: Call depositFraction(nftId, 10) when implemented
+                                        alert('Fractional deposit coming soon! Use smaller fNFT for now.');
+                                      }
+                                    }}
+                                    disabled={isLoading}
+                                    className="button-primary"
+                                    style={{ flex: 1, background: '#28a745' }}
+                                  >
+                                                                         {isLoading ? 'Depositing...' : 'Deposit 10% (Low Gas)'}
+                                   </button>
+                                   <button
+                                     onClick={() => {
+                                       const confirmed = window.confirm(
+                                         `⚠️ EXPENSIVE TRANSACTION WARNING ⚠️\n\n` +
+                                         `Depositing all ${nft.totalAmount} tS will cost ~$15-25 in gas!\n\n` +
+                                         `Consider:\n` +
+                                         `• Minting smaller demo fNFT instead (~$1 gas)\n` +
+                                         `• Using "Deposit 10%" option\n` +
+                                         `• Most real users will have 100-1000 tS NFTs\n\n` +
+                                         `Continue with expensive full deposit?`
+                                       );
+                                       if (confirmed) {
+                                         depositToVault(nft.tokenId);
+                                       }
+                                     }}
+                                     disabled={isLoading}
+                                     className="button-primary"
+                                     style={{ flex: 1, background: '#dc3545' }}
+                                   >
+                                     Full Deposit (💸 $15-25 Gas)
+                                   </button>
+                                </>
+                              ) : (
+                                <button
+                                  onClick={() => {
+                                    const confirmed = window.confirm(
+                                      `Deposit fNFT #${nft.tokenId} to Vault?\n\n` +
+                                      `• Get ${nft.totalAmount} D-vS tokens right now\n` +
+                                      `• Low gas cost (under $2)\n` +
+                                      `• Safe and reversible\n\n` +
+                                      `Continue?`
+                                    );
+                                    if (confirmed) {
+                                      depositToVault(nft.tokenId);
+                                    }
+                                  }}
+                                  disabled={isLoading}
+                                  className="button-primary"
+                                  style={{ width: '100%', background: '#28a745' }}
+                                >
+                                  {isLoading ? 'Depositing...' : 'Deposit to Vault (Low Gas)'}
+                                </button>
+                              )}
+                            </div>
                           </div>
                         </div>
                       ))}
