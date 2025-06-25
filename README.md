@@ -73,9 +73,9 @@ This repository contains the complete, production-ready code for the vS Vault pr
 
 For a deeper technical overview, please see the **[Technical Whitepaper](https://github.com/b1rdmania/vs-token-mvp/blob/main/WHITEPAPER.md)**.
 
-# DecayfNFT Testnet Demo (Isolated)
+# DecayfNFT Mainnet Demo (Isolated)
 
-This is a full-stack, isolated testnet demo for the DecayfNFT contract, which implements the Sonic airdrop vesting/decay logic: **25% claimable immediately, 75% vests linearly** over a set duration. This demo is for development/testing only and does not affect production code or documentation.
+This repository now includes a **live, mainnet demo** for the DecayfNFT contract, which implements the Sonic airdrop vesting/decay logic: **25% claimable immediately, 75% vests linearly** over a set duration. This demo is for demonstration and onboarding purposes, allowing anyone to experience the real protocol flow on mainnet with demo tokens and NFTs. It does not affect production Sonic airdrop assets.
 
 ---
 
@@ -83,55 +83,19 @@ This is a full-stack, isolated testnet demo for the DecayfNFT contract, which im
 
 - **DecayfNFT.sol**: ERC721 NFT with Sonic-style vesting/decay logic.
 - **MockToken.sol**: Minimal ERC20 token as the underlying asset.
-- **DeployDecayfNFT.s.sol**: Foundry script to deploy and initialize contracts on a local testnet.
-- **frontend/src/pages/TestnetDemo.tsx**: Minimal React page to mint/view/claim fNFTs and show real-time decay.
+- **DeployDecayfNFT.s.sol**: Foundry script to deploy and initialize contracts.
+- **frontend/src/pages/TestnetDemo.tsx**: Minimal React page to mint/view/claim fNFTs and show real-time decay. (Accessible as the "Demo" page in the app.)
 
 ---
 
-## Quickstart
-
-### 1. Deploy Contracts Locally (Foundry)
-
-```sh
-forge script script/DeployDecayfNFT.s.sol --fork-url http://localhost:8545 --broadcast --verify --rpc-url http://localhost:8545
-```
-- Set your PRIVATE_KEY in the environment for deployment.
-- Note the deployed addresses for DecayfNFT and MockToken.
-
-### 2. Frontend Setup
-
-- Update `DECAYFNFT_ADDRESS` and `MOCKTOKEN_ADDRESS` in `frontend/src/pages/TestnetDemo.tsx` with the deployed addresses.
-- Import the correct ABIs for DecayfNFT and MockToken.
-- Start the frontend dev server:
-
-```sh
-cd frontend
-npm install
-npm run dev
-```
-- Visit `/TestnetDemo` in your browser.
-
-### 3. Using the Demo
-- Connect your wallet (MetaMask, configured for your local testnet).
-- Mint new fNFTs with custom principal and duration.
-- View your fNFTs, see real-time vesting/decay, and claim vested tokens.
-
----
-
-## Roadmap
-
-- [x] DecayfNFT contract (Sonic vesting logic)
-- [x] MockToken contract
-- [x] Foundry deployment script
-- [x] Frontend demo page (React)
-- [ ] Integration: ABI wiring, NFT fetching, claim/mint actions
-- [ ] Documentation polish
-- [ ] (Optional) Public testnet deployment
-- [ ] (Optional) Keeper/automation script
+## Using the Mainnet Demo
+- Connect your wallet (MetaMask, configured for Sonic mainnet).
+- Use the "Demo" page to mint new fNFTs with demo tokens, view your fNFTs, and claim vested tokens as they unlock.
+- All actions are on mainnet, but use demo assets for a risk-free, hands-on experience.
 
 ---
 
 ## Notes
-- This demo is **isolated** and does not affect production contracts or frontend.
-- For debugging, you can modify/test any part of this stack without risk.
+- This demo is **isolated** and does not affect production Sonic airdrop contracts or frontend.
+- For debugging, you can modify/test any part of this stack without risk to real user funds.
 - See code comments and TODOs for integration points.
