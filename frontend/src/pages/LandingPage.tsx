@@ -62,6 +62,10 @@ export const LandingPage: React.FC = () => {
             <a href="https://github.com/b1rdmania/vs-token-mvp" target="_blank" rel="noopener noreferrer">
               GitHub
             </a>
+            <span style={{ margin: '0 8px' }}>|</span>
+            <Link to="/TestnetDemo">
+              Testnet Demo
+            </Link>
           </div>
           <p>&copy; {new Date().getFullYear()} vS Vault. All rights reserved.</p>
         </div>
