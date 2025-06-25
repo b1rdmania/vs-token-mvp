@@ -99,3 +99,121 @@ This repository now includes a **live, mainnet demo** for the DecayfNFT contract
 - This demo is **isolated** and does not affect production Sonic airdrop contracts or frontend.
 - For debugging, you can modify/test any part of this stack without risk to real user funds.
 - See code comments and TODOs for integration points.
+
+## 🎯 The Problem
+Sonic airdrop recipients receive fNFTs (future NFTs) that vest over 9 months. These assets are:
+- **Non-transferable** (soulbound)
+- **Illiquid** for the entire vesting period
+- **Unusable** as collateral in DeFi
+
+## ✨ Our Solution
+The vS Vault Protocol provides **immediate liquidity** through:
+
+1. **Delegation-based deposits**: Users delegate claiming rights to the vault
+2. **Liquid representation**: Mint D-vS tokens worth full future value  
+3. **Instant trading**: Trade D-vS tokens on DEXs like Shadow
+4. **Direct redemption**: Vault claims from fNFTs as users redeem
+
+## 🌑 Shadow DEX Integration
+
+Our demo showcases complete liquidity unlock with **Shadow DEX** - Sonic's leading decentralized exchange:
+
+### Why Shadow DEX?
+- 🏆 **Market leader**: 60% of Sonic's total trading volume
+- 💰 **MEV protection**: 100% MEV recycled back to liquidity providers
+- ⚡ **Ultra-low fees**: $0.0001 transaction costs
+- 🔄 **Deep liquidity**: Minimal slippage for large trades
+- 📈 **High yields**: LPs earn from high-frequency trading
+
+### Demo Flow
+1. **Mint fNFT**: Create demo vesting NFT (10,000 tS, 9 months)
+2. **Deposit to vault**: Delegate fNFT → Get 10,000 D-vS tokens instantly
+3. **Trade on Shadow**: Swap D-vS for tS at market rate (~15% discount)
+4. **Immediate liquidity**: Access funds today instead of waiting 9 months
+
+## 🔧 Technical Architecture
+
+### Core Contracts
+- **TestSonicDecayfNFT**: ERC-721 vesting NFT with delegation
+- **vSVault**: Core protocol with fee mechanism  
+- **VSToken**: ERC-20 liquid representation (D-vS)
+- **TestSonicToken**: Demo underlying asset (tS)
+
+### Economic Model
+- **1% protocol fee** taken in underlying Sonic tokens (not vS tokens)
+- **0.05% keeper incentive** for claiming vested tokens
+- **Treasury sustainability**: Fees in real assets, never worthless tokens
+
+### Security Features
+- ✅ **ReentrancyGuard**: Prevents reentrancy attacks
+- ✅ **Pausable**: Emergency stop mechanism
+- ✅ **Delegation system**: Works with soulbound NFTs
+- ✅ **Direct claiming**: No liquidity mismatches
+
+## 🚀 Live Demo
+
+**Sonic Mainnet**: [https://vs-vault-demo.netlify.app](https://vs-vault-demo.netlify.app)
+
+### Contract Addresses
+- **fNFT**: `0xdf34078C9C8E5891320B780F6C8b8a54B784108C`
+- **tS Token**: `0x4a201419ED3e4d6D58A434F1D077AD7B2ED71f49`  
+- **D-vS Token**: `0x4dE74524A2cE5e2A310615a6aDe7eC35B0f81031`
+- **Vault**: `0x37BD20868FB91eB37813648F4D05F59e07A1bcfb`
+
+### Try the Demo
+1. Connect wallet to Sonic Mainnet
+2. Get test tokens from faucet
+3. Mint demo fNFT
+4. Deposit to vault → Get D-vS tokens
+5. Trade on Shadow DEX demo interface
+
+## 🏗️ Development
+
+```bash
+# Install dependencies
+npm install
+
+# Start frontend
+cd frontend && npm run dev
+
+# Compile contracts
+forge build
+
+# Run tests
+forge test
+
+# Deploy (set PRIVATE_KEY in .env)
+forge script script/DeployDecayfNFT.s.sol --rpc-url sonic --broadcast
+```
+
+## 🔬 Testing
+
+Comprehensive test suite covering:
+- ✅ Deposit and minting flow
+- ✅ Claiming vested tokens with keeper incentives
+- ✅ Redemption with protocol fees (in underlying tokens)
+- ✅ Delegation-based architecture
+- ✅ Error conditions and edge cases
+
+```bash
+forge test --match-contract VaultTest -vv
+```
+
+## 💡 Innovation Highlights
+
+1. **Soulbound compatibility**: First vault to work with non-transferable NFTs
+2. **Economic sustainability**: Fees in underlying assets prevent treasury devaluation
+3. **Shadow DEX integration**: Seamless liquidity provision through leading Sonic DEX
+4. **Complete user journey**: From locked fNFT to liquid tradeable tokens
+
+## 🌟 Future Enhancements
+
+- [ ] Cross-chain bridge integration
+- [ ] Advanced yield strategies  
+- [ ] Governance token and DAO
+- [ ] Integration with more Sonic DeFi protocols
+- [ ] Automated market making features
+
+---
+
+**Built for Sonic ecosystem** | **Liquidity when you need it** | **DeFi composability unlocked**

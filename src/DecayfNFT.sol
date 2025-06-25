@@ -17,6 +17,9 @@ contract TestSonicDecayfNFT is ERC721, Ownable {
     }
 
     mapping(uint256 => VestingInfo) public vestingSchedules;
+    
+    // Allow delegation of claiming rights to vaults
+    mapping(uint256 => address) public claimDelegates;
 
     constructor(address _underlyingToken) ERC721("Test Sonic Vesting NFT", "tS-fNFT") Ownable(msg.sender) {
         underlyingToken = IERC20(_underlyingToken);
@@ -62,19 +65,40 @@ contract TestSonicDecayfNFT is ERC721, Ownable {
         return totalVested - schedule.claimedAmount;
     }
 
+    /**
+     * @notice Delegate claiming rights for a specific NFT to another address (e.g., vault)
+     * @param tokenId The NFT to delegate
+     * @param delegate The address that can claim on behalf of the owner (address(0) to revoke)
+     */
+    function setClaimDelegate(uint256 tokenId, address delegate) external {
+        require(ownerOf(tokenId) == msg.sender, "Only owner can delegate");
+        claimDelegates[tokenId] = delegate;
+    }
+
     function claimVestedTokens(uint256 tokenId) external returns (uint256) {
-        address owner = ownerOf(tokenId);
+        address nftOwner = ownerOf(tokenId);
+        address delegate = claimDelegates[tokenId];
+        
+        // Allow owner, approved addresses, or delegate to claim
         require(
-            msg.sender == owner ||
+            msg.sender == nftOwner ||
             getApproved(tokenId) == msg.sender ||
-            isApprovedForAll(owner, msg.sender),
-            "Not owner or approved"
+            isApprovedForAll(nftOwner, msg.sender) ||
+            msg.sender == delegate,
+            "Not authorized to claim"
         );
+        
         VestingInfo storage schedule = vestingSchedules[tokenId];
         uint256 claimableAmount = claimable(tokenId);
         require(claimableAmount > 0, "Nothing to claim");
+        
         schedule.claimedAmount += claimableAmount;
-        underlyingToken.transfer(msg.sender, claimableAmount);
+        
+        // If delegate is claiming, send tokens to the delegate (vault)
+        // Otherwise send to the message sender
+        address recipient = (msg.sender == delegate && delegate != address(0)) ? delegate : msg.sender;
+        underlyingToken.transfer(recipient, claimableAmount);
+        
         return claimableAmount;
     }
 

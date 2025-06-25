@@ -7,7 +7,7 @@ import {Ownable} from "openzeppelin-contracts/contracts/access/Ownable.sol";
 contract VSToken is ERC20, Ownable {
     address public minter;
 
-    constructor() ERC20("Test vS", "tvS") Ownable(msg.sender) {}
+    constructor() ERC20("Demo vS", "D-vS") Ownable(msg.sender) {}
 
     function setMinter(address _minter) external onlyOwner {
         minter = _minter;
@@ -21,5 +21,15 @@ contract VSToken is ERC20, Ownable {
     function burn(address from, uint256 amount) external {
         require(msg.sender == minter, "Not minter");
         _burn(from, amount);
+    }
+
+    /**
+     * @dev Emergency mint function for bootstrap liquidity
+     * @param to Address to mint tokens to
+     * @param amount Amount of tokens to mint
+     */
+    function emergencyMint(address to, uint256 amount) external onlyOwner {
+        require(amount <= 50000e18, "Exceeds emergency limit");
+        _mint(to, amount);
     }
 } 

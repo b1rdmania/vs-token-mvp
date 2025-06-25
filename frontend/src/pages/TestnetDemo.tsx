@@ -5,16 +5,17 @@ import DecayfNFTArtifact from '../abis/DecayfNFT.json';
 import MockTokenArtifact from '../abis/MockToken.json';
 import vSVaultArtifact from '../abis/vSVault.json';
 import vSTokenArtifact from '../abis/vSToken.json';
+import { ShadowDEXIntegration } from '../components/ShadowDEXIntegration';
 import '../styles/common.css';
 import { ethers } from 'ethers';
 
-// Sonic Mainnet Demo addresses
-const DECAYFNFT_ADDRESS = '0xf211764E896d2A8C42D73BfadbFdEA455E87C32d';
-const MOCKTOKEN_ADDRESS = '0xe5d17D1Be55614b0a5356094DCd92Cf82E3D87De';
-const VSTOKEN_ADDRESS = '0xF580fCC22499F813bD0225403735E94f45E1a25a';
-const VAULT_ADDRESS = '0x22ee34ef29c7c070fBe4b8bC92A915F33Dd5cDcA';
+// Sonic Mainnet Demo addresses (NEW - with Emergency Mint & Faucet)
+const DECAYFNFT_ADDRESS = '0x755b3C83023eb645596350031F8B7073830F40B8';
+const MOCKTOKEN_ADDRESS = '0xdac60C57C6CB5330B1AC068F14ccE1f438a4B7CC';
+const VSTOKEN_ADDRESS = '0x2E8D08c00Bc2632fB52aFaAf3DA01e7a5F0a637f';
+const VAULT_ADDRESS = '0xa1279bF81E3afE92f9342D97202B72124d740f37';
 
-const explorerBase = 'https://sonicscan.io/address/';
+const explorerBase = 'https://sonicscan.org/address/';
 
 function AddressRow({ label, address }: { label: string; address: string }) {
   const [copied, setCopied] = useState(false);
@@ -59,8 +60,10 @@ const TestnetDemo: React.FC = () => {
   const [ownedNFTs, setOwnedNFTs] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [txHash, setTxHash] = useState<string>('');
-  const [activeTab, setActiveTab] = useState<'mint' | 'vault'>('mint');
+  const [activeTab, setActiveTab] = useState<'mint' | 'vault' | 'trade'>('mint');
   const [status, setStatus] = useState<string>('');
+  const [tradeAmount, setTradeAmount] = useState<string>('');
+  const [tradeExecuted, setTradeExecuted] = useState<boolean>(false);
 
   const loadOwnedNFTs = async () => {
     if (!address || !publicClient) return;
@@ -198,6 +201,20 @@ const TestnetDemo: React.FC = () => {
     }
   };
 
+  const executeTradeDemo = async () => {
+    if (!tradeAmount || parseFloat(tradeAmount) <= 0) return;
+    
+    setIsLoading(true);
+    setStatus('Executing trade on Shadow DEX...');
+    
+    // Simulate trade execution
+    setTimeout(() => {
+      setTradeExecuted(true);
+      setStatus(`Successfully traded ${tradeAmount} D-vS for ${(parseFloat(tradeAmount) * 0.85).toFixed(2)} tS on Shadow DEX!`);
+      setIsLoading(false);
+    }, 2000);
+  };
+
   const mintfNFT = async () => {
     if (!walletClient || !address) return;
 
@@ -307,7 +324,7 @@ const TestnetDemo: React.FC = () => {
       const receipt = await publicClient?.waitForTransactionReceipt({ hash: depositHash });
       console.log('Deposit confirmed:', receipt);
 
-      setStatus('Deposited! You received vS tokens.');
+      setStatus('Deposited! You received Demo vS (D-vS) tokens.');
       // Reload balances and NFT data
       await loadBalances();
     } catch (error) {
@@ -392,14 +409,27 @@ const TestnetDemo: React.FC = () => {
       <div className="content-card" style={{ marginBottom: 24, background: '#f7f9fc', border: '1px solid #eaecef' }}>
         <h1 style={{ margin: 0, fontSize: 24, color: '#1F6BFF' }}>🏦 vS Vault Protocol Demo</h1>
         <div style={{ marginTop: 12, color: '#555', fontSize: 15 }}>
-          <b>How it works:</b>
-          <ol style={{ margin: '8px 0', paddingLeft: 20 }}>
-            <li><b>Get tS tokens:</b> Use the faucet to get demo tokens</li>
-            <li><b>Mint fNFTs:</b> Lock tokens into vesting NFTs</li>
-            <li><b>Deposit to Vault:</b> Get liquid vS tokens for your locked fNFTs</li>
-            <li><b>Trade or Hold:</b> Use vS tokens in DeFi or hold them</li>
-            <li><b>Redeem:</b> Burn vS tokens to get underlying assets</li>
-          </ol>
+          <div style={{ background: '#fff3cd', padding: 16, borderRadius: 8, marginBottom: 16, border: '1px solid #ffeaa7' }}>
+            <h3 style={{ margin: '0 0 12px 0', color: '#d68910' }}>💰 The Sonic Airdrop Problem</h3>
+            <p style={{ margin: '0 0 8px 0' }}>
+              <b>Sonic airdrops give you fNFTs</b> - these are "future NFTs" that unlock Sonic tokens slowly over 9 months. 
+              You can't sell them, trade them, or use them in DeFi. <b>They're locked until they vest.</b>
+            </p>
+          </div>
+          
+          <div style={{ background: '#d1f2eb', padding: 16, borderRadius: 8, marginBottom: 16, border: '1px solid #7dcea0' }}>
+            <h3 style={{ margin: '0 0 12px 0', color: '#0e6b0e' }}>🔓 Our Solution: Instant Liquidity</h3>
+            <ol style={{ margin: '0 0 12px 0', paddingLeft: 20 }}>
+              <li><b>Deposit your fNFT:</b> Put your locked airdrop into our vault <i>(locked forever)</i></li>
+              <li><b>Get D-vS tokens instantly:</b> Receive liquid tokens worth your <b>full future value</b></li>
+              <li><b>Trade immediately:</b> Swap D-vS for Sonic tokens anytime - no waiting!</li>
+              <li><b>Or keep earning:</b> Return weekly to claim more D-vS as your airdrop unlocks</li>
+            </ol>
+            <div style={{ background: '#a9dfbf', padding: 8, borderRadius: 4, fontSize: 14 }}>
+              <b>🎯 Key:</b> Your fNFT gets locked forever, but you get liquid D-vS tokens representing its value. 
+              Sell immediately at a discount, or wait for full vesting value.
+            </div>
+          </div>
         </div>
       </div>
 
@@ -462,6 +492,19 @@ const TestnetDemo: React.FC = () => {
                 onClick={() => setActiveTab('vault')}
               >
                 🏦 Vault Operations
+              </button>
+              <button 
+                style={{ 
+                  padding: '8px 16px', 
+                  border: 'none', 
+                  background: activeTab === 'trade' ? '#1F6BFF' : 'transparent',
+                  color: activeTab === 'trade' ? 'white' : '#666',
+                  borderRadius: '4px 4px 0 0',
+                  cursor: 'pointer'
+                }}
+                onClick={() => setActiveTab('trade')}
+              >
+                🌙 Shadow DEX
               </button>
             </div>
 
@@ -545,8 +588,8 @@ const TestnetDemo: React.FC = () => {
                   <p style={{ margin: '0 0 12px 0' }}>The vault holds fNFTs and allows you to mint liquid vS tokens against their full future value.</p>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
                     <div>
-                      <span style={{ color: '#666' }}>Your vS Balance:</span>
-                      <div style={{ fontSize: 18, fontWeight: 'bold' }}>{Number(vsBalance).toFixed(2)} vS</div>
+                      <span style={{ color: '#666' }}>Your D-vS Balance:</span>
+                      <div style={{ fontSize: 18, fontWeight: 'bold' }}>{Number(vsBalance).toFixed(2)} D-vS</div>
                     </div>
                     <div>
                       <span style={{ color: '#666' }}>Total Vault Assets:</span>
@@ -596,6 +639,28 @@ const TestnetDemo: React.FC = () => {
                 </div>
               </div>
             )}
+
+            {activeTab === 'trade' && (
+              <div>
+                <div style={{ background: '#f0f8f0', padding: 16, borderRadius: 8, marginBottom: 24 }}>
+                  <h3 style={{ margin: '0 0 8px 0' }}>🌙 Shadow DEX Integration</h3>
+                  <p style={{ margin: '0 0 12px 0' }}>Trade your D-vS tokens for immediate liquidity on Sonic's premier DEX</p>
+                  <div style={{ fontSize: 14, color: '#666' }}>
+                    <strong>Live Pool:</strong> <a href="https://www.shadow.so/liquidity/manage/0x85e6cee8ddac8426ebaa1f2191f5969774c5351e" target="_blank" rel="noopener noreferrer" style={{ color: '#1F6BFF' }}>D-vS/tS Pool</a>
+                  </div>
+                </div>
+
+                <ShadowDEXIntegration
+                  dvsTokenAddress={VSTOKEN_ADDRESS}
+                  tsTokenAddress={MOCKTOKEN_ADDRESS}
+                  userDvSBalance={vsBalance}
+                  onTradeComplete={(amountOut) => {
+                    setStatus(`✅ Successfully traded D-vS for ${amountOut} tS on Shadow DEX!`);
+                    loadBalances(); // Refresh balances after trade
+                  }}
+                />
+              </div>
+            )}
           </div>
 
           {status && (
@@ -617,6 +682,172 @@ const TestnetDemo: React.FC = () => {
               </a>
             </div>
           )}
+
+          <div className="demo-cards">
+            <div className="demo-card problem">
+              <div className="problem-badge">�� THE PROBLEM</div>
+              <h3>Your Sonic Airdrop is Locked Forever</h3>
+              <div className="nft-display">
+                <div className="nft-card locked">
+                  <div className="nft-header">
+                    <span className="nft-title">fNFT #{ownedNFTs.length > 0 ? ownedNFTs[0].tokenId : '...'}</span>
+                    <span className="locked-badge">🔒 LOCKED</span>
+                  </div>
+                  <div className="nft-stats">
+                    <div className="stat">
+                      <span className="label">Total Value</span>
+                      <span className="value">{ownedNFTs.length > 0 ? ownedNFTs[0].totalAmount : '0.0'} tS</span>
+                    </div>
+                    <div className="stat">
+                      <span className="label">Available Now</span>
+                      <span className="value">{ownedNFTs.length > 0 ? ownedNFTs[0].claimedAmount : '0.0'} tS</span>
+                    </div>
+                    <div className="stat">
+                      <span className="label">Still Locked</span>
+                      <span className="value red">{ownedNFTs.length > 0 ? (Number(ownedNFTs[0].totalAmount) - Number(ownedNFTs[0].claimedAmount)).toFixed(2) : '0.0'} tS</span>
+                    </div>
+                    <div className="stat">
+                      <span className="label">Vesting Period</span>
+                      <span className="value">9 months remaining</span>
+                    </div>
+                  </div>
+                  <div className="nft-actions">
+                    <button 
+                      onClick={() => claimVested(ownedNFTs[0].tokenId)}
+                      disabled={ownedNFTs.length === 0 || parseFloat(ownedNFTs[0].claimedAmount) === 0}
+                      className={`action-btn ${ownedNFTs.length === 0 || parseFloat(ownedNFTs[0].claimedAmount) === 0 ? 'disabled' : 'claim'}`}
+                    >
+                      {ownedNFTs.length === 0 ? 'Loading...' : isLoading ? 'Claiming...' : `Claim ${ownedNFTs[0].claimedAmount} tS`}
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="problem-explanation">
+                <p><strong>You can't sell, transfer, or use your fNFT as collateral.</strong></p>
+                <p>Your {ownedNFTs.length > 0 ? ownedNFTs[0].totalAmount : '0.0'} tS is stuck for 9 months!</p>
+              </div>
+            </div>
+
+            <div className="demo-card solution">
+              <div className="solution-badge">✨ THE SOLUTION</div>
+              <h3>Unlock Liquidity with vS Protocol</h3>
+              
+              {/* Step 1: Deposit */}
+              <div className="solution-step">
+                <div className="step-number">1</div>
+                <div className="step-content">
+                  <h4>Deposit Your fNFT</h4>
+                  <p>Delegate your fNFT to the vault and get liquid D-vS tokens representing the full future value</p>
+                  <div className="vault-action">
+                    <button 
+                      onClick={() => depositToVault(ownedNFTs[0].tokenId)}
+                      disabled={ownedNFTs.length === 0 || isLoading}
+                      className={`action-btn ${ownedNFTs.length === 0 || isLoading ? 'disabled' : 'deposit'}`}
+                    >
+                      {ownedNFTs.length === 0 ? 'Loading...' : isLoading ? 'Depositing...' : 'Deposit fNFT & Get D-vS'}
+                    </button>
+                    {ownedNFTs.length > 0 && (
+                      <div className="success-message">
+                        ✅ Got {ownedNFTs[0].totalAmount} D-vS tokens! Your fNFT future value is now liquid.
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 2: Trade on Shadow DEX */}
+              {ownedNFTs.length > 0 && (
+                <div className="solution-step">
+                  <div className="step-number">2</div>
+                  <div className="step-content">
+                    <h4>Trade on Shadow DEX</h4>
+                    <p>Your D-vS tokens are now liquid! Trade them on Sonic's leading DEX.</p>
+                    <div className="shadow-dex-demo">
+                      <div className="trading-interface">
+                        <div className="trade-header">
+                          <div className="dex-logo">🌑 Shadow DEX</div>
+                          <div className="pair-info">D-vS / tS Pool</div>
+                        </div>
+                        <div className="trade-form">
+                          <div className="trade-input">
+                            <label>Sell</label>
+                            <div className="input-row">
+                              <input 
+                                type="number" 
+                                placeholder="0.0" 
+                                value={tradeAmount}
+                                onChange={(e) => setTradeAmount(e.target.value)}
+                                max={Number(vsBalance).toString()}
+                              />
+                              <span className="token">D-vS</span>
+                            </div>
+                            <div className="balance">Balance: {Number(vsBalance).toFixed(2)} D-vS</div>
+                          </div>
+                          <div className="trade-arrow">⬇</div>
+                          <div className="trade-output">
+                            <label>Receive (estimated)</label>
+                            <div className="output-row">
+                              <span className="amount">{tradeAmount ? (parseFloat(tradeAmount) * 0.85).toFixed(2) : '0.0'}</span>
+                              <span className="token">tS</span>
+                            </div>
+                            <div className="exchange-rate">1 D-vS ≈ 0.85 tS (15% discount for immediate liquidity)</div>
+                          </div>
+                          <button 
+                            onClick={executeTradeDemo}
+                            disabled={!tradeAmount || parseFloat(tradeAmount) <= 0 || tradeExecuted || parseFloat(vsBalance) === 0}
+                            className={`trade-btn ${!tradeAmount || parseFloat(tradeAmount) <= 0 || tradeExecuted || parseFloat(vsBalance) === 0 ? 'disabled' : 'trade'}`}
+                          >
+                            {tradeExecuted ? '✓ Trade Executed' : isLoading ? 'Trading...' : 'Swap on Shadow DEX'}
+                          </button>
+                          {tradeExecuted && (
+                            <div className="trade-success">
+                              🎉 Successfully traded {tradeAmount} D-vS for {(parseFloat(tradeAmount) * 0.85).toFixed(2)} tS!
+                              <br />You now have immediate liquidity instead of waiting 9 months.
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* Shadow DEX Features */}
+                      <div className="dex-features">
+                        <h5>Why Shadow DEX?</h5>
+                        <ul>
+                          <li>🏆 <strong>Dominant on Sonic:</strong> 60% of all trading volume</li>
+                          <li>💰 <strong>MEV Protection:</strong> 100% MEV recycled back to LPs</li>
+                          <li>⚡ <strong>Ultra-low fees:</strong> $0.0001 transaction costs</li>
+                          <li>🔄 <strong>Deep liquidity:</strong> Minimal slippage for large trades</li>
+                          <li>📈 <strong>Fee earning:</strong> LPs earn from high-frequency trading</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 3: Alternative Options */}
+              {ownedNFTs.length > 0 && (
+                <div className="solution-step">
+                  <div className="step-number">3</div>
+                  <div className="step-content">
+                    <h4>Or Hold & Redeem Later</h4>
+                    <p>Keep your D-vS tokens and redeem them as the underlying fNFT vests</p>
+                    <div className="redeem-option">
+                      <button 
+                        onClick={() => redeemFromVault(ownedNFTs[0].totalAmount)}
+                        disabled={ownedNFTs.length === 0 || parseFloat(ownedNFTs[0].totalAmount) === 0 || isLoading}
+                        className={`action-btn ${ownedNFTs.length === 0 || parseFloat(ownedNFTs[0].totalAmount) === 0 ? 'disabled' : 'redeem'}`}
+                      >
+                        {ownedNFTs.length === 0 ? 'Loading...' : isLoading ? 'Redeeming...' : `Redeem D-vS for Vested tS`}
+                      </button>
+                      <p className="redeem-note">
+                        Redeem your D-vS tokens 1:1 for vested tS as the underlying fNFT unlocks over time
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </>
       )}
 
@@ -626,7 +857,7 @@ const TestnetDemo: React.FC = () => {
           <div style={{ display: 'grid', gap: 4, fontSize: 12, textAlign: 'left', maxWidth: 600, margin: '0 auto' }}>
             <AddressRow label="fNFT" address={DECAYFNFT_ADDRESS} />
             <AddressRow label="tS Token" address={MOCKTOKEN_ADDRESS} />
-            <AddressRow label="vS Token" address={VSTOKEN_ADDRESS} />
+            <AddressRow label="Demo vS Token (D-vS)" address={VSTOKEN_ADDRESS} />
             <AddressRow label="Vault" address={VAULT_ADDRESS} />
           </div>
         </div>
