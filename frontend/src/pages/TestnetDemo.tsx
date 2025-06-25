@@ -565,12 +565,26 @@ const TestnetDemo: React.FC = () => {
                               {isLoading ? 'Claiming...' : `Claim ${Number(nft.availableAmount).toFixed(2)} tS`}
                             </button>
                             <button
-                              onClick={() => depositToVault(nft.tokenId)}
+                              onClick={() => {
+                                const confirmed = window.confirm(
+                                  `Deposit fNFT #${nft.tokenId} to Vault?\n\n` +
+                                  `What happens:\n` +
+                                  `• You keep your fNFT in your wallet\n` +
+                                  `• Vault gets delegation rights to claim future tokens\n` +
+                                  `• You receive ${nft.totalAmount} D-vS tokens immediately\n` +
+                                  `• You can redeem D-vS for tS tokens as fNFT vests\n\n` +
+                                  `This action is REVERSIBLE via vault redemption.\n\n` +
+                                  `Proceed?`
+                                );
+                                if (confirmed) {
+                                  depositToVault(nft.tokenId);
+                                }
+                              }}
                               disabled={isLoading}
                               className="button-primary"
                               style={{ flex: 1, background: '#28a745' }}
                             >
-                              {isLoading ? 'Depositing...' : 'Deposit to Vault'}
+                              {isLoading ? 'Depositing...' : 'Deposit to Vault (Safe)'}
                             </button>
                           </div>
                         </div>
@@ -585,7 +599,10 @@ const TestnetDemo: React.FC = () => {
               <div>
                 <div style={{ background: '#e6f7ff', padding: 16, borderRadius: 8, marginBottom: 24 }}>
                   <h3 style={{ margin: '0 0 8px 0' }}>🏦 Vault Information</h3>
-                  <p style={{ margin: '0 0 12px 0' }}>The vault holds fNFTs and allows you to mint liquid D-vS tokens against their full future value.</p>
+                  <p style={{ margin: '0 0 8px 0' }}>The vault holds delegation rights to your fNFTs and mints liquid D-vS tokens against their full future value.</p>
+                  <div style={{ background: '#d1f2eb', padding: 12, borderRadius: 6, border: '1px solid #7dcea0', fontSize: 14 }}>
+                    <strong>✅ Safe:</strong> Vault operations are <strong>reversible</strong> - you can redeem D-vS for tS tokens as your fNFT vests
+                  </div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
                     <div>
                       <span style={{ color: '#666' }}>Your D-vS Balance:</span>
@@ -642,10 +659,30 @@ const TestnetDemo: React.FC = () => {
 
             {activeTab === 'trade' && (
               <div>
-                <div style={{ background: '#f0f8f0', padding: 16, borderRadius: 8, marginBottom: 24 }}>
-                  <h3 style={{ margin: '0 0 8px 0' }}>🌙 Shadow DEX Integration</h3>
-                  <p style={{ margin: '0 0 12px 0' }}>Trade your D-vS tokens for immediate liquidity on Sonic's premier DEX</p>
-                  <div style={{ fontSize: 14, color: '#666' }}>
+                <div style={{ background: '#fff3cd', padding: 16, borderRadius: 8, marginBottom: 24, border: '1px solid #ffeaa7' }}>
+                  <h3 style={{ margin: '0 0 8px 0', color: '#d68910' }}>⚠️ CRITICAL: Understand What You're Doing</h3>
+                  <div style={{ background: '#dc3545', color: 'white', padding: 12, borderRadius: 6, marginBottom: 12 }}>
+                    <strong>🚨 THIS STEP IS IRREVERSIBLE!</strong>
+                  </div>
+                  <p style={{ margin: '0 0 8px 0' }}>
+                    <strong>What happens when you trade on Shadow DEX:</strong>
+                  </p>
+                  <ol style={{ margin: '0 0 12px 0', paddingLeft: 20 }}>
+                    <li>You sell your D-vS tokens for tS tokens at a <strong>15% discount</strong></li>
+                    <li>You get <strong>immediate liquidity</strong> - real tS tokens right now</li>
+                    <li><strong>You give up future vesting value</strong> - no more claims from your fNFT</li>
+                    <li><strong>Someone else buys your future at a discount</strong></li>
+                  </ol>
+                  <div style={{ background: '#f8d7da', padding: 12, borderRadius: 6, marginBottom: 12, border: '1px solid #f5c6cb' }}>
+                    <strong>💀 Once traded, you CANNOT:</strong><br/>
+                    • Get your fNFT value back<br/>
+                    • Redeem for full vesting value<br/>
+                    • Participate in future unlocks
+                  </div>
+                  <div style={{ background: '#d1f2eb', padding: 12, borderRadius: 6, border: '1px solid #7dcea0' }}>
+                    <strong>✅ Alternative:</strong> Keep your D-vS and use vault "Redeem" to get full vesting value over time
+                  </div>
+                  <div style={{ fontSize: 14, color: '#666', marginTop: 12 }}>
                     <strong>Live Pool:</strong> <a href="https://www.shadow.so/liquidity/manage/0x85e6cee8ddac8426ebaa1f2191f5969774c5351e" target="_blank" rel="noopener noreferrer" style={{ color: '#1F6BFF' }}>D-vS/tS Pool</a>
                   </div>
                 </div>

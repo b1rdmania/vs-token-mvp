@@ -155,10 +155,25 @@ export const ShadowDEXIntegration: React.FC<ShadowDEXIntegrationProps> = ({
 
         <button
           className={`trade-button ${!tradeAmount || isTrading ? 'disabled' : ''}`}
-          onClick={executeTrade}
+          onClick={() => {
+            const confirmed = window.confirm(
+              `⚠️ IRREVERSIBLE ACTION WARNING ⚠️\n\n` +
+              `You are about to trade ${tradeAmount} D-vS tokens for ${estimatedOutput} tS tokens.\n\n` +
+              `This means:\n` +
+              `• You get ${estimatedOutput} tS tokens RIGHT NOW\n` +
+              `• You LOSE future vesting value from your fNFT\n` +
+              `• This action CANNOT be undone\n` +
+              `• You're selling at a 15% discount\n\n` +
+              `Alternative: Keep your D-vS tokens and redeem them gradually as your fNFT vests for FULL value.\n\n` +
+              `Are you SURE you want to proceed?`
+            );
+            if (confirmed) {
+              executeTrade();
+            }
+          }}
           disabled={!tradeAmount || isTrading}
         >
-          {isTrading ? 'Trading on Shadow DEX...' : 'Trade on Shadow DEX'}
+          {isTrading ? 'Trading on Shadow DEX...' : '⚠️ Trade on Shadow DEX (IRREVERSIBLE)'}
         </button>
       </div>
 
