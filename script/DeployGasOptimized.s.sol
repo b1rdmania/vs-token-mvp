@@ -6,7 +6,7 @@ import {console} from "forge-std/console.sol";
 import {TestSonicDecayfNFT} from "../src/DecayfNFT.sol";
 import {TestSonicToken} from "../src/MockToken.sol";
 import {VSToken} from "../src/VSToken.sol";
-import {VSVault} from "../src/vSVault.sol";
+import {vSVault} from "../src/vSVault.sol";
 
 contract DeployGasOptimized is Script {
     function run() external {
@@ -31,18 +31,20 @@ contract DeployGasOptimized is Script {
         console.log("Gas-Optimized D-vS Token deployed at:", address(dvsToken));
 
         // Deploy vault with gas optimizations
-        VSVault vault = new VSVault(
+        vSVault vault = new vSVault(
             address(dvsToken),
             address(tsToken),
-            address(fnft),
-            deployer, // protocol treasury
-            250      // 2.5% protocol fee
+            deployer // protocol treasury
         );
         console.log("Gas-Optimized Vault deployed at:", address(vault));
 
         // Set vault as minter for D-vS token
         dvsToken.setMinter(address(vault));
         console.log("Vault set as D-vS token minter");
+        
+        // Set the NFT contract in the vault
+        vault.setNFTContract(address(fnft));
+        console.log("NFT contract set in vault");
 
         // Emergency mint initial D-vS tokens for demo
         dvsToken.emergencyMint(deployer, 2000e18);

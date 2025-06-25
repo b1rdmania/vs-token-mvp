@@ -9,11 +9,11 @@ import ShadowDEXIntegration from '../components/ShadowDEXIntegration';
 import '../styles/common.css';
 import { ethers } from 'ethers';
 
-// Sonic Mainnet Demo addresses (LATEST - with Low-Gas SimpleRedeem)
-const DECAYFNFT_ADDRESS = '0x1ba2151c61cAA88e8890a9425697Fd722C9136b5';
-const MOCKTOKEN_ADDRESS = '0x567a92ADA6a5D7d31b9e7aa410D868fa91Cd7b7C';
-const VSTOKEN_ADDRESS = '0x671B9634158A163521b029528b3Fd73EAefd6422';
-const VAULT_ADDRESS = '0x44720F6F56c787b8d2AF196C7c7e23230B63FAEb';
+// Gas-Optimized Contracts (Ultra-Low Gas for Demo Deposits!)
+const DECAYFNFT_ADDRESS = '0xC6E821326AD497ba4987bA98057abEA7abC425cA';
+const MOCKTOKEN_ADDRESS = '0x16e5294Cc116819BfB79752C238a74c9f83a35f9';
+const VSTOKEN_ADDRESS = '0x2649125B1a683e3448F2BB15425AcD83aa2dfd35';
+const VAULT_ADDRESS = '0x2e17544f3E692a05F9c3C88049bca0eBCF27Bb6B';
 
 const explorerBase = 'https://sonicscan.org/address/';
 
