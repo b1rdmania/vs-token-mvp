@@ -9,11 +9,11 @@ import ShadowDEXIntegration from '../components/ShadowDEXIntegration';
 import '../styles/common.css';
 import { ethers } from 'ethers';
 
-// Sonic Mainnet Demo addresses (NEW - with Emergency Mint & Faucet)
-const DECAYFNFT_ADDRESS = '0x755b3C83023eb645596350031F8B7073830F40B8';
-const MOCKTOKEN_ADDRESS = '0xdac60C57C6CB5330B1AC068F14ccE1f438a4B7CC';
-const VSTOKEN_ADDRESS = '0x2E8D08c00Bc2632fB52aFaAf3DA01e7a5F0a637f';
-const VAULT_ADDRESS = '0xa1279bF81E3afE92f9342D97202B72124d740f37';
+// Sonic Mainnet Demo addresses (LATEST - with Low-Gas SimpleRedeem)
+const DECAYFNFT_ADDRESS = '0x1ba2151c61cAA88e8890a9425697Fd722C9136b5';
+const MOCKTOKEN_ADDRESS = '0x567a92ADA6a5D7d31b9e7aa410D868fa91Cd7b7C';
+const VSTOKEN_ADDRESS = '0x671B9634158A163521b029528b3Fd73EAefd6422';
+const VAULT_ADDRESS = '0x44720F6F56c787b8d2AF196C7c7e23230B63FAEb';
 
 const explorerBase = 'https://sonicscan.org/address/';
 
@@ -341,25 +341,25 @@ const TestnetDemo: React.FC = () => {
     if (!walletClient || !address || !amount) return;
 
     setIsLoading(true);
-    setStatus('Redeeming from vault...');
+    setStatus('Redeeming from vault (low gas)...');
     try {
       const amountWei = ethers.parseEther(amount);
       
       const hash = await walletClient.writeContract({
         address: VAULT_ADDRESS as `0x${string}`,
         abi: vSVaultArtifact.abi,
-        functionName: 'redeem',
+        functionName: 'simpleRedeem',
         args: [amountWei],
       });
 
       setTxHash(hash);
-      console.log('Redeem transaction sent:', hash);
+      console.log('Simple redeem transaction sent:', hash);
 
       // Wait for transaction confirmation
       const receipt = await publicClient?.waitForTransactionReceipt({ hash });
-      console.log('Redeem confirmed:', receipt);
+      console.log('Simple redeem confirmed:', receipt);
 
-      setStatus('Redeemed! You received underlying tokens.');
+      setStatus('Redeemed! You received underlying tokens (low gas cost).');
       // Reload balances
       await loadBalances();
     } catch (error) {
