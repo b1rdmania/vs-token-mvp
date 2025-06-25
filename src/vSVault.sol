@@ -6,7 +6,9 @@ import {ERC721Holder} from "openzeppelin-contracts/contracts/token/ERC721/utils/
 import {Ownable} from "openzeppelin-contracts/contracts/access/Ownable.sol";
 import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
 import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
-import {vSToken} from "./vSToken.sol";
+import {ReentrancyGuard} from "openzeppelin-contracts/contracts/utils/ReentrancyGuard.sol";
+import {Pausable} from "openzeppelin-contracts/contracts/utils/Pausable.sol";
+import {VSToken} from "./VSToken.sol";
 import {MockSonicNFT} from "../test/MockSonicNFT.sol";
 
 /**
@@ -16,8 +18,8 @@ import {MockSonicNFT} from "../test/MockSonicNFT.sol";
  * This contract then collects vested tokens from the fNFTs over time,
  * allowing vS holders to redeem them for the underlying asset.
  */
-contract vSVault is ERC721Holder, Ownable {
-    vSToken public immutable vsToken;
+contract vSVault is ERC721Holder, Ownable, ReentrancyGuard, Pausable {
+    VSToken public vS;
     address public sonicNFT;
     address public immutable underlyingToken; // The actual token being vested, e.g. SONIC
 
@@ -44,7 +46,7 @@ contract vSVault is ERC721Holder, Ownable {
         address _vsToken,
         address _underlyingToken
     ) Ownable(msg.sender) {
-        vsToken = vSToken(_vsToken);
+        vS = VSToken(_vsToken);
         underlyingToken = _underlyingToken;
     }
 
@@ -66,7 +68,7 @@ contract vSVault is ERC721Holder, Ownable {
      * @dev This is a one-way bridge. The NFT is permanently locked.
      * @param nftId The ID of the Sonic NFT to deposit.
      */
-    function deposit(uint256 nftId) external {
+    function deposit(uint256 nftId) external nonReentrant whenNotPaused {
         require(sonicNFT != address(0), "NFT contract not set");
         // 1. Take ownership of the NFT
         IERC721(sonicNFT).safeTransferFrom(msg.sender, address(this), nftId);
@@ -77,7 +79,7 @@ contract vSVault is ERC721Holder, Ownable {
         require(totalValue > 0, "NFT has no value");
 
         // 3. Mint vS tokens 1:1 for the total future value
-        vsToken.mint(msg.sender, totalValue);
+        vS.mint(msg.sender, totalValue);
 
         emit NFTDeposited(msg.sender, nftId, totalValue);
     }
@@ -123,24 +125,38 @@ contract vSVault is ERC721Holder, Ownable {
      * @notice Burns vS tokens to redeem a proportional share of the underlying tokens held by the vault.
      * @param amount The amount of vS tokens to burn.
      */
-    function redeem(uint256 amount) external {
+    function redeem(uint256 amount) external nonReentrant whenNotPaused {
         require(amount > 0, "Cannot redeem 0");
         
         // Calculate proportional share of underlying tokens held by the vault
         uint256 totalUnderlying = IERC20(underlyingToken).balanceOf(address(this));
-        uint256 vsTotalSupply = vsToken.totalSupply();
+        uint256 vsTotalSupply = vS.totalSupply();
         
         require(vsTotalSupply > 0, "No vS tokens in circulation");
         uint256 redeemableAmount = (amount * totalUnderlying) / vsTotalSupply;
         require(redeemableAmount > 0, "No underlying assets to redeem");
 
         // 1. Burn user's vS tokens first to prevent re-entrancy
-        vsToken.burn(msg.sender, amount);
+        vS.burn(msg.sender, amount);
         
         // 2. Transfer underlying tokens to the user
         IERC20(underlyingToken).transfer(msg.sender, redeemableAmount);
 
         emit Redeemed(msg.sender, amount, redeemableAmount);
+    }
+
+    /**
+     * @notice Emergency pause function for the owner
+     */
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    /**
+     * @notice Unpause function for the owner
+     */
+    function unpause() external onlyOwner {
+        _unpause();
     }
 
     /**

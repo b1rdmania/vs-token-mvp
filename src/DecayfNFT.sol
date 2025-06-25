@@ -5,7 +5,7 @@ import {ERC721} from "openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
 import {Ownable} from "openzeppelin-contracts/contracts/access/Ownable.sol";
 import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
-contract DemoDecayfNFT is ERC721, Ownable {
+contract TestSonicDecayfNFT is ERC721, Ownable {
     uint256 private _nextTokenId;
     IERC20 public immutable underlyingToken;
 
@@ -18,7 +18,7 @@ contract DemoDecayfNFT is ERC721, Ownable {
 
     mapping(uint256 => VestingInfo) public vestingSchedules;
 
-    constructor(address _underlyingToken) ERC721("Demo Decay fNFT", "DEMOFNFT") Ownable(msg.sender) {
+    constructor(address _underlyingToken) ERC721("Test Sonic Vesting NFT", "tS-fNFT") Ownable(msg.sender) {
         underlyingToken = IERC20(_underlyingToken);
     }
 

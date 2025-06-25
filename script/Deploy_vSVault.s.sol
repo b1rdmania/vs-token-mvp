@@ -3,7 +3,7 @@ pragma solidity ^0.8.24;
 
 import {Script} from "forge-std/Script.sol";
 import {vSVault} from "../src/vSVault.sol";
-import {vSToken} from "../src/vSToken.sol";
+import {VSToken} from "../src/VSToken.sol";
 import {MockSonicNFT} from "../test/MockSonicNFT.sol";
 import {MockSToken} from "../test/MockSToken.sol";
 
@@ -17,7 +17,7 @@ contract Deploy_vSVault is Script {
         MockSToken mockSToken = new MockSToken();
         
         // 2. Deploy vSToken
-        vSToken vsToken = new vSToken();
+        VSToken vsToken = new VSToken();
 
         // 3. Deploy MockSonicNFT, linking it to the underlying S-Token
         MockSonicNFT mockSonicNFT = new MockSonicNFT(address(mockSToken));
@@ -35,6 +35,7 @@ contract Deploy_vSVault is Script {
         vault.setNFTContract(address(mockSonicNFT));
 
         // 7. Grant minting/burning rights from vSToken to the Vault
+        vsToken.setMinter(address(vault));
         vsToken.transferOwnership(address(vault));
 
         // 8. Mint a test NFT to the deployer
