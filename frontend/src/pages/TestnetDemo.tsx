@@ -585,7 +585,7 @@ const TestnetDemo: React.FC = () => {
               <div>
                 <div style={{ background: '#e6f7ff', padding: 16, borderRadius: 8, marginBottom: 24 }}>
                   <h3 style={{ margin: '0 0 8px 0' }}>🏦 Vault Information</h3>
-                  <p style={{ margin: '0 0 12px 0' }}>The vault holds fNFTs and allows you to mint liquid vS tokens against their full future value.</p>
+                  <p style={{ margin: '0 0 12px 0' }}>The vault holds fNFTs and allows you to mint liquid D-vS tokens against their full future value.</p>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
                     <div>
                       <span style={{ color: '#666' }}>Your D-vS Balance:</span>
@@ -600,12 +600,12 @@ const TestnetDemo: React.FC = () => {
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
                   <div style={{ background: '#f8f9fa', padding: 20, borderRadius: 8, border: '1px solid #eaecef' }}>
-                    <h3 style={{ margin: '0 0 12px 0' }}>💰 Redeem vS Tokens</h3>
-                    <p style={{ margin: '0 0 16px 0' }}>Burn vS tokens to get your share of underlying tS tokens</p>
+                                      <h3 style={{ margin: '0 0 12px 0' }}>💰 Redeem D-vS Tokens</h3>
+                  <p style={{ margin: '0 0 16px 0' }}>Burn D-vS tokens to get your share of underlying tS tokens</p>
                     <div style={{ display: 'flex', gap: 8 }}>
                       <input
                         type="number"
-                        placeholder="Amount of vS to redeem"
+                        placeholder="Amount of D-vS to redeem"
                         id="redeem-amount"
                         step="0.1"
                         max={vsBalance}
