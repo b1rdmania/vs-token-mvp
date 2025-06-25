@@ -24,7 +24,7 @@ const ShadowDEXIntegration: React.FC<ShadowDEXIntegrationProps> = ({
   const [poolStats, setPoolStats] = useState({
     tvl: '0',
     volume24h: '0',
-    apr: 'TBD',
+    apr: 'Pool not created yet',
     userLpTokens: '0',
     userPoolShare: '0.00'
   });
@@ -96,18 +96,20 @@ const ShadowDEXIntegration: React.FC<ShadowDEXIntegrationProps> = ({
       </div>
 
       <div style={{ 
-        backgroundColor: '#e8f5e8', 
+        backgroundColor: '#fff3cd', 
         padding: '15px', 
         borderRadius: '8px', 
         marginBottom: '20px',
-        border: '1px solid #4caf50'
+        border: '1px solid #ffc107'
       }}>
-        <h3 style={{ margin: '0 0 10px 0', color: '#2e7d32' }}>✅ Live Pool Active</h3>
-        <p style={{ margin: 0, fontSize: '14px', color: '#2e7d32' }}>
-          <strong>Great!</strong> Your D-vS/tS liquidity pool is live and ready for trading.
+        <h3 style={{ margin: '0 0 10px 0', color: '#856404' }}>🚧 Pool Needs Creation</h3>
+        <p style={{ margin: 0, fontSize: '14px', color: '#856404' }}>
+          <strong>Action Required:</strong> Create a new Shadow DEX pool with your gas-optimized tokens first.
         </p>
         <div style={{ marginTop: '10px', fontSize: '12px', color: '#666' }}>
-          Pool: {POOL_ADDRESS}
+          <a href="https://www.shadow.so/" target="_blank" rel="noopener noreferrer" style={{ color: '#0066cc' }}>
+            Create Pool on Shadow DEX →
+          </a>
         </div>
       </div>
 
@@ -206,6 +208,25 @@ const ShadowDEXIntegration: React.FC<ShadowDEXIntegrationProps> = ({
           </div>
         )}
 
+        <button
+          onClick={() => alert('Please create the Shadow DEX pool first using your gas-optimized token addresses:\n\nD-vS: 0x2649125B1a683e3448F2BB15425AcD83aa2dfd35\ntS: 0x16e5294Cc116819BfB79752C238a74c9f83a35f9\n\nGo to https://www.shadow.so/ to create the pool!')}
+          disabled={true}
+          style={{
+            width: '100%',
+            padding: '15px',
+            backgroundColor: '#cccccc',
+            color: '#666',
+            border: 'none',
+            borderRadius: '8px',
+            fontSize: '16px',
+            fontWeight: 'bold',
+            cursor: 'not-allowed',
+            marginBottom: '15px'
+          }}
+        >
+          Create Pool First (Shadow DEX Required)
+        </button>
+
         <div style={{ 
           backgroundColor: '#f8f9fa', 
           padding: '15px', 
@@ -248,13 +269,18 @@ const ShadowDEXIntegration: React.FC<ShadowDEXIntegrationProps> = ({
 
         <div style={{ 
           marginTop: '15px', 
-          padding: '10px', 
-          backgroundColor: '#e8f5e8', 
-          borderRadius: '4px',
-          fontSize: '12px',
-          color: '#2e7d32'
+          padding: '15px', 
+          backgroundColor: '#fff3cd', 
+          borderRadius: '8px',
+          fontSize: '14px',
+          color: '#856404',
+          border: '1px solid #ffc107'
         }}>
-          <strong>💡 Pro Tip:</strong> Once the pool is created, you'll earn fees from every trade while keeping your future token value!
+          <strong>📋 Demo Setup Required:</strong><br/>
+          1. Create Shadow DEX pool with your gas-optimized tokens<br/>
+          2. Add initial liquidity (suggest 500 D-vS + 425 tS)<br/>
+          3. Then this interface will become fully functional<br/><br/>
+          <strong>💡 Pro Tip:</strong> Once created, you'll earn fees from every trade while keeping your future token value!
         </div>
       </div>
     </div>

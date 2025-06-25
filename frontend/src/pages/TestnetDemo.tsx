@@ -430,19 +430,58 @@ const TestnetDemo: React.FC = () => {
 
   return (
     <div className="page-container">
-      {/* Clean Header */}
-      <div className="content-card" style={{ marginBottom: 24, background: '#f8f9fa', border: '1px solid #e9ecef' }}>
-        <h1 style={{ margin: '0 0 16px 0', fontSize: 28, color: '#1F6BFF' }}>🏦 vS Vault Protocol Demo</h1>
-        <p style={{ margin: '0 0 16px 0', fontSize: 16, color: '#555' }}>
-          <strong>Turn locked fNFTs into productive DeFi assets.</strong> Deposit your vesting Sonic fNFTs to get liquid D-vS tokens immediately, 
-          then use them to earn fees in liquidity pools while maintaining exposure to your future vesting value.
-        </p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 16 }}>
-          <div style={{ background: '#e3f2fd', padding: 12, borderRadius: 6, border: '1px solid #90caf9' }}>
-            <strong>💰 The Problem:</strong> Your fNFT locks 10,000 tS for 9 months - unusable in DeFi
+      {/* Value Proposition Header */}
+      <div className="content-card" style={{ marginBottom: 24, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white', border: 'none' }}>
+        <h1 style={{ margin: '0 0 16px 0', fontSize: 32, color: 'white', textAlign: 'center' }}>🚀 vS Vault: Turn Locked fNFTs into Productive DeFi Assets</h1>
+        
+        <div style={{ background: 'rgba(255,255,255,0.1)', padding: 20, borderRadius: 12, marginBottom: 20 }}>
+          <h2 style={{ margin: '0 0 16px 0', fontSize: 18, color: '#e8f4ff' }}>💡 The Complete Flow (9-Month Strategy)</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+            <div style={{ background: 'rgba(255,255,255,0.15)', padding: 16, borderRadius: 8 }}>
+              <div style={{ fontSize: 24, marginBottom: 8 }}>1️⃣ <strong>Stake fNFT</strong></div>
+              <div style={{ fontSize: 14, opacity: 0.9 }}>Permanently deposit your vesting fNFT into the vault</div>
+            </div>
+            <div style={{ background: 'rgba(255,255,255,0.15)', padding: 16, borderRadius: 8 }}>
+              <div style={{ fontSize: 24, marginBottom: 8 }}>2️⃣ <strong>Get D-vS Tokens</strong></div>
+              <div style={{ fontSize: 14, opacity: 0.9 }}>Withdraw liquid tokens equal to current vesting value</div>
+            </div>
+            <div style={{ background: 'rgba(255,255,255,0.15)', padding: 16, borderRadius: 8 }}>
+              <div style={{ fontSize: 24, marginBottom: 8 }}>3️⃣ <strong>Use in DeFi</strong></div>
+              <div style={{ fontSize: 14, opacity: 0.9 }}>Put D-vS tokens to work immediately in protocols</div>
+            </div>
+            <div style={{ background: 'rgba(255,255,255,0.15)', padding: 16, borderRadius: 8 }}>
+              <div style={{ fontSize: 24, marginBottom: 8 }}>4️⃣ <strong>Earn LP Fees</strong></div>
+              <div style={{ fontSize: 14, opacity: 0.9 }}>Stake in Shadow DEX pools to earn trading fees</div>
+            </div>
+            <div style={{ background: 'rgba(255,255,255,0.15)', padding: 16, borderRadius: 8 }}>
+              <div style={{ fontSize: 24, marginBottom: 8 }}>5️⃣ <strong>Auto-Unlock</strong></div>
+              <div style={{ fontSize: 14, opacity: 0.9 }}>More D-vS unlocks as your fNFT vests over time</div>
+            </div>
+            <div style={{ background: 'rgba(255,255,255,0.15)', padding: 16, borderRadius: 8 }}>
+              <div style={{ fontSize: 24, marginBottom: 8 }}>6️⃣ <strong>Exit at 100%</strong></div>
+              <div style={{ fontSize: 14, opacity: 0.9 }}>At 9 months, sell D-vS for full S token value</div>
+            </div>
           </div>
-          <div style={{ background: '#e8f5e8', padding: 12, borderRadius: 6, border: '1px solid #81c784' }}>
-            <strong>🚀 Our Solution:</strong> Get liquid D-vS tokens instantly, earn fees while vesting
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+          <div style={{ background: 'rgba(255,255,255,0.1)', padding: 16, borderRadius: 8 }}>
+            <h3 style={{ margin: '0 0 8px 0', color: '#ffcccb' }}>😵 Without vS Vault</h3>
+            <div style={{ fontSize: 14, lineHeight: 1.5 }}>
+              • fNFT locked for 9 months<br/>
+              • No DeFi opportunities<br/>
+              • No yield while waiting<br/>
+              • Assets sitting idle
+            </div>
+          </div>
+          <div style={{ background: 'rgba(255,255,255,0.1)', padding: 16, borderRadius: 8 }}>
+            <h3 style={{ margin: '0 0 8px 0', color: '#90ee90' }}>🚀 With vS Vault</h3>
+            <div style={{ fontSize: 14, lineHeight: 1.5 }}>
+              • Instant liquidity from day 1<br/>
+              • Earn LP fees for 9 months<br/>
+              • Use in other DeFi protocols<br/>
+              • Keep full vesting upside
+            </div>
           </div>
         </div>
       </div>
@@ -495,7 +534,7 @@ const TestnetDemo: React.FC = () => {
                 }}
                 onClick={() => setActiveTab('mint')}
               >
-                🎯 Step 1: Get Assets
+                🎯 Steps 1-2: Get Assets & Stake fNFT
               </button>
               <button 
                 style={{ 
@@ -509,7 +548,7 @@ const TestnetDemo: React.FC = () => {
                 }}
                 onClick={() => setActiveTab('vault')}
               >
-                🏦 Step 2: Vault Operations
+                🏦 Steps 5-6: Manage D-vS & Exit
               </button>
               <button 
                 style={{ 
@@ -523,12 +562,23 @@ const TestnetDemo: React.FC = () => {
                 }}
                 onClick={() => setActiveTab('trade')}
               >
-                💰 Step 3: Earn Fees
+                💰 Steps 3-4: Use in DeFi & Earn Fees
               </button>
             </div>
 
             {activeTab === 'mint' && (
               <>
+                <div style={{ background: '#e8f5e8', padding: 16, borderRadius: 8, marginBottom: 20, border: '1px solid #4caf50' }}>
+                  <h3 style={{ margin: '0 0 8px 0', color: '#2e7d32' }}>🎯 Steps 1-2: Setup Your Position</h3>
+                  <div style={{ fontSize: 15, marginBottom: 12 }}>
+                    <strong>Step 1:</strong> Get test tokens and mint a realistic fNFT (like real Sonic airdrop)<br/>
+                    <strong>Step 2:</strong> Stake your fNFT in the vault → Get liquid D-vS tokens immediately!
+                  </div>
+                  <div style={{ background: '#d1f2eb', padding: 12, borderRadius: 6, border: '1px solid #7dcea0' }}>
+                    <strong>💡 What happens:</strong> Your fNFT gets deposited permanently, but you receive D-vS tokens equal to its current vesting value. You can now use these tokens in DeFi while your original fNFT continues vesting in the background.
+                  </div>
+                </div>
+
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16, marginBottom: 24 }}>
                   <div style={{ background: '#f8f9fa', padding: 20, borderRadius: 8, border: '1px solid #eaecef' }}>
                     <h3 style={{ margin: '0 0 12px 0' }}>🔥 Get Test Tokens</h3>
@@ -662,12 +712,15 @@ const TestnetDemo: React.FC = () => {
             {activeTab === 'vault' && (
               <div>
                 <div style={{ background: '#e6f7ff', padding: 16, borderRadius: 8, marginBottom: 24 }}>
-                  <h3 style={{ margin: '0 0 8px 0' }}>🏦 How the Vault Works</h3>
-                  <p style={{ margin: '0 0 8px 0' }}>Think of it like a bank: you deposit your fNFT, get liquid D-vS tokens to spend immediately, and can still collect your original tS tokens as they unlock.</p>
-                  <div style={{ background: '#d1f2eb', padding: 12, borderRadius: 6, border: '1px solid #7dcea0', fontSize: 14 }}>
-                    <strong>✅ Safe:</strong> You can always exchange your D-vS tokens back for tS tokens. Nothing is lost forever!
+                  <h3 style={{ margin: '0 0 8px 0' }}>🏦 Steps 5-6: Watch Your Position Grow & Exit Strategy</h3>
+                  <div style={{ fontSize: 15, marginBottom: 12 }}>
+                    <strong>Step 5:</strong> As your fNFT vests over 9 months, more D-vS tokens become available to claim<br/>
+                    <strong>Step 6:</strong> At 100% vesting (9 months), exchange all D-vS for full S token value
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
+                  <div style={{ background: '#d1f2eb', padding: 12, borderRadius: 6, border: '1px solid #7dcea0', fontSize: 14 }}>
+                    <strong>✅ Safe & Flexible:</strong> You can exit anytime by exchanging D-vS for tS tokens. No funds are ever lost - you always get proportional value based on vesting progress.
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginTop: 16 }}>
                     <div>
                       <span style={{ color: '#666' }}>Your D-vS Balance:</span>
                       <div style={{ fontSize: 18, fontWeight: 'bold' }}>{Number(vsBalance).toFixed(2)} D-vS</div>
@@ -724,18 +777,22 @@ const TestnetDemo: React.FC = () => {
             {activeTab === 'trade' && (
               <div>
                 <div style={{ background: '#e8f5e8', padding: 16, borderRadius: 8, marginBottom: 24, border: '1px solid #4caf50' }}>
-                  <h3 style={{ margin: '0 0 8px 0', color: '#2e7d32' }}>💰 Smart Move: Earn Fees Instead of Selling</h3>
+                  <h3 style={{ margin: '0 0 8px 0', color: '#2e7d32' }}>💰 Steps 3-4: Put Your D-vS to Work & Earn Fees</h3>
+                  <div style={{ fontSize: 15, marginBottom: 12 }}>
+                    <strong>Step 3:</strong> Use your liquid D-vS tokens in DeFi protocols (lending, collateral, etc.)<br/>
+                    <strong>Step 4:</strong> Provide liquidity on Shadow DEX to earn trading fees while keeping vesting upside
+                  </div>
                   <p style={{ margin: '0 0 8px 0' }}>
-                    <strong>Why provide liquidity instead of trading away your D-vS tokens:</strong>
+                    <strong>Why provide liquidity instead of just holding or trading:</strong>
                   </p>
                   <ol style={{ margin: '0 0 12px 0', paddingLeft: 20 }}>
-                    <li><strong>Keep your future value</strong> - Still get full vesting benefits over time</li>
-                    <li><strong>Earn trading fees</strong> - Get paid when others trade the pool</li>
+                    <li><strong>Keep your future value</strong> - Still get full vesting benefits over 9 months</li>
+                    <li><strong>Earn trading fees</strong> - Get paid when others trade the pool (15% APR)</li>
                     <li><strong>Potential bonus rewards</strong> - Shadow DEX often offers extra incentives</li>
-                    <li><strong>Stay productive</strong> - Your tokens work for you while you wait</li>
+                    <li><strong>Stay productive</strong> - Your tokens work for you instead of sitting idle</li>
                   </ol>
                   <div style={{ background: '#d1f2eb', padding: 12, borderRadius: 6, border: '1px solid #7dcea0' }}>
-                    <strong>💡 Pro Strategy:</strong> Add both D-vS and tS to the pool. Earn fees while maintaining exposure to your fNFT's future value!
+                    <strong>💡 Pro Strategy:</strong> Add both D-vS and tS to the pool. Earn fees for 9 months while maintaining full exposure to your fNFT's vesting value. At month 9, you have: fees earned + full vesting value!
                   </div>
                   <div style={{ fontSize: 14, color: '#666', marginTop: 12 }}>
                     <strong>Live Pool:</strong> <a href="https://www.shadow.so/liquidity/manage/0x85e6cee8ddac8426ebaa1f2191f5969774c5351e" target="_blank" rel="noopener noreferrer" style={{ color: '#1F6BFF' }}>D-vS/tS Pool on Shadow DEX</a>
