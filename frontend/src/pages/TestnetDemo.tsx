@@ -5,7 +5,7 @@ import DecayfNFTArtifact from '../abis/DecayfNFT.json';
 import MockTokenArtifact from '../abis/MockToken.json';
 import vSVaultArtifact from '../abis/vSVault.json';
 import vSTokenArtifact from '../abis/vSToken.json';
-import { ShadowDEXIntegration } from '../components/ShadowDEXIntegration';
+import ShadowDEXIntegration from '../components/ShadowDEXIntegration';
 import '../styles/common.css';
 import { ethers } from 'ethers';
 
