@@ -3,14 +3,13 @@ import ReactMarkdown from 'react-markdown';
 import './WhitepaperPage.css';
 
 const markdownContent = `
-# vS Vault: Technical Whitepaper
-Version 2.1 – Immutable Infrastructure
+# vS Vault Whitepaper
+Turn locked tokens into cash
 
-## 1. The Problem
-Sonic's airdrop locks 75% of rewards in 9-month vesting NFTs (fNFTs). Users can only claim 25% now and must wait 9 months for full value. This creates:
-- **Dead Capital**: 75% of airdrop value sits idle for 9 months
-- **No DeFi Participation**: Locked assets can't be used in lending, LP pools, or other protocols
-- **Poor User Experience**: Users who need liquidity have no good options
+## The Problem
+Sonic gave users tokens locked in NFTs for 9 months. Users can't spend these tokens. They can't use them in DeFi. They wait 9 months or lose money to penalties.
+
+This wastes millions in locked value.
 
 ## 2. The Solution: Wait-and-Claim Strategy
 vS Vault provides immediate liquidity while preserving full value recovery:
@@ -38,11 +37,7 @@ vS Vault provides immediate liquidity while preserving full value recovery:
 - **Pure Infrastructure**: Works forever without intervention, like a bridge or AMM
 - **Maximum Security**: No rug pull risk, no governance attacks, no admin privilege escalation
 
-### vSVault.sol (Demo Only)
-- **Testing Environment**: Contains admin functions for demo purposes only
-- **Not Production**: Will not be used for mainnet deployment
-
-### vSToken.sol  
+### ImmutableVSToken.sol (Production)  
 - **Standard ERC-20**: Fully composable with all DeFi protocols
 - **Mint/Burn Control**: Only vault can mint (on deposit) or burn (on redemption)
 - **No Special Features**: Simple, predictable token mechanics

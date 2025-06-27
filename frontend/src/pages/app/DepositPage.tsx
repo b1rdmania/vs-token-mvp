@@ -7,22 +7,19 @@ interface Nft {
   id: number;
   lockedAmount: number;
   vestingEndDate: string;
-  currentPenalty: number;
 }
 
-// Mock data based on the brief
+// Mock data for simplified model
 const mockNfts: Nft[] = [
   {
     id: 1234,
     lockedAmount: 4800,
     vestingEndDate: '16 Mar 2026',
-    currentPenalty: 95.5,
   },
   {
     id: 5678,
     lockedAmount: 10000,
     vestingEndDate: '16 Mar 2026',
-    currentPenalty: 95.5,
   },
 ];
 
@@ -30,15 +27,20 @@ const DepositModal = ({ nft, onClose }: { nft: Nft; onClose: () => void }) => (
   <div className="modal-backdrop">
     <div className="modal-content content-card">
       <h2>Deposit NFT #{nft.id}</h2>
-      <p>This will mint vS tokens against your vesting fNFT.</p>
+      <p>Deposit your fNFT and receive the full value in vS tokens immediately.</p>
+      
+      <div className="modal-warning">
+        <strong>⚠️ Warning:</strong> This action is irreversible. Your fNFT will be permanently converted to vS tokens.
+      </div>
+      
       <div className="modal-details">
         <div>
-          <span>vS to Mint (estimate)</span>
-          <strong>{(nft.lockedAmount * (1 - nft.currentPenalty / 100)).toFixed(2)} vS</strong>
+          <span>fNFT Value</span>
+          <strong>{nft.lockedAmount.toLocaleString()} S</strong>
         </div>
         <div>
-          <span>Current Burn Penalty</span>
-          <strong>{nft.currentPenalty}%</strong>
+          <span>vS Tokens You Get</span>
+          <strong>{nft.lockedAmount.toLocaleString()} vS</strong>
         </div>
         <div>
           <span>Gas Estimate</span>
@@ -69,7 +71,19 @@ export const DepositPage: React.FC = () => {
   return (
     <div className="page-container">
       <h1 className="page-title">Your fNFTs</h1>
-      <p className="page-description">Select an fNFT to deposit into the vault and mint liquid vS tokens.</p>
+      <p className="page-description">Select an fNFT to deposit into the vault and receive full-value vS tokens immediately.</p>
+      
+      <div className="warning-banner">
+        <h3>⚠️ Important: This Action is Irreversible</h3>
+        <p>
+          Your fNFT will be permanently converted to liquid vS tokens, which are:
+        </p>
+        <ul>
+          <li><strong>Redeemable 1:1</strong> for S tokens at full vest maturity</li>
+          <li><strong>Fully liquid</strong> and tradeable on Shadow DEX</li>
+          <li><strong>DeFi-ready</strong> for use as collateral in flywheels throughout the Sonic ecosystem</li>
+        </ul>
+      </div>
       
       {!isConnected && (
          <div className="dummy-data-banner">
@@ -91,8 +105,8 @@ export const DepositPage: React.FC = () => {
                 <strong>{nft.vestingEndDate}</strong>
               </div>
               <div>
-                <span>Current Penalty</span>
-                <strong className="penalty">{nft.currentPenalty}%</strong>
+                <span>vS Tokens You Get</span>
+                <strong className="vs-amount">{nft.lockedAmount.toLocaleString()} vS</strong>
               </div>
             </div>
             <button className="button-primary" onClick={() => handleDepositClick(nft)}>Deposit</button>

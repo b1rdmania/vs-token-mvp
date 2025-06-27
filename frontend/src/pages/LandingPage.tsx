@@ -17,9 +17,9 @@ export const LandingPage: React.FC = () => {
       <main>
         <section className="hero-section">
           <div className="container">
-            <h1 className="hero-title">Get Full Value Now from Your Locked fNFTs</h1>
+            <h1 className="hero-title">Turn Locked Tokens into Cash</h1>
             <p className="hero-subtitle">
-              Deposit your vesting fNFT and receive full-value vS tokens immediately. Trade them in the Shadow DEX pool for instant liquidity while your fNFT continues vesting in the vault.
+              Deposit your locked fNFT. Get vS tokens worth the full amount. Sell them for cash today.
             </p>
             <div className="hero-cta">
               <Link to="/app" className="button-primary button-hero">
@@ -41,16 +41,16 @@ export const LandingPage: React.FC = () => {
         <section className="features-section">
           <div className="container">
             <div className="feature-card">
-              <h3>Instant Full Value</h3>
-              <p>Deposit your fNFT once and receive vS tokens equal to its total value immediately. No complex tracking - just simple, full-value liquidity you can use right away.</p>
+              <h3>Get Full Value Now</h3>
+              <p>Put in your fNFT. Get tokens worth the full amount. No waiting, no penalties.</p>
             </div>
             <div className="feature-card">
-              <h3>Market-Driven Pricing</h3>
-              <p>Trade your vS tokens in the Shadow DEX pool at market rates. Price naturally appreciates as your fNFT approaches full vesting, reflecting time value.</p>
+              <h3>Market Sets Price</h3>
+              <p>Sell vS tokens at whatever price buyers will pay. We don't control the price - the market does.</p>
             </div>
             <div className="feature-card">
-              <h3>🔒 Immutable Infrastructure</h3>
-              <p>Zero admin control after deployment. No owner functions, no pause mechanisms, no rug pull risk. Works forever as pure decentralized infrastructure - like a bridge or AMM.</p>
+              <h3>No Admin Control</h3>
+              <p>No one can steal your money. No one can change the rules. No one controls the vault after we deploy it.</p>
             </div>
           </div>
         </section>

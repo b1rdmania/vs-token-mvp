@@ -5,7 +5,7 @@ import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
 import {ERC721Holder} from "openzeppelin-contracts/contracts/token/ERC721/utils/ERC721Holder.sol";
 import {ReentrancyGuard} from "openzeppelin-contracts/contracts/utils/ReentrancyGuard.sol";
-import {VSToken} from "./VSToken.sol";
+import {ImmutableVSToken} from "./ImmutableVSToken.sol";
 
 interface IDecayfNFT is IERC721 {
     function claimDelegates(uint256 tokenId) external view returns (address);
@@ -15,25 +15,28 @@ interface IDecayfNFT is IERC721 {
 }
 
 /**
- * @title ImmutableVault
+ * @title ImmutableVault - Ultra-Minimal Design
  * @notice Truly immutable vault with zero admin controls after deployment
- * @dev All parameters set in constructor and cannot be changed
+ * @dev Four functions: deposit, claimBatch, redeem, sweepSurplus - no owner, no upgrades
  */
 contract ImmutableVault is ERC721Holder, ReentrancyGuard {
     // ============ IMMUTABLE STATE ============
-    VSToken public immutable vS;
+    ImmutableVSToken public immutable vS;
     address public immutable sonicNFT;
     address public immutable underlyingToken;
     address public immutable protocolTreasury;
     uint256 public immutable maturityTimestamp;
+    uint256 public immutable vaultFreezeTimestamp;  // No deposits after this
     
     // ============ CONSTANTS ============
     uint256 public constant KEEPER_INCENTIVE_BPS = 5;    // 0.05%
     uint256 public constant PROTOCOL_FEE_BPS = 100;      // 1%
+    uint256 public constant GRACE_PERIOD = 180 days;     // Grace before sweep
     
-    // ============ STATE ============
+    // ============ MINIMAL STATE ============
     uint256[] public heldNFTs;
     mapping(uint256 => address) public depositedNFTs;
+    uint256 public nextClaimIndex = 0;    // Rolling pointer for batch claims
     bool public matured = false;
 
     // ============ EVENTS ============
@@ -41,6 +44,8 @@ contract ImmutableVault is ERC721Holder, ReentrancyGuard {
     event VestedTokensClaimed(address indexed caller, uint256 totalAmount, uint256 incentivePaid);
     event Redeemed(address indexed user, uint256 vsAmount, uint256 underlyingAmount);
     event MaturityTriggered(address indexed triggeredBy, uint256 totalClaimed);
+    event RedemptionBounty(address indexed redeemer, uint256 gasUsed);  // For manual tips
+    event SurplusSwept(address indexed sweeper, uint256 amount);
 
     /**
      * @notice Deploy immutable vault - all parameters fixed forever
@@ -49,25 +54,30 @@ contract ImmutableVault is ERC721Holder, ReentrancyGuard {
      * @param _underlyingToken Address of the underlying S token
      * @param _protocolTreasury Address to receive protocol fees (immutable)
      * @param _maturityTimestamp When fNFTs can be claimed at 0% penalty
+     * @param _vaultFreezeTimestamp No deposits accepted after this (prevents season mixing)
      */
     constructor(
         address _vsToken,
         address _sonicNFT, 
         address _underlyingToken,
         address _protocolTreasury,
-        uint256 _maturityTimestamp
+        uint256 _maturityTimestamp,
+        uint256 _vaultFreezeTimestamp
     ) {
         require(_vsToken != address(0), "Invalid vS token");
         require(_sonicNFT != address(0), "Invalid NFT contract");
         require(_underlyingToken != address(0), "Invalid underlying token");
         require(_protocolTreasury != address(0), "Invalid treasury");
         require(_maturityTimestamp > block.timestamp, "Maturity must be future");
+        require(_vaultFreezeTimestamp > block.timestamp, "Freeze must be future");
+        require(_vaultFreezeTimestamp < _maturityTimestamp, "Freeze before maturity");
         
-        vS = VSToken(_vsToken);
+        vS = ImmutableVSToken(_vsToken);
         sonicNFT = _sonicNFT;
         underlyingToken = _underlyingToken;
         protocolTreasury = _protocolTreasury;
         maturityTimestamp = _maturityTimestamp;
+        vaultFreezeTimestamp = _vaultFreezeTimestamp;
     }
 
     /**
@@ -76,6 +86,7 @@ contract ImmutableVault is ERC721Holder, ReentrancyGuard {
      * @param nftId ID of the fNFT to deposit
      */
     function deposit(uint256 nftId) external nonReentrant {
+        require(block.timestamp <= vaultFreezeTimestamp, "Vault frozen - use new season vault");
         require(depositedNFTs[nftId] == address(0), "NFT already deposited");
         require(IERC721(sonicNFT).ownerOf(nftId) == msg.sender, "Not NFT owner");
         require(
@@ -97,71 +108,37 @@ contract ImmutableVault is ERC721Holder, ReentrancyGuard {
     }
 
     /**
-     * @notice Batch deposit multiple fNFTs
-     * @param nftIds Array of NFT IDs to deposit
+     * @notice Batch claim vested tokens using rolling pointer (gas-bomb proof)
+     * @dev Anyone can call - processes k NFTs from nextClaimIndex, updates pointer
+     * @param k Number of NFTs to process (bounded for gas safety)
      */
-    function batchDeposit(uint256[] calldata nftIds) external nonReentrant {
-        require(nftIds.length > 0 && nftIds.length <= 10, "Invalid batch size");
+    function claimBatch(uint256 k) external nonReentrant {
+        require(k > 0 && k <= 50, "Invalid batch size");
+        require(nextClaimIndex < heldNFTs.length, "All NFTs processed");
         
-        uint256 totalValueToMint = 0;
-        
-        // Validate all NFTs first
-        for (uint256 i = 0; i < nftIds.length; i++) {
-            uint256 nftId = nftIds[i];
-            require(depositedNFTs[nftId] == address(0), "NFT already deposited");
-            require(IERC721(sonicNFT).ownerOf(nftId) == msg.sender, "Not NFT owner");
-            require(
-                IDecayfNFT(sonicNFT).claimDelegates(nftId) == address(this),
-                "Must delegate claiming rights first"
-            );
-            
-            uint256 nftValue = IDecayfNFT(sonicNFT).getTotalAmount(nftId);
-            require(nftValue > 0, "NFT has no value");
-            totalValueToMint += nftValue;
-        }
-        
-        // Store all NFTs
-        for (uint256 i = 0; i < nftIds.length; i++) {
-            uint256 nftId = nftIds[i];
-            depositedNFTs[nftId] = msg.sender;
-            heldNFTs.push(nftId);
-            
-            uint256 nftValue = IDecayfNFT(sonicNFT).getTotalAmount(nftId);
-            emit NFTDeposited(msg.sender, nftId, nftValue);
-        }
-        
-        // Single mint for gas efficiency
-        vS.mint(msg.sender, totalValueToMint);
-    }
-
-    /**
-     * @notice Public function to claim vested tokens from fNFTs
-     * @dev Anyone can call this - keeper gets small incentive
-     * @param startIndex Starting index in heldNFTs array
-     * @param count Number of NFTs to process
-     */
-    function claimVested(uint256 startIndex, uint256 count) external nonReentrant {
         uint256 totalClaimed = 0;
-        uint256 endIndex = startIndex + count;
-        require(endIndex <= heldNFTs.length, "Index out of bounds");
-
-        for (uint256 i = startIndex; i < endIndex; i++) {
-            uint256 nftId = heldNFTs[i];
-            require(depositedNFTs[nftId] != address(0), "NFT not deposited");
+        uint256 processed = 0;
+        
+        // Process k NFTs starting from pointer
+        while (processed < k && nextClaimIndex < heldNFTs.length) {
+            uint256 nftId = heldNFTs[nextClaimIndex];
             
             uint256 claimableAmount = IDecayfNFT(sonicNFT).claimable(nftId);
             if (claimableAmount > 0) {
                 try IDecayfNFT(sonicNFT).claimVestedTokens(nftId) returns (uint256 vested) {
                     totalClaimed += vested;
                 } catch {
-                    continue; // Skip failed claims
+                    // Skip failed claims, continue processing
                 }
             }
+            
+            nextClaimIndex++;
+            processed++;
         }
         
         if (totalClaimed == 0) return;
 
-        // Pay keeper incentive
+        // Pay keeper incentive from vault balance
         uint256 incentiveAmount = (totalClaimed * KEEPER_INCENTIVE_BPS) / 10_000;
         if (incentiveAmount > 0) {
             uint256 vaultBalance = IERC20(underlyingToken).balanceOf(address(this));
@@ -182,9 +159,15 @@ contract ImmutableVault is ERC721Holder, ReentrancyGuard {
         require(amount > 0, "Cannot redeem 0");
         require(vS.balanceOf(msg.sender) >= amount, "Insufficient vS balance");
         
+        uint256 gasStart = gasleft();
+        
         // Trigger maturity if we've reached it and haven't claimed yet
         if (!matured && block.timestamp >= maturityTimestamp) {
             _triggerMaturity();
+            
+            // Emit gas bounty event for manual tips by front-ends
+            uint256 gasUsed = gasStart - gasleft();
+            emit RedemptionBounty(msg.sender, gasUsed);
         }
         
         uint256 vsTotalSupply = vS.totalSupply();
@@ -215,14 +198,30 @@ contract ImmutableVault is ERC721Holder, ReentrancyGuard {
     }
 
     /**
-     * @notice Internal function to claim all fNFTs at maturity (0% penalty)
+     * @notice Sweep surplus tokens after grace period (PERMISSIONLESS)
+     * @dev No owner required - anyone can call after maturity + 180 days
+     */
+    function sweepSurplus() external nonReentrant {
+        require(block.timestamp >= maturityTimestamp + GRACE_PERIOD, "Grace period not over");
+        
+        uint256 surplus = IERC20(underlyingToken).balanceOf(address(this));
+        require(surplus > 0, "No surplus to sweep");
+        
+        // Transfer surplus to treasury (or could burn if treasury is burn address)
+        IERC20(underlyingToken).transfer(protocolTreasury, surplus);
+        
+        emit SurplusSwept(msg.sender, surplus);
+    }
+
+    /**
+     * @notice Internal function to claim all remaining fNFTs at maturity (0% penalty)
      * @dev Called automatically on first redemption after maturity
      */
     function _triggerMaturity() internal {
         uint256 totalClaimed = 0;
         
-        // Claim from all held fNFTs
-        for (uint256 i = 0; i < heldNFTs.length; i++) {
+        // Claim from all remaining unheld fNFTs (from nextClaimIndex onward)
+        for (uint256 i = nextClaimIndex; i < heldNFTs.length; i++) {
             uint256 nftId = heldNFTs[i];
             try IDecayfNFT(sonicNFT).claimVestedTokens(nftId) returns (uint256 claimed) {
                 totalClaimed += claimed;
@@ -231,36 +230,55 @@ contract ImmutableVault is ERC721Holder, ReentrancyGuard {
             }
         }
         
+        // Mark all as processed
+        nextClaimIndex = heldNFTs.length;
         matured = true;
+        
         emit MaturityTriggered(msg.sender, totalClaimed);
     }
 
+    // ============ VIEW FUNCTIONS ============
+    
     /**
-     * @notice View function to check if vault has matured
+     * @notice Check if vault has matured
      */
     function hasMatured() external view returns (bool) {
         return matured || block.timestamp >= maturityTimestamp;
     }
 
     /**
-     * @notice View function to get total assets held by vault
+     * @notice Get total assets held by vault
      */
     function totalAssets() external view returns (uint256) {
         return IERC20(underlyingToken).balanceOf(address(this));
     }
 
     /**
-     * @notice View function to get number of held NFTs
+     * @notice Get number of held NFTs
      */
     function getHeldNFTCount() external view returns (uint256) {
         return heldNFTs.length;
     }
 
     /**
-     * @notice View function to get held NFT by index
+     * @notice Get held NFT by index
      */
     function getHeldNFT(uint256 index) external view returns (uint256) {
         require(index < heldNFTs.length, "Index out of bounds");
         return heldNFTs[index];
+    }
+
+    /**
+     * @notice Get claim progress (how many NFTs processed)
+     */
+    function getClaimProgress() external view returns (uint256 processed, uint256 total) {
+        return (nextClaimIndex, heldNFTs.length);
+    }
+
+    /**
+     * @notice Check if vault is frozen for new deposits
+     */
+    function isVaultFrozen() external view returns (bool) {
+        return block.timestamp > vaultFreezeTimestamp;
     }
 } 
