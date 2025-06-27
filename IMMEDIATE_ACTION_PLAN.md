@@ -108,10 +108,10 @@ if (!matured) {
 - [ ] Redemption window alerts
 - [ ] Bulk-redeem zap contracts for dust wallets
 
-### **Governance Clarity**
-- [ ] Document who controls sweep address
-- [ ] Clarify POL removal permissions
-- [ ] Fee distribution policy (burn %, dev %, future bribes %)
+### **Immutable Deployment**
+- [ ] Deploy ImmutableVault.sol for mainnet (zero admin control)
+- [ ] Set maturity timestamp (9 months from launch)
+- [ ] Verify all parameters are immutable
 
 ### **Future Seasons Planning**
 - [ ] Season-2 vault strategy (new vault vs reuse)
