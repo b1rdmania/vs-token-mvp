@@ -143,6 +143,30 @@
   margin-bottom: 1rem;
 }
 
+.whitepaper-page .contract-links {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #EAECEF;
+}
+
+.whitepaper-page .contract-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: var(--primary-color);
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.whitepaper-page .contract-link:hover {
+  background-color: #1557CC;
+  transform: translateY(-1px);
+}
+
 .whitepaper-page .risk-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
