@@ -7,16 +7,17 @@
 
 ## Why Use vS
 
-- **Get liquidity today** instead of waiting 9 months
-- **No penalty** – vault waits, you don't
-- **Market sets the price**, not us
-- **Zero admin keys, zero upgrades, zero governance**
-- **Early LP depth** seeded by protocol-owned liquidity; no rug risk
-- **Natural discount yield** as vS converges to S
+- **Unlock liquidity today** without burning away 75% of your airdrop
+- **Vault absorbs the waiting cost**; you stay liquid
+- **Trade, LP, borrow, farm** with vS — it's a standard ERC-20
+- **1:1 redeem for S** after maturity (fully collateralised on-chain)
+- **No admin keys, no upgrades, no governance**
+- **Protocol-owned liquidity** jump-starts the pool; yield comes from swap fees + natural price convergence
 
 ## How It Works
 
-1. **Deposit fNFT** → mint equal vS immediately
+1. **Deposit fNFT** → mint equal vS immediately  
+   *(Vault holds the NFT; you avoid the 75% burn you'd take if you self-claimed early.)*
 2. **Trade / LP vS** any time on Shadow DEX
 3. **At maturity** (2026-03-01) burn vS → receive 1 S per vS
 4. **Grace period** 180 days, then leftover S swept to treasury
@@ -25,8 +26,8 @@
 
 You have: 10,000 S tokens locked in fNFT for 270 days  
 You get: 10,000 vS tokens today  
-You sell: vS tokens at market rate (maybe 0.25 S per vS)  
-Result: 2,500 S cash today instead of waiting 9 months
+You sell: vS tokens at, say, 0.25 S each (market decides)  
+Result: 2,500 S of liquidity today — and you keep upside as price drifts toward 1 S by month 9
 
 ## Key Contracts
 
