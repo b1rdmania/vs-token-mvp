@@ -2,6 +2,8 @@
 
 **vS Vault transforms illiquid vesting NFTs into liquid ERC-20 tokens. Deposit your Sonic fNFT → Get full-value vS tokens → Trade immediately on Shadow DEX.**
 
+**🔒 Truly Immutable Design: Zero admin control after deployment - operates as pure decentralized infrastructure.**
+
 ---
 
 ## The Problem & Our Solution
@@ -23,6 +25,8 @@
 - **Market-Driven Pricing**: Let the market determine fair discount rates
 - **Shadow DEX Integration**: Trade on Sonic's leading DEX with deep liquidity
 - **Simple Economics**: No complex vesting tracking or proportional calculations
+- **🔒 Immutable Vault**: Zero admin control - no pause, no owner functions, no rug risk
+- **⚡ Pure Infrastructure**: Works forever without intervention, like a bridge or AMM
 
 ## Demo Experience
 
@@ -38,7 +42,8 @@ Our live demo shows the complete user journey:
 ## Smart Contract Architecture
 
 ### Core Contracts
-- **vSVault.sol**: Main vault contract that holds fNFTs and mints vS tokens
+- **ImmutableVault.sol**: Production vault with zero admin control (mainnet)
+- **vSVault.sol**: Demo vault with admin functions (testnet only)
 - **vSToken.sol**: Standard ERC-20 token representing vault shares
 - **DecayfNFT.sol**: Demo vesting NFT with Sonic-style mechanics
 
@@ -109,11 +114,13 @@ forge test --gas-report
 
 ## Innovation Highlights
 
-1. **Simplicity**: No complex vesting calculations or streaming mechanics
-2. **Market Efficiency**: Let Shadow DEX handle price discovery
-3. **Honest Messaging**: Clear about market risks and discounts
-4. **Instant Utility**: Immediate composability with DeFi ecosystem
-5. **Sonic Native**: Built specifically for Sonic's vesting NFT mechanics
+1. **True Immutability**: Zero admin control after deployment - operates as pure infrastructure
+2. **Simplicity**: No complex vesting calculations or streaming mechanics
+3. **Market Efficiency**: Let Shadow DEX handle price discovery
+4. **Honest Messaging**: Clear about market risks and discounts
+5. **Instant Utility**: Immediate composability with DeFi ecosystem
+6. **Sonic Native**: Built specifically for Sonic's vesting NFT mechanics
+7. **Maximum Security**: No owner keys, no pause functions, no rug pull risk
 
 ## Future Roadmap
 
