@@ -501,38 +501,42 @@ const TestnetDemo: React.FC = () => {
         </div>
       </div>
 
-      {!isConnected ? (
-        <div className="content-card" style={{ textAlign: 'center', padding: 40 }}>
-          <h2>Connect Your Wallet</h2>
-          <p>Connect your wallet to start testing the vS Vault Protocol</p>
-          <button onClick={openConnectModal} className="button-primary" style={{ padding: '12px 24px', fontSize: 16 }}>
-            Connect Wallet
-          </button>
+      {/* Status Dashboard */}
+      <div className="content-card" style={{ marginBottom: 16 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <h3 style={{ margin: 0 }}>📊 Your Assets</h3>
+          {!isConnected && (
+            <button onClick={openConnectModal} className="button-primary" style={{ padding: '8px 16px', fontSize: 14 }}>
+              Connect Wallet to Interact
+            </button>
+          )}
         </div>
-      ) : (
-        <>
-          {/* Status Dashboard */}
-          <div className="content-card" style={{ marginBottom: 16 }}>
-            <h3 style={{ margin: '0 0 16px 0' }}>📊 Your Assets</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16 }}>
-              <div style={{ background: '#fff3e0', padding: 16, borderRadius: 8, border: '1px solid #ffcc02', textAlign: 'center' }}>
-                <div style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>fNFTs Owned</div>
-                <div style={{ fontSize: 24, fontWeight: 'bold', color: '#f57c00' }}>{fNFTBalance}</div>
-              </div>
-              <div style={{ background: '#e3f2fd', padding: 16, borderRadius: 8, border: '1px solid #2196f3', textAlign: 'center' }}>
-                <div style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>tS Balance</div>
-                <div style={{ fontSize: 24, fontWeight: 'bold', color: '#1976d2' }}>{Number(underlyingBalance).toFixed(0)}</div>
-              </div>
-              <div style={{ background: '#e8f5e8', padding: 16, borderRadius: 8, border: '1px solid #4caf50', textAlign: 'center' }}>
-                <div style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>D-vS Balance</div>
-                <div style={{ fontSize: 24, fontWeight: 'bold', color: '#2e7d32' }}>{Number(vsBalance).toFixed(0)}</div>
-              </div>
-              <div style={{ background: '#f3e5f5', padding: 16, borderRadius: 8, border: '1px solid #9c27b0', textAlign: 'center' }}>
-                <div style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>Vault Assets</div>
-                <div style={{ fontSize: 24, fontWeight: 'bold', color: '#7b1fa2' }}>{Number(vaultBalance).toFixed(0)}</div>
-              </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16 }}>
+          <div style={{ background: '#fff3e0', padding: 16, borderRadius: 8, border: '1px solid #ffcc02', textAlign: 'center' }}>
+            <div style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>fNFTs Owned</div>
+            <div style={{ fontSize: 24, fontWeight: 'bold', color: '#f57c00' }}>{isConnected ? fNFTBalance : '--'}</div>
+          </div>
+          <div style={{ background: '#e3f2fd', padding: 16, borderRadius: 8, border: '1px solid #2196f3', textAlign: 'center' }}>
+            <div style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>tS Balance</div>
+            <div style={{ fontSize: 24, fontWeight: 'bold', color: '#1976d2' }}>{isConnected ? Number(underlyingBalance).toFixed(0) : '--'}</div>
+          </div>
+          <div style={{ background: '#e8f5e8', padding: 16, borderRadius: 8, border: '1px solid #4caf50', textAlign: 'center' }}>
+            <div style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>D-vS Balance</div>
+            <div style={{ fontSize: 24, fontWeight: 'bold', color: '#2e7d32' }}>{isConnected ? Number(vsBalance).toFixed(0) : '--'}</div>
+          </div>
+          <div style={{ background: '#f3e5f5', padding: 16, borderRadius: 8, border: '1px solid #9c27b0', textAlign: 'center' }}>
+            <div style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>Vault Assets</div>
+            <div style={{ fontSize: 24, fontWeight: 'bold', color: '#7b1fa2' }}>{isConnected ? Number(vaultBalance).toFixed(0) : '--'}</div>
+          </div>
+        </div>
+        {!isConnected && (
+          <div style={{ marginTop: 12, padding: 12, backgroundColor: '#f0f9ff', borderRadius: 6, border: '1px solid #bfdbfe' }}>
+            <div style={{ fontSize: 14, color: '#1e40af' }}>
+              💡 <strong>Demo Mode:</strong> Connect wallet to interact with live contracts on Sonic Mainnet
             </div>
           </div>
+        )}
+      </div>
 
           {/* Main Tabs */}
           <div className="content-card" style={{ marginBottom: 16 }}>
@@ -600,11 +604,11 @@ const TestnetDemo: React.FC = () => {
                     <p style={{ margin: '0 0 16px 0' }}>Mint yourself 1,000 tS tokens for testing</p>
                     <button
                       onClick={mintTokens}
-                      disabled={isLoading}
+                      disabled={isLoading || !isConnected}
                       className="button-primary"
                       style={{ width: '100%' }}
                     >
-                      {isLoading ? 'Minting...' : 'Get 1,000 tS'}
+                      {!isConnected ? 'Connect Wallet' : isLoading ? 'Minting...' : 'Get 1,000 tS'}
                     </button>
                   </div>
 
@@ -613,11 +617,11 @@ const TestnetDemo: React.FC = () => {
                     <p style={{ margin: '0 0 16px 0' }}>Create realistic demo fNFT (500 tS, 270 days vesting - like real Sonic airdrop)</p>
                     <button
                       onClick={mintfNFT}
-                      disabled={isLoading}
+                      disabled={isLoading || !isConnected}
                       className="button-primary"
                       style={{ width: '100%' }}
                     >
-                      {isLoading ? 'Minting...' : 'Mint Realistic Demo fNFT (500 tS)'}
+                      {!isConnected ? 'Connect Wallet' : isLoading ? 'Minting...' : 'Mint Realistic Demo fNFT (500 tS)'}
                     </button>
                   </div>
                 </div>
@@ -668,12 +672,12 @@ const TestnetDemo: React.FC = () => {
                             <div style={{ display: 'flex', gap: 8 }}>
                               <button
                                 onClick={() => claimVested(nft.tokenId)}
-                                disabled={isLoading || !nft.canClaimDirectly}
+                                disabled={isLoading || !nft.canClaimDirectly || !isConnected}
                                 className="button-primary"
                                 style={{ flex: 1, opacity: nft.canClaimDirectly ? 1 : 0.5 }}
                                 title={nft.canClaimDirectly ? '' : 'No tokens available to claim yet'}
                               >
-                                {isLoading ? 'Claiming...' : 
+                                {!isConnected ? 'Connect Wallet' : isLoading ? 'Claiming...' : 
                                  nft.canClaimDirectly ? `Claim ${Number(nft.availableAmount).toFixed(2)} tS` : 
                                  'Nothing to Claim Yet'}
                               </button>
@@ -694,11 +698,11 @@ const TestnetDemo: React.FC = () => {
                                           alert('Fractional deposit coming soon! Use smaller fNFT for now.');
                                         }
                                       }}
-                                      disabled={isLoading || !nft.canDepositToVault}
+                                      disabled={isLoading || !nft.canDepositToVault || !isConnected}
                                       className="button-primary"
                                       style={{ flex: 1, background: '#28a745' }}
                                     >
-                                      {isLoading ? 'Depositing...' : 'Deposit 10% (Low Gas)'}
+                                      {!isConnected ? 'Connect Wallet' : isLoading ? 'Depositing...' : 'Deposit 10% (Low Gas)'}
                                     </button>
                                     <button
                                       onClick={() => {
@@ -715,11 +719,11 @@ const TestnetDemo: React.FC = () => {
                                           depositToVault(nft.tokenId);
                                         }
                                       }}
-                                      disabled={isLoading || !nft.canDepositToVault}
+                                      disabled={isLoading || !nft.canDepositToVault || !isConnected}
                                       className="button-primary"
                                       style={{ flex: 1, background: '#dc3545' }}
                                     >
-                                      Full Deposit (💸 $15-25 Gas)
+                                      {!isConnected ? 'Connect Wallet' : 'Full Deposit (💸 $15-25 Gas)'}
                                     </button>
                                   </>
                                 ) : (
@@ -736,11 +740,11 @@ const TestnetDemo: React.FC = () => {
                                         depositToVault(nft.tokenId);
                                       }
                                     }}
-                                    disabled={isLoading || !nft.canDepositToVault}
+                                    disabled={isLoading || !nft.canDepositToVault || !isConnected}
                                     className="button-primary"
                                     style={{ width: '100%', background: '#28a745' }}
                                   >
-                                    {isLoading ? 'Depositing...' : 'Deposit to Vault (Low Gas)'}
+                                    {!isConnected ? 'Connect Wallet' : isLoading ? 'Depositing...' : 'Deposit to Vault (Low Gas)'}
                                   </button>
                                 )}
                               </div>
@@ -794,10 +798,10 @@ const TestnetDemo: React.FC = () => {
                           const input = document.getElementById('redeem-amount') as HTMLInputElement;
                           redeemFromVault(input.value);
                         }}
-                        disabled={isLoading || parseFloat(vsBalance) === 0}
+                        disabled={isLoading || parseFloat(vsBalance) === 0 || !isConnected}
                         className="button-primary"
                       >
-                        {isLoading ? 'Redeeming...' : 'Redeem'}
+                        {!isConnected ? 'Connect Wallet' : isLoading ? 'Redeeming...' : 'Redeem'}
                       </button>
                     </div>
                   </div>
@@ -807,11 +811,11 @@ const TestnetDemo: React.FC = () => {
                     <p style={{ margin: '0 0 16px 0' }}>Collect newly unlocked tS tokens from the vault's fNFTs (anyone can do this)</p>
                     <button
                       onClick={claimVaultVested}
-                      disabled={isLoading}
+                      disabled={isLoading || !isConnected}
                       className="button-primary"
                       style={{ width: '100%' }}
                     >
-                      {isLoading ? 'Claiming...' : 'Claim Vault Vested'}
+                      {!isConnected ? 'Connect Wallet' : isLoading ? 'Claiming...' : 'Claim Vault Vested'}
                     </button>
                   </div>
                 </div>
@@ -856,8 +860,6 @@ const TestnetDemo: React.FC = () => {
               </a>
             </div>
           )}
-        </>
-      )}
 
       <footer style={{ marginTop: 48, textAlign: 'center', color: '#888', fontSize: 14 }}>
         <div style={{ marginBottom: 16 }}>
