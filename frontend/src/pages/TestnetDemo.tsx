@@ -465,16 +465,16 @@ const TestnetDemo: React.FC = () => {
               <div style={{ fontSize: 14, opacity: 0.9 }}>vS trades at discount (0.25 S) reflecting time to maturity</div>
             </div>
                           <div style={{ background: 'rgba(255,255,255,0.15)', padding: 16, borderRadius: 8 }}>
-                <div style={{ fontSize: 24, marginBottom: 8 }}>4️⃣ <strong>Price Appreciates</strong></div>
-                <div style={{ fontSize: 14, opacity: 0.9 }}>As months pass, vS price naturally rises toward full S value</div>
+                <div style={{ fontSize: 24, marginBottom: 8 }}>4️⃣ <strong>Prices Should Converge</strong></div>
+                <div style={{ fontSize: 14, opacity: 0.9 }}>As months pass, vS price should converge toward full S value</div>
               </div>
               <div style={{ background: 'rgba(255,255,255,0.15)', padding: 16, borderRadius: 8 }}>
                 <div style={{ fontSize: 24, marginBottom: 8 }}>5️⃣ <strong>Exit Anytime</strong></div>
                 <div style={{ fontSize: 14, opacity: 0.9 }}>Sell vS on DEX at current market rate for immediate liquidity</div>
               </div>
               <div style={{ background: 'rgba(255,255,255,0.15)', padding: 16, borderRadius: 8 }}>
-                <div style={{ fontSize: 24, marginBottom: 8 }}>6️⃣ <strong>Month 9: Market Rate</strong></div>
-                <div style={{ fontSize: 14, opacity: 0.9 }}>Trade vS at market rate (should be ~1:1) when fNFTs mature</div>
+                <div style={{ fontSize: 24, marginBottom: 8 }}>6️⃣ <strong>Month 9: Redeem</strong></div>
+                <div style={{ fontSize: 14, opacity: 0.9 }}>Redeem vS to S at 1:1 price on our site when fNFTs mature</div>
               </div>
           </div>
         </div>
@@ -494,7 +494,7 @@ const TestnetDemo: React.FC = () => {
             <div style={{ fontSize: 14, lineHeight: 1.5 }}>
               • Get full value vS tokens now<br/>
               • Trade at market discount (0.25x)<br/>
-              • Price appreciates over time<br/>
+              • Prices should converge over time<br/>
               • Immediate DeFi liquidity
             </div>
           </div>
