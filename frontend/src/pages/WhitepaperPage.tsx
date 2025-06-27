@@ -93,18 +93,17 @@ Instead of complex vesting calculations or artificial pricing mechanisms, we let
 
 ## Current Implementation
 
-### Live Demo
-Experience the complete flow with test tokens:
-1. **Get Test Tokens**: Mint 15,000 TEST_S tokens
-2. **Create fNFT**: Mint 10,000 TEST_S fNFT (270 days vesting)
-3. **Deposit**: Get 10,000 TEST_vS immediately (1:1 value)
-4. **Trade**: Swap TEST_vS for instant liquidity on Shadow DEX
-
 ### Production Ready
 - Core contracts deployed on Sonic Mainnet
 - Shadow DEX integration complete
 - Frontend with full user experience
 - Ready for real fNFT deposits
+
+### Yield Opportunities
+Beyond immediate liquidity, vS tokens offer additional earning potential:
+- **LP Rewards**: Provide vS/S liquidity on Shadow DEX to earn trading fees
+- **Incentivized Pools**: Protocol may incentivize LP positions with additional rewards
+- **DeFi Integration**: Use vS tokens across Sonic's DeFi ecosystem while waiting for better exit prices
 
 ## The Bottom Line
 vS Vault doesn't promise magic or guaranteed returns. We provide simple, honest infrastructure:
