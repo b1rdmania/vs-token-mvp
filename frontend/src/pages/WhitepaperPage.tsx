@@ -3,127 +3,120 @@ import ReactMarkdown from 'react-markdown';
 import './WhitepaperPage.css';
 
 const markdownContent = `
-# vS Vault Whitepaper
-Turn locked tokens into cash
+# vS Vault Whitepaper v2.0
+Turn locked fNFTs into immediate liquidity
 
 ## The Problem
-Sonic gave users tokens locked in NFTs for 9 months. Users can't spend these tokens. They can't use them in DeFi. They wait 9 months or lose money to penalties.
+Sonic users received vesting NFTs (fNFTs) containing S tokens locked for 9 months. These fNFTs represent real value but can't be:
+- Spent for immediate needs
+- Used in DeFi protocols  
+- Traded without penalty burns
 
-This wastes millions in locked value.
+This locks millions in value that could be productive today.
 
-## 2. The Solution: Wait-and-Claim Strategy
-vS Vault provides immediate liquidity while preserving full value recovery:
+## The Solution: Wait-and-Claim Strategy
+vS Vault provides immediate liquidity while preserving full backing:
 
-1. **Deposit**: User deposits fNFT (worth 1000 S total) into vault
-2. **Mint**: Vault mints 1000 vS tokens immediately (full value)
-3. **Trade**: User trades vS on Shadow DEX at current market rate
-4. **Vault Waits**: Vault holds fNFT until month 9 (no early claiming, no penalty burns)
-5. **Redeem**: At month 9+, users can redeem vS → S at exactly 1:1 ratio
+### Core Mechanism
+1. **Deposit**: User deposits fNFT (1000 S total) → Vault mints 1000 vS immediately
+2. **Trade**: User trades vS on Shadow DEX at market rates for instant liquidity
+3. **Vault Waits**: Vault holds all fNFTs until month 9 (no early claiming = no penalty burns)
+4. **Global Maturity**: At month 9, vault claims 100% of all S tokens (0% penalty burn)
+5. **Redeem**: Users can redeem vS → S at exactly 1:1 ratio on our site
 
-## 3. Why This Works
-**Market Efficiency**: Instead of complex protocol engineering, we let the market price time value. Users get immediate access to their full future value, paying a time discount through market pricing.
+### Key Innovation: Zero Penalty Burns
+By never claiming early, the vault preserves 100% of the underlying S tokens. Every vS token is backed by exactly 1 S token at maturity.
 
-**Simple Economics**: No complex vesting calculations or proportional redemption. Just deposit, get tokens, and trade at market rates.
-
-**Honest Approach**: We don't promise guaranteed returns or artificial pricing. The market decides what vS tokens are worth.
-
-## 4. Smart Contract Architecture
-
-### ImmutableVault.sol (Production)
-- **Zero Admin Control**: No owner functions, pause mechanisms, or admin keys
-- **Immutable Parameters**: Treasury address, fees, and maturity timestamp set permanently in constructor
-- **Simple Vault**: Accepts fNFT deposits and mints full-value vS tokens
-- **Holds Assets**: Keeps deposited fNFTs until maturity (month 9)
-- **Pure Infrastructure**: Works forever without intervention, like a bridge or AMM
-- **Maximum Security**: No rug pull risk, no governance attacks, no admin privilege escalation
-
-### ImmutableVSToken.sol (Production)  
-- **Standard ERC-20**: Fully composable with all DeFi protocols
-- **Mint/Burn Control**: Only vault can mint (on deposit) or burn (on redemption)
-- **No Special Features**: Simple, predictable token mechanics
-
-## 5. Market Dynamics
+## Market Dynamics
 
 ### Expected Price Evolution
-- **Month 0**: vS trades at ~25% of face value (immediate liquidity discount)
-- **Month 3**: vS trades at ~50% of face value (halfway point)
-- **Month 6**: vS trades at ~70-80% of face value (approaching maturity)
-- **Month 9**: Direct redemption available at 1:1 rate on our site
+- **Month 0**: vS trades at ~25% (immediate liquidity discount)
+- **Month 3**: vS trades at ~50% (time value decreasing)
+- **Month 6**: vS trades at ~70-85% (approaching maturity)
+- **Month 9**: Redeem vS → S at 1:1 on our site
 
-### User Behavior Patterns
-Most users will exit before month 9 when they reach their "good enough" price point (typically 80-90% of face value). Only diamond hands will wait for full maturity.
+### Realistic User Behavior
+Most users will exit at 80-90% recovery ("good enough") rather than wait for full maturity. Only diamond hands hold until month 9.
 
-## 6. Shadow DEX Integration
-The vS/S pool on Shadow DEX is the heart of the system:
-- **Market-Driven Pricing**: No artificial pegs or protocol intervention
-- **Deep Liquidity**: Protocol can seed initial liquidity to bootstrap trading
-- **Standard AMM**: Works with all existing DeFi infrastructure
-- **Fee Generation**: Trading fees benefit liquidity providers
+## Technical Architecture
 
-## 7. Risk Disclosure
+### ImmutableVault.sol
+- **Zero Admin Control**: No owner, no pause, no upgrades
+- **Immutable Parameters**: Set once in constructor, never changed
+- **Simple Flow**: Deposit fNFT → Mint vS → Hold until maturity
+- **Wait-and-Claim**: Never claims early, preserves full backing
+- **Pure Infrastructure**: Works forever without intervention
 
-### For Users
-- **Market Risk**: vS price determined by market, not protocol guarantees
-- **Discount Risk**: Early exit means accepting current market discount
-- **Liquidity Risk**: Pool depth affects trade size and slippage
+### ImmutableVSToken.sol  
+- **Standard ERC-20**: Full DeFi composability
+- **Vault-Only Minting**: Only vault can mint (deposit) or burn (redemption)
+- **No Special Features**: Clean, predictable token mechanics
+
+## Risk Disclosure
 
 ### Market Realities
-- **1:1 Guarantee at Maturity**: Protocol guarantees 1:1 redemption at month 9+
-- **Market Dependent Before Maturity**: Value depends on Shadow DEX pool liquidity during vesting
-- **Honest Pricing**: We tell users the truth about discounts and risks
+- **Pre-Maturity**: vS price determined by Shadow DEX market, not protocol
+- **Market Discount**: Early exit means accepting current market rate
+- **Liquidity Dependent**: Large trades affected by pool depth
 
-## 8. Why It's Still Valuable
-Despite honest risk disclosure, vS Vault provides real value:
-- **Immediate Access**: Get liquidity today instead of waiting 9 months
-- **Market Choice**: Let users decide if current discount is acceptable
-- **DeFi Composability**: Use vS tokens across the entire Sonic ecosystem
-- **Price Appreciation**: Natural price appreciation as maturity approaches
+### What We Guarantee
+- **1:1 Redemption**: At month 9+, redeem vS → S at exactly 1:1 ratio
+- **Full Backing**: Every vS backed by 1 S token (zero penalty burns)
+- **No Rug Risk**: Immutable contracts, no admin control
 
-## 9. Technical Implementation
+### What We Don't Promise
+- **Pre-maturity Pricing**: Market decides vS value, not the protocol
+- **Guaranteed Returns**: We don't manipulate prices or promise yields
+- **Artificial Pegs**: No complex mechanisms to maintain specific ratios
 
-### Current Status ✅
+## Shadow DEX Integration
+The vS/S pool is the liquidity heart:
+- **Market Pricing**: Pure supply/demand, no protocol intervention
+- **Standard AMM**: Works with existing DeFi infrastructure
+- **Bootstrap Liquidity**: Protocol can seed initial trading pairs
+
+## Why This Approach Works
+
+### Economic Honesty
+Instead of complex vesting calculations or artificial pricing mechanisms, we let the market efficiently price time value. Users get access to their full future value today, paying only the market-determined time discount.
+
+### Maximum Security
+- **Immutable Design**: No admin keys or upgrade paths
+- **Simple Logic**: Fewer attack vectors than complex protocols
+- **Transparent Economics**: No hidden mechanisms or surprise behaviors
+
+### Real Utility
+- **Immediate Liquidity**: Cash today instead of 9-month wait
+- **DeFi Composability**: Use vS across the entire Sonic ecosystem  
+- **Natural Appreciation**: Price should converge toward 1:1 as maturity approaches
+- **User Choice**: Market lets users decide acceptable discount
+
+## Current Implementation
+
+### Live Demo
+Experience the complete flow with test tokens:
+1. **Get Test Tokens**: Mint 15,000 TEST_S tokens
+2. **Create fNFT**: Mint 10,000 TEST_S fNFT (270 days vesting)
+3. **Deposit**: Get 10,000 TEST_vS immediately (1:1 value)
+4. **Trade**: Swap TEST_vS for instant liquidity on Shadow DEX
+
+### Production Ready
 - Core contracts deployed on Sonic Mainnet
-- Demo environment with test tokens
-- Shadow DEX integration ready
-- Frontend with complete user flow
+- Shadow DEX integration complete
+- Frontend with full user experience
+- Ready for real fNFT deposits
 
-### Future Enhancements
-- Production deployment for real Sonic fNFTs
-- Additional DEX integrations
-- Lending protocol compatibility
-- Cross-chain bridge support
+## The Bottom Line
+vS Vault doesn't promise magic or guaranteed returns. We provide simple, honest infrastructure:
+- Deposit your fNFT, get full-value vS tokens
+- Trade at market rates for immediate liquidity
+- Redeem 1:1 at maturity if you wait
 
-## 10. Demo Experience
-Try our live demo to see the complete flow:
-1. **Mint Demo fNFT**: Get test vesting NFT (1000 tS, 9 months)
-2. **Deposit to Vault**: Receive 1000 vS tokens instantly
-3. **Trade on Shadow DEX**: Swap for immediate tS liquidity
-4. **Experience**: See how market pricing works in practice
-
-**Live Demo**: [vs-vault-demo.netlify.app](https://vs-vault-demo.netlify.app)
-
-## 11. Key Innovation: True Immutability
-Our main innovation is what we DON'T do:
-- ❌ Complex vesting progress tracking
-- ❌ Proportional redemption calculations  
-- ❌ Automated claiming systems
-- ❌ False promises about guaranteed returns
-- ❌ **Admin control after deployment**
-- ❌ **Owner functions or pause mechanisms**
-- ❌ **Upgradeable contracts or governance**
-
-Instead, we focus on:
-- ✅ Simple deposit → mint → trade flow
-- ✅ Market-driven pricing
-- ✅ Honest risk disclosure
-- ✅ Clean, auditable economics
-- ✅ **Zero admin control - pure infrastructure**
-- ✅ **Immutable parameters set once forever**
-- ✅ **Maximum security and decentralization**
+The market determines fair pricing. We just provide the rails.
 
 ---
 
-*vS Vault: Transform your locked fNFTs into liquid DeFi assets today.*
+*Transform your locked fNFTs into liquid DeFi assets today.*
 `;
 
 export const WhitepaperPage: React.FC = () => {
