@@ -1,57 +1,323 @@
+.whitepaper-page {
+  min-height: 100vh;
+  background-color: var(--background-color);
+}
+
 .whitepaper-page .landing-header {
   position: sticky;
   top: 0;
   background-color: white;
   z-index: 10;
   border-bottom: 1px solid #EAECEF;
+  padding: 1rem 0;
 }
 
-.whitepaper-page main {
-  padding-top: 2rem;
-  padding-bottom: 4rem;
+.whitepaper-page .header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.whitepaper-page .logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+.whitepaper-page .hero-section {
+  padding: 4rem 0;
+  background-color: #F7F9FC;
+  text-align: center;
+}
+
+.whitepaper-page .hero-title {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+
+.whitepaper-page .hero-subtitle {
+  max-width: 65ch;
+  margin: 0 auto;
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: var(--text-color);
+  opacity: 0.8;
+}
+
+.whitepaper-page .content-section {
+  padding: 4rem 0;
 }
 
 .whitepaper-page .content-card {
   background: white;
-  padding: 2rem 3rem;
+  padding: 3rem;
   border-radius: 16px;
   border: 1px solid #EAECEF;
-  max-width: 900px;
+  max-width: 1000px;
   margin: 0 auto;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.whitepaper-page h1 {
-  margin-top: 0;
+.whitepaper-page .section {
+  margin-bottom: 3rem;
+}
+
+.whitepaper-page .section:last-child {
+  margin-bottom: 0;
 }
 
 .whitepaper-page h2 {
-  border-bottom: 1px solid #EAECEF;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: var(--text-color);
+  border-bottom: 2px solid #EAECEF;
   padding-bottom: 0.5rem;
-  margin-top: 2rem;
+}
+
+.whitepaper-page h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+
+.whitepaper-page p {
+  line-height: 1.7;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+
+.whitepaper-page ul, .whitepaper-page ol {
+  line-height: 1.7;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+}
+
+.whitepaper-page li {
+  margin-bottom: 0.5rem;
+}
+
+.whitepaper-page strong {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.whitepaper-page .subsection {
+  margin: 2rem 0;
+}
+
+.whitepaper-page .highlight-box {
+  background-color: #F0F8FF;
+  border: 2px solid var(--primary-color);
+  border-radius: 12px;
+  padding: 2rem;
+  margin: 2rem 0;
+}
+
+.whitepaper-page .highlight-box h3 {
+  color: var(--primary-color);
   margin-bottom: 1rem;
 }
 
-.whitepaper-page .version {
-  margin-top: -1rem;
-  margin-bottom: 2rem;
-  opacity: 0.6;
+.whitepaper-page .tech-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+  margin: 2rem 0;
 }
 
-.whitepaper-page p, .whitepaper-page li {
-  line-height: 1.7;
-  font-size: 1.1rem;
-}
-
-.whitepaper-page code {
+.whitepaper-page .tech-card {
   background-color: #F7F9FC;
-  padding: 0.2rem 0.4rem;
-  border-radius: 4px;
-  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+  border: 1px solid #EAECEF;
+  border-radius: 12px;
+  padding: 2rem;
 }
 
-.whitepaper-page pre code {
-  display: block;
-  padding: 1rem;
-  white-space: pre-wrap;
-  word-wrap: break-word;
+.whitepaper-page .tech-card h3 {
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.whitepaper-page .risk-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.whitepaper-page .risk-card {
+  border-radius: 12px;
+  padding: 2rem;
+  border: 2px solid;
+}
+
+.whitepaper-page .risk-card.market-realities {
+  background-color: #FFF8E1;
+  border-color: #FF9800;
+}
+
+.whitepaper-page .risk-card.market-realities h3 {
+  color: #FF9800;
+}
+
+.whitepaper-page .risk-card.guarantees {
+  background-color: #E8F5E8;
+  border-color: #4CAF50;
+}
+
+.whitepaper-page .risk-card.guarantees h3 {
+  color: #4CAF50;
+}
+
+.whitepaper-page .risk-card.no-promises {
+  background-color: #FFEBEE;
+  border-color: #F44336;
+}
+
+.whitepaper-page .risk-card.no-promises h3 {
+  color: #F44336;
+}
+
+.whitepaper-page .benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.whitepaper-page .benefit-card {
+  background-color: white;
+  border: 1px solid #EAECEF;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.whitepaper-page .benefit-card h3 {
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.whitepaper-page .implementation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.whitepaper-page .impl-card {
+  background-color: #F7F9FC;
+  border: 1px solid #EAECEF;
+  border-radius: 12px;
+  padding: 2rem;
+}
+
+.whitepaper-page .impl-card h3 {
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.whitepaper-page .bottom-line {
+  background-color: #F0F8FF;
+  border: 2px solid var(--primary-color);
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+}
+
+.whitepaper-page .bottom-line h2 {
+  color: var(--primary-color);
+  border-bottom: none;
+  margin-bottom: 1rem;
+}
+
+.whitepaper-page .cta-section {
+  text-align: center;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid #EAECEF;
+}
+
+.whitepaper-page .button-primary, .whitepaper-page .button-secondary {
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  margin: 0 0.5rem;
+  display: inline-block;
+}
+
+.whitepaper-page .button-primary {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+}
+
+.whitepaper-page .button-primary:hover {
+  opacity: 0.9;
+}
+
+.whitepaper-page .button-secondary {
+  background-color: transparent;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+}
+
+.whitepaper-page .button-secondary:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.whitepaper-page .button-hero {
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+}
+
+.whitepaper-page .landing-footer {
+  background-color: #F7F9FC;
+  padding: 2rem 0;
+  border-top: 1px solid #EAECEF;
+  text-align: center;
+}
+
+.whitepaper-page .footer-links {
+  margin-bottom: 1rem;
+}
+
+.whitepaper-page .footer-links a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+.whitepaper-page .footer-links a:hover {
+  opacity: 0.8;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .whitepaper-page .hero-title {
+    font-size: 2.5rem;
+  }
+  
+  .whitepaper-page .content-card {
+    padding: 2rem;
+    margin: 0 1rem;
+  }
+  
+  .whitepaper-page .tech-grid,
+  .whitepaper-page .risk-grid,
+  .whitepaper-page .benefits-grid,
+  .whitepaper-page .implementation-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .whitepaper-page .container {
+    padding: 0 1rem;
+  }
 } 
