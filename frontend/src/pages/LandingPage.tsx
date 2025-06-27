@@ -49,8 +49,8 @@ export const LandingPage: React.FC = () => {
               <p>Trade your vS tokens in the Shadow DEX pool at market rates. Price naturally appreciates as your fNFT approaches full vesting, reflecting time value.</p>
             </div>
             <div className="feature-card">
-              <h3>Zero Trust, Fully On-Chain</h3>
-              <p>Your assets are secured in a non-custodial smart contract vault. All logic is transparent, on-chain, and built on open-source, audited principles.</p>
+              <h3>🔒 Immutable Infrastructure</h3>
+              <p>Zero admin control after deployment. No owner functions, no pause mechanisms, no rug pull risk. Works forever as pure decentralized infrastructure - like a bridge or AMM.</p>
             </div>
           </div>
         </section>

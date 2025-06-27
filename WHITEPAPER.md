@@ -1,5 +1,5 @@
 # vS Vault: Technical Whitepaper
-Version 2.1 – Simplified Model with Maturity Redemption
+Version 2.2 – Immutable Infrastructure
 
 ## 1. Executive Summary
 
@@ -33,12 +33,18 @@ Sonic's Season 1 airdrop distributes 90M S tokens, with 75% locked in 9-month ve
 
 ## 4. Smart Contract Architecture
 
-### vSVault.sol
-The core vault contract that:
-- Accepts fNFT deposits and mints full-value vS tokens
-- Holds deposited fNFTs until maturity
-- Provides optional redemption mechanism at month 9+
-- Maintains simple, auditable economics
+### ImmutableVault.sol (Production)
+The production vault contract with zero admin control:
+- **No Owner Functions**: Cannot be paused, upgraded, or controlled after deployment
+- **Immutable Parameters**: Treasury address, fees, maturity timestamp set permanently in constructor
+- **Pure Infrastructure**: Works forever without intervention, like a bridge or AMM
+- **Maximum Security**: No rug pull risk, no governance attacks, no admin privilege escalation
+- **Simple Core Logic**: Accepts fNFT deposits, mints vS tokens, enables redemption at maturity
+
+### vSVault.sol (Demo Only)
+Demo contract with admin functions for testing:
+- Contains pause/unpause and emergency functions for demo environment
+- **Not used in production** - mainnet deployment uses ImmutableVault.sol only
 
 ### vSToken.sol
 Standard OpenZeppelin ERC-20 token:
@@ -116,7 +122,9 @@ function demoMint() external // Demo tokens only
 ### Security Features
 - **ReentrancyGuard**: Prevents reentrancy attacks
 - **Access Control**: Clear separation of demo vs production functions
-- **Immutable Core**: No upgrade mechanisms in production contracts
+- **Truly Immutable**: Zero admin control in production deployment
+- **No Upgrade Risk**: Cannot be modified, paused, or controlled after deployment
+- **Maximum Decentralization**: Works as pure infrastructure without human intervention
 
 ## 9. User Flows
 
@@ -138,11 +146,13 @@ function demoMint() external // Demo tokens only
 ## 10. Conclusion
 
 This approach delivers:
+- **True Immutability**: Zero admin control after deployment
 - **Simple Implementation**: No complex vesting mechanics
 - **Economic Soundness**: True 1:1 backing at maturity
 - **User Choice**: Immediate liquidity vs waiting for full value
 - **Market Efficiency**: Price discovery through trading
 - **Risk Minimization**: No early claiming penalties
+- **Maximum Security**: No rug pull risk or governance attacks
 
 The vault acts as a patient holder, converting illiquid time-locked assets into liquid tokens while preserving the option for full value recovery at maturity.
 

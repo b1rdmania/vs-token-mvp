@@ -4,7 +4,7 @@ import './WhitepaperPage.css';
 
 const markdownContent = `
 # vS Vault: Technical Whitepaper
-Version 2.0 – Simplified Model
+Version 2.1 – Immutable Infrastructure
 
 ## 1. The Problem
 Sonic's airdrop locks 75% of rewards in 9-month vesting NFTs (fNFTs). Users can only claim 25% now and must wait 9 months for full value. This creates:
@@ -30,11 +30,17 @@ vS Vault provides immediate liquidity while preserving full value recovery:
 
 ## 4. Smart Contract Architecture
 
-### vSVault.sol
+### ImmutableVault.sol (Production)
+- **Zero Admin Control**: No owner functions, pause mechanisms, or admin keys
+- **Immutable Parameters**: Treasury address, fees, and maturity timestamp set permanently in constructor
 - **Simple Vault**: Accepts fNFT deposits and mints full-value vS tokens
 - **Holds Assets**: Keeps deposited fNFTs until maturity (month 9)
-- **Optional Redemption**: Provides direct vS→S redemption starting month 9
-- **Clean Economics**: No complex fee structures or proportional calculations
+- **Pure Infrastructure**: Works forever without intervention, like a bridge or AMM
+- **Maximum Security**: No rug pull risk, no governance attacks, no admin privilege escalation
+
+### vSVault.sol (Demo Only)
+- **Testing Environment**: Contains admin functions for demo purposes only
+- **Not Production**: Will not be used for mainnet deployment
 
 ### vSToken.sol  
 - **Standard ERC-20**: Fully composable with all DeFi protocols
@@ -101,18 +107,24 @@ Try our live demo to see the complete flow:
 
 **Live Demo**: [vs-vault-demo.netlify.app](https://vs-vault-demo.netlify.app)
 
-## 11. Key Innovation: Simplicity
+## 11. Key Innovation: True Immutability
 Our main innovation is what we DON'T do:
 - ❌ Complex vesting progress tracking
 - ❌ Proportional redemption calculations  
 - ❌ Automated claiming systems
 - ❌ False promises about guaranteed returns
+- ❌ **Admin control after deployment**
+- ❌ **Owner functions or pause mechanisms**
+- ❌ **Upgradeable contracts or governance**
 
 Instead, we focus on:
 - ✅ Simple deposit → mint → trade flow
 - ✅ Market-driven pricing
 - ✅ Honest risk disclosure
 - ✅ Clean, auditable economics
+- ✅ **Zero admin control - pure infrastructure**
+- ✅ **Immutable parameters set once forever**
+- ✅ **Maximum security and decentralization**
 
 ---
 
