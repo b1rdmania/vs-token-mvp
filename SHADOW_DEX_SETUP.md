@@ -1,26 +1,26 @@
 # Shadow DEX Pool Setup Guide
-## Creating D-vS / tS Liquidity Pool for Live Demo
+## Creating vS / tS Liquidity Pool for Live Demo
 
-### **🎯 CURRENT DEPLOYED CONTRACTS (Gas-Optimized on Sonic Mainnet)**
-- ✅ **tS Token**: `0x16e5294Cc116819BfB79752C238a74c9f83a35f9` 
-- ✅ **D-vS Token**: `0x2649125B1a683e3448F2BB15425AcD83aa2dfd35`
-- ✅ **fNFT Contract**: `0xC6E821326AD497ba4987bA98057abEA7abC425cA`
-- ✅ **Vault Contract**: `0x2e17544f3e692a05f9c3c88049bca0ebcf27bb6b`
+### **🎯 CURRENT DEPLOYED CONTRACTS (Sonic Mainnet)**
+- ✅ **tS Token**: `0x4a201419ED3e4d6D58A434F1D077AD7B2ED71f49` 
+- ✅ **vS Token**: `0x4dE74524A2cE5e2A310615a6aDe7eC35B0f81031`
+- ✅ **fNFT Contract**: `0xdf34078C9C8E5891320B780F6C8b8a54B784108C`
+- ✅ **Vault Contract**: `0x37BD20868FB91eB37813648F4D05F59e07A1bcfb`
 
 ### **✅ BOOTSTRAP COMPLETE (Just Done)**
-- 🎉 **5000 D-vS tokens**: MINTED via emergency function
+- 🎉 **5000 vS tokens**: MINTED via emergency function
 - 🎉 **1000 tS tokens**: MINTED via faucet  
 - 🎉 **Ready for liquidity pool**: Both tokens in deployer wallet
 
-### **🚀 Quick Setup (20 minutes remaining)**
+### **🚀 Quick Setup Process**
 
 #### **Step 1: Approve Tokens for Shadow DEX**
 ```bash
-# Approve D-vS tokens
-cast send 0x2649125B1a683e3448F2BB15425AcD83aa2dfd35 "approve(address,uint256)" [SHADOW_ROUTER] 5000000000000000000000 --rpc-url https://sonic.drpc.org --private-key [YOUR_KEY]
+# Approve vS tokens
+cast send 0x4dE74524A2cE5e2A310615a6aDe7eC35B0f81031 "approve(address,uint256)" [SHADOW_ROUTER] 1000000000000000000000 --rpc-url https://sonic.drpc.org --private-key [YOUR_KEY]
 
 # Approve tS tokens  
-cast send 0x16e5294Cc116819BfB79752C238a74c9f83a35f9 "approve(address,uint256)" [SHADOW_ROUTER] 1000000000000000000000 --rpc-url https://sonic.drpc.org --private-key [YOUR_KEY]
+cast send 0x4a201419ED3e4d6D58A434F1D077AD7B2ED71f49 "approve(address,uint256)" [SHADOW_ROUTER] 850000000000000000000 --rpc-url https://sonic.drpc.org --private-key [YOUR_KEY]
 ```
 
 #### **Step 2: Create Shadow DEX Pool**
@@ -30,42 +30,42 @@ cast send 0x16e5294Cc116819BfB79752C238a74c9f83a35f9 "approve(address,uint256)" 
 
 #### **Step 3: Pool Configuration**
 ```
-Token A: D-vS
-Contract: 0x2649125B1a683e3448F2BB15425AcD83aa2dfd35
-Symbol: D-vS
+Token A: vS
+Contract: 0x4dE74524A2cE5e2A310615a6aDe7eC35B0f81031
+Symbol: vS
 
 Token B: tS  
-Contract: 0x16e5294Cc116819BfB79752C238a74c9f83a35f9
+Contract: 0x4a201419ED3e4d6D58A434F1D077AD7B2ED71f49
 Symbol: tS
 
 Initial Liquidity:
-- 1000 D-vS tokens (value anchor)
-- 850 tS tokens (15% discount = 0.85 ratio)
+- 1000 vS tokens (full value)
+- Market determines actual ratio based on time to maturity
 
 Pool Settings:
 - Fee Tier: 0.3% (standard AMM fee)
-- Price Range: ±10% (for concentrated liquidity if supported)
+- Price Range: Market-driven (no artificial pegs)
 ```
 
 #### **Step 4: Add Initial Liquidity**
 ```
-Amount A: 1000 D-vS
-Amount B: 850 tS
-Ratio: 1 D-vS = 0.85 tS (15% liquidity discount)
+Amount A: 1000 vS tokens
+Amount B: [Market determines amount]
+Ratio: Let market decide fair discount rate
 
-Expected Pool Value: ~$3,700 (assuming $2/token proxy price)
+Expected behavior: Market will price vS at discount to face value
 ```
 
-### **📱 Frontend Integration - REAL SHADOW DEX**
+### **📱 Frontend Integration - Real Shadow DEX**
 
 ```typescript
-// Real Shadow DEX Router on Sonic (need to find actual address)
+// Real Shadow DEX integration
 const SHADOW_ROUTER = "0x..." // Shadow router address
 const SHADOW_FACTORY = "0x..." // Shadow factory address  
 
 // Real trading function
 export const executeRealTrade = async (
-  dvsAmount: string,
+  vsAmount: string,
   signer: ethers.Signer
 ) => {
   const routerContract = new ethers.Contract(
@@ -74,25 +74,25 @@ export const executeRealTrade = async (
     signer
   );
 
-  // Get amounts out for price display
+  // Get market price for vS tokens
   const amountsOut = await routerContract.getAmountsOut(
-    ethers.utils.parseEther(dvsAmount),
+    ethers.utils.parseEther(vsAmount),
     [
-      "0x2649125B1a683e3448F2BB15425AcD83aa2dfd35", // D-vS
-      "0x16e5294Cc116819BfB79752C238a74c9f83a35f9"  // tS  
+      "0x4dE74524A2cE5e2A310615a6aDe7eC35B0f81031", // vS
+      "0x4a201419ED3e4d6D58A434F1D077AD7B2ED71f49"  // tS  
     ]
   );
 
-  // Execute real swap
+  // Execute real swap at market price
   const deadline = Math.floor(Date.now() / 1000) + 1800; // 30 min
   const minAmountOut = amountsOut[1].mul(97).div(100); // 3% slippage
 
   const tx = await routerContract.swapExactTokensForTokens(
-    ethers.utils.parseEther(dvsAmount),
+    ethers.utils.parseEther(vsAmount),
     minAmountOut,
     [
-      "0x2649125B1a683e3448F2BB15425AcD83aa2dfd35", // D-vS
-      "0x16e5294Cc116819BfB79752C238a74c9f83a35f9"  // tS
+      "0x4dE74524A2cE5e2A310615a6aDe7eC35B0f81031", // vS
+      "0x4a201419ED3e4d6D58A434F1D077AD7B2ED71f49"  // tS
     ],
     await signer.getAddress(),
     deadline
@@ -113,8 +113,8 @@ export const getPoolInfo = async () => {
   );
 
   const poolAddress = await factoryContract.getPair(
-    "0x2649125B1a683e3448F2BB15425AcD83aa2dfd35", // D-vS
-    "0x16e5294Cc116819BfB79752C238a74c9f83a35f9"  // tS
+    "0x4dE74524A2cE5e2A310615a6aDe7eC35B0f81031", // vS
+    "0x4a201419ED3e4d6D58A434F1D077AD7B2ED71f49"  // tS
   );
 
   if (poolAddress === ethers.constants.AddressZero) {
@@ -127,42 +127,50 @@ export const getPoolInfo = async () => {
   return {
     poolAddress,
     tvl: reserves[0].add(reserves[1]),
-    ratio: reserves[1].div(reserves[0]) // tS per D-vS
+    currentRate: reserves[1].div(reserves[0]) // tS per vS (market rate)
   };
 };
 ```
 
-### **🎬 DEMO FLOW (Real Trading)**
+### **🎬 DEMO FLOW (Simplified Model)**
 
-1. **User mints fNFT** → Gets vesting NFT with locked tokens
-2. **User deposits to Vault** → Gets D-vS tokens instantly (1:1 ratio)  
-3. **User trades on Shadow DEX** → **REAL LIQUIDITY POOL** with market pricing
-4. **User gets tS tokens** → Immediate liquidity instead of 9-month vesting wait
+1. **User mints fNFT** → Gets demo vesting NFT (1000 tS, 9 months)
+2. **User deposits to Vault** → Gets 1000 vS tokens instantly (full value)  
+3. **User trades on Shadow DEX** → Market determines fair discount price
+4. **User gets tS tokens** → Immediate liquidity based on market conditions
 
 ### **💡 Key Benefits of Real Implementation**
-- ✅ **Market-driven pricing** (not hardcoded 0.85 rate)
+- ✅ **Market-driven pricing** (no artificial rates)
 - ✅ **Real slippage** shows actual market depth
 - ✅ **True MEV protection** from Shadow DEX features
 - ✅ **Genuine DeFi composability** demonstration  
 - ✅ **LP fee earnings** for liquidity providers
-- ✅ **Trading volume** shows real protocol usage
+- ✅ **Honest price discovery** based on time to maturity
 
-### **🔧 Gas Costs (Estimated)**
-```bash
-Pool Creation: ~0.1 S (~$0.20)
-Add Liquidity: ~0.05 S (~$0.10)  
-Approve + Trade: ~0.002 S (~$0.004)
-Total Demo Cost: ~0.152 S (~$0.30)
+### **🔧 Expected Market Behavior**
+```
+Month 0: vS trades at ~25% of face value (immediate liquidity premium)
+Month 3: vS trades at ~50% of face value (halfway point)
+Month 6: vS trades at ~70-80% of face value (approaching maturity)
+Month 9: vS can be redeemed 1:1 for S tokens on protocol site
 ```
 
-### **📊 Expected Demo Results**
-- **Pool TVL**: $3,700 (1000 D-vS + 850 tS at $2 proxy price)
-- **Trading fee**: 0.3% per trade (competitive with Uniswap V2)
-- **Price impact**: <2% for small trades ($100-500)
-- **Slippage protection**: 3% max slippage setting
+### **📊 Demo Economics**
+- **Initial Pool**: 1000 vS + market-determined tS amount
+- **Trading Fee**: 0.3% per trade (standard Shadow DEX fee)
+- **Price Discovery**: Pure market-driven (no artificial pegs)
+- **User Experience**: Honest about discounts and market risks
+
+### **🎯 Key Messaging for Demo**
+1. ✅ **Honest Expectations**: "Market will determine fair discount rate"
+2. ✅ **Risk Disclosure**: "Early exit means accepting market discount"
+3. ✅ **Value Proposition**: "Immediate liquidity vs 9-month wait"
+4. ✅ **Market Efficiency**: "Let traders decide fair pricing"
+
+**The simplified model creates a sustainable, honest market for vesting NFT liquidity! 🚀**
 
 ### **🎯 Next Steps**
-1. ✅ **Tokens ready** (5000 D-vS + 1000 tS minted)
+1. ✅ **Tokens ready** (5000 vS + 1000 tS minted)
 2. 🔜 **Create Shadow DEX pool** (20 minutes)
 3. 🔜 **Update frontend** to use real Shadow integration
 4. 🔜 **Test full flow** end-to-end
