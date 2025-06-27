@@ -1,5 +1,5 @@
 # vS Vault: Technical Whitepaper
-Version 2.0 – Updated for Simplified Model
+Version 2.1 – Simplified Model with Maturity Redemption
 
 ## 1. Executive Summary
 
@@ -8,29 +8,28 @@ vS Vault solves the liquidity problem for Sonic's vesting NFTs through a simple,
 - **Deposit**: Users deposit their 9-month vesting fNFT into the vault
 - **Mint**: Vault mints full-value vS tokens (1000 S fNFT → 1000 vS tokens)
 - **Trade**: Users trade vS tokens on Shadow DEX for immediate liquidity
-- **Market**: Shadow DEX pool determines fair pricing based on time remaining
+- **Redeem**: At month 9 maturity, 1:1 vS → S redemption becomes available
 
 ## 2. The Problem
 
 Sonic's Season 1 airdrop distributes 90M S tokens, with 75% locked in 9-month vesting NFTs. This creates:
 
 - **Dead Capital**: $67.5M worth of assets unusable for DeFi
-- **Poor User Experience**: Users must wait 9 months to access their rewards
-- **Ecosystem Stagnation**: Locked assets can't participate in trading, lending, or yield farming
+- **Linear Burn Penalty**: Early claiming burns tokens (0% at month 9, up to 75% at month 0)
+- **Poor Liquidity Options**: Users must wait 9 months or accept severe penalties
 
-## 3. Our Solution: Instant Full-Value Liquidity
+## 3. The Solution: Wait-and-Claim Strategy
 
-### Core Mechanism
-1. **One-Way Deposit**: User deposits fNFT into vault (permanent, irreversible)
-2. **Full-Value Minting**: Vault mints 1:1 vS tokens based on fNFT's total value
-3. **Immediate Trading**: vS tokens are standard ERC-20, tradeable on Shadow DEX
-4. **Market Pricing**: Pool determines discount rate based on time to maturity
+### Phase 1: Deposit & Trade (Months 0-9)
+1. **Deposit**: User deposits fNFT to vault, receives full-value vS tokens immediately
+2. **Vault Holds**: Vault sits on fNFT for 9 months - **no early claiming, no penalty burns**
+3. **Market Trading**: vS tokens trade on Shadow DEX at market-determined rates
 
-### Key Benefits
-- **Instant Access**: Get tradeable tokens immediately, not after 9 months
-- **Market Efficiency**: Let traders determine fair discount rates
-- **Simple Economics**: No complex vesting calculations or proportional redemption
-- **DeFi Composability**: vS tokens work with all standard DeFi protocols
+### Phase 2: Maturity Redemption (Month 9+)
+1. **Global Maturity**: Linear burn penalty drops to 0%
+2. **Mass Claim**: First redeemer triggers `claimAll()` - vault claims 100% of all fNFTs in one transaction
+3. **1:1 Redemption**: Users can redeem vS → S at exactly 1:1 ratio through vault contract
+4. **Grace Period**: 180-day window for redemption, then sweep unclaimed S
 
 ## 4. Smart Contract Architecture
 
@@ -55,16 +54,15 @@ Demo contract replicating Sonic's vesting mechanics:
 
 ## 5. Economic Model
 
-### Honest Market Pricing
-- **No False Promises**: We don't guarantee 1:1 redemption rates
-- **Market Discovery**: Shadow DEX pool determines fair discount
-- **Risk Transparency**: Users understand they're trading future value for current liquidity
+### Months 0-9: Market-Driven Pricing
+- vS trades at discount reflecting time value and market sentiment
+- No protocol intervention in pricing
+- Shadow DEX pool provides liquidity
 
-### Expected User Behavior
-- **Month 0**: Users trade vS at ~25% of face value (immediate liquidity needs)
-- **Months 3-6**: Price appreciation as maturity approaches (~50-70%)
-- **Months 6-9**: Most users exit at 80-90% ("good enough" psychology)
-- **Month 9+**: Direct redemption available for remaining holders
+### Month 9+: Guaranteed Redemption
+- Vault enables 1:1 vS → S redemption
+- Pool liquidity may disappear (users can always redeem directly)
+- 180-day grace period for redemption
 
 ### Revenue Model
 - **Protocol Fee**: 1% fee on redemptions (taken in underlying tokens)
@@ -87,20 +85,14 @@ Demo contract replicating Sonic's vesting mechanics:
 
 ## 7. Risk Analysis
 
-### Market Risks
-- **Discount Volatility**: vS price may fluctuate based on market sentiment
-- **Liquidity Risk**: Pool depth affects trade execution and slippage
-- **Timing Risk**: Early exit means accepting current market discount
+### For Users
+- **Market Risk**: vS may trade below face value before maturity
+- **Smart Contract Risk**: Vault contract security
+- **Liquidity Risk**: Pool liquidity may dry up (but redemption always available)
 
-### Protocol Risks
-- **Smart Contract Risk**: Standard audit and security practices applied
-- **Regulatory Risk**: Simple model reduces regulatory complexity
-- **Centralization Risk**: No admin keys or upgrade mechanisms
-
-### Mitigation Strategies
-- **Honest Messaging**: Clear communication about risks and discounts
-- **Optional Redemption**: Safety valve available at maturity
-- **Market Efficiency**: Let traders, not protocol, handle pricing
+### For Protocol
+- **No Economic Risk**: Vault never claims early, no penalty exposure
+- **Simple Audit**: No complex economic mechanisms to verify
 
 ## 8. Technical Implementation
 
@@ -126,42 +118,33 @@ function demoMint() external // Demo tokens only
 - **Access Control**: Clear separation of demo vs production functions
 - **Immutable Core**: No upgrade mechanisms in production contracts
 
-## 9. Comparison to Complex Alternatives
+## 9. User Flows
 
-### What We Don't Do (Intentionally)
-- ❌ **Proportional Redemption**: No complex vesting progress tracking
-- ❌ **Streaming Rewards**: No daily distribution mechanisms
-- ❌ **Keeper Systems**: No automated claiming or harvesting
-- ❌ **Dynamic Pricing**: Let the market handle price discovery
-- ❌ **Cross-Subsidization**: No complex fee redistribution
+### Immediate Liquidity Seekers
+1. Deposit fNFT → Get vS tokens
+2. Trade vS on Shadow DEX for immediate S tokens
+3. Accept market discount for instant liquidity
 
-### Why Simplicity Wins
-- ✅ **Easier Audits**: Fewer attack vectors and edge cases
-- ✅ **Lower Gas Costs**: Simple operations, predictable fees
-- ✅ **Market Efficiency**: Traders better at pricing than protocols
-- ✅ **Regulatory Clarity**: Simple model easier to understand and approve
-- ✅ **User Experience**: Clear, predictable behavior
+### Long-Term Holders
+1. Deposit fNFT → Get vS tokens
+2. Hold vS tokens for 9 months
+3. Redeem vS → S at 1:1 ratio through vault
 
-## 10. Future Enhancements
+### Arbitrageurs
+1. Buy discounted vS on Shadow DEX
+2. Hold until month 9
+3. Redeem at 1:1 for risk-free profit
 
-### Phase 1: Core Deployment
-- Production deployment for real Sonic fNFTs
-- Deep Shadow DEX liquidity pools
-- Comprehensive security audit
+## 10. Conclusion
 
-### Phase 2: Ecosystem Integration
-- Additional DEX integrations (Uniswap, SushiSwap)
-- Lending protocol compatibility
-- Cross-chain bridge support
+This approach delivers:
+- **Simple Implementation**: No complex vesting mechanics
+- **Economic Soundness**: True 1:1 backing at maturity
+- **User Choice**: Immediate liquidity vs waiting for full value
+- **Market Efficiency**: Price discovery through trading
+- **Risk Minimization**: No early claiming penalties
 
-### Phase 3: Advanced Features
-- Automated trading strategies
-- Yield farming opportunities
-- Governance token and DAO
-
-## 11. Conclusion
-
-vS Vault transforms Sonic's vesting NFT problem into a market opportunity. By providing instant full-value liquidity and letting Shadow DEX handle price discovery, we create a sustainable, honest, and efficient solution.
+The vault acts as a patient holder, converting illiquid time-locked assets into liquid tokens while preserving the option for full value recovery at maturity.
 
 **Key Innovation**: Simplicity over complexity. Let markets work instead of fighting them.
 

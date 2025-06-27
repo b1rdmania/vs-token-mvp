@@ -12,13 +12,14 @@ Sonic's airdrop locks 75% of rewards in 9-month vesting NFTs (fNFTs). Users can 
 - **No DeFi Participation**: Locked assets can't be used in lending, LP pools, or other protocols
 - **Poor User Experience**: Users who need liquidity have no good options
 
-## 2. The Solution: Instant Full-Value Liquidity
-vS Vault provides immediate liquidity through a simple model:
+## 2. The Solution: Wait-and-Claim Strategy
+vS Vault provides immediate liquidity while preserving full value recovery:
 
 1. **Deposit**: User deposits fNFT (worth 1000 S total) into vault
 2. **Mint**: Vault mints 1000 vS tokens immediately (full value)
 3. **Trade**: User trades vS on Shadow DEX at current market rate
-4. **Market Pricing**: Shadow DEX pool determines fair discount based on time remaining
+4. **Vault Waits**: Vault holds fNFT until month 9 (no early claiming, no penalty burns)
+5. **Redeem**: At month 9+, users can redeem vS → S at exactly 1:1 ratio
 
 ## 3. Why This Works
 **Market Efficiency**: Instead of complex protocol engineering, we let the market price time value. Users get immediate access to their full future value, paying a time discount through market pricing.
@@ -66,8 +67,8 @@ The vS/S pool on Shadow DEX is the heart of the system:
 - **Liquidity Risk**: Pool depth affects trade size and slippage
 
 ### Market Realities
-- **No 1:1 Guarantee**: Protocol doesn't guarantee 1:1 redemption before month 9
-- **Market Dependent**: Value depends entirely on Shadow DEX pool liquidity
+- **1:1 Guarantee at Maturity**: Protocol guarantees 1:1 redemption at month 9+
+- **Market Dependent Before Maturity**: Value depends on Shadow DEX pool liquidity during vesting
 - **Honest Pricing**: We tell users the truth about discounts and risks
 
 ## 8. Why It's Still Valuable
