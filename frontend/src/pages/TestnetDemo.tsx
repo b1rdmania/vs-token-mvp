@@ -5,7 +5,7 @@ import DecayfNFTArtifact from '../abis/DecayfNFT.json';
 import MockTokenArtifact from '../abis/MockToken.json';
 import vSVaultArtifact from '../abis/vSVault.json';
 import vSTokenArtifact from '../abis/vSToken.json';
-import ShadowDEXIntegration from '../components/ShadowDEXIntegration';
+import ShadowDEXPoolInfo from '../components/ShadowDEXIntegration';
 import '../styles/common.css';
 import { ethers } from 'ethers';
 
@@ -844,14 +844,8 @@ const TestnetDemo: React.FC = () => {
                   </div>
                 </div>
 
-                <ShadowDEXIntegration
-                  userAddress="0x58011d39F938A32d5D6CEFDdb342eDB877ce0B7E"
+                <ShadowDEXPoolInfo
                   dvsBalance={vsBalance}
-                  tsBalance={underlyingBalance}
-                  onRefresh={() => {
-                    loadBalances();
-                    setStatus('✅ Liquidity added successfully! You are now earning trading fees.');
-                  }}
                 />
               </div>
             )}

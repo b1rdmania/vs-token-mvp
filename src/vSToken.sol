@@ -59,12 +59,13 @@ contract VSToken is ERC20, Ownable {
     }
 
     /**
-     * @dev Emergency mint function for bootstrap liquidity
+     * @dev DEMO ONLY - Emergency mint function for bootstrap liquidity
+     * @notice WARNING: This function will be removed in production
      * @param to Address to mint tokens to
      * @param amount Amount of tokens to mint
      */
     function emergencyMint(address to, uint256 amount) external onlyOwner {
-        require(amount <= 50000e18, "Exceeds emergency limit");
+        require(amount <= 50000e18, "DEMO: Exceeds emergency limit");
         _mint(to, amount);
     }
 } 
