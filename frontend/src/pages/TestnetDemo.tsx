@@ -60,7 +60,7 @@ const TestnetDemo: React.FC = () => {
   const [ownedNFTs, setOwnedNFTs] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [txHash, setTxHash] = useState<string>('');
-  const [activeTab, setActiveTab] = useState<'mint' | 'trade'>('mint');
+  const [activeTab, setActiveTab] = useState<'mint' | 'trade' | 'redeem'>('mint');
   const [status, setStatus] = useState<string>('');
   const [tradeAmount, setTradeAmount] = useState<string>('');
   const [tradeExecuted, setTradeExecuted] = useState<boolean>(false);
@@ -517,11 +517,11 @@ const TestnetDemo: React.FC = () => {
             <div style={{ fontSize: 24, fontWeight: 'bold', color: '#f57c00' }}>{isConnected ? fNFTBalance : '--'}</div>
           </div>
           <div style={{ background: '#e3f2fd', padding: 16, borderRadius: 8, border: '1px solid #2196f3', textAlign: 'center' }}>
-            <div style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>tS Balance</div>
+            <div style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>TEST_S Balance</div>
             <div style={{ fontSize: 24, fontWeight: 'bold', color: '#1976d2' }}>{isConnected ? Number(underlyingBalance).toFixed(0) : '--'}</div>
           </div>
           <div style={{ background: '#e8f5e8', padding: 16, borderRadius: 8, border: '1px solid #4caf50', textAlign: 'center' }}>
-                                <div style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>vS Balance</div>
+            <div style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>TEST_vS Balance</div>
             <div style={{ fontSize: 24, fontWeight: 'bold', color: '#2e7d32' }}>{isConnected ? Number(vsBalance).toFixed(0) : '--'}</div>
           </div>
           <div style={{ background: '#f3e5f5', padding: 16, borderRadius: 8, border: '1px solid #9c27b0', textAlign: 'center' }}>
@@ -570,6 +570,20 @@ const TestnetDemo: React.FC = () => {
                 >
                   💰 Step 2: Trade vS for Immediate Liquidity
                 </button>
+                <button 
+                  style={{ 
+                    padding: '12px 20px', 
+                    border: 'none', 
+                    background: activeTab === 'redeem' ? '#1F6BFF' : 'transparent',
+                    color: activeTab === 'redeem' ? 'white' : '#666',
+                    borderRadius: '8px 8px 0 0',
+                    cursor: 'pointer',
+                    fontWeight: activeTab === 'redeem' ? 'bold' : 'normal'
+                  }}
+                  onClick={() => setActiveTab('redeem')}
+                >
+                  🎯 Step 3: 1:1 Redemption (Day 270+)
+                </button>
               </div>
             </div>
 
@@ -581,34 +595,34 @@ const TestnetDemo: React.FC = () => {
                     Mint test assets → Create demo fNFT → Deposit to vault → Receive full-value vS tokens immediately
                   </div>
                   <div style={{ background: '#d1f2eb', padding: 12, borderRadius: 6, border: '1px solid #7dcea0' }}>
-                    <strong>💡 Simple:</strong> Deposit 500 tS fNFT → Get 500 vS tokens. Full value immediately, market determines the trading price.
+                    <strong>💡 Simple:</strong> Deposit 10,000 TEST_S fNFT → Get 10,000 TEST_vS tokens. Full value immediately, trade for instant liquidity.
                   </div>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16, marginBottom: 24 }}>
                   <div style={{ background: '#f8f9fa', padding: 20, borderRadius: 8, border: '1px solid #eaecef' }}>
                     <h3 style={{ margin: '0 0 12px 0' }}>🔥 Get Test Tokens</h3>
-                    <p style={{ margin: '0 0 16px 0' }}>Mint yourself 1,000 tS tokens for testing</p>
+                    <p style={{ margin: '0 0 16px 0' }}>Mint yourself TEST_S tokens for testing</p>
                     <button
                       onClick={mintTokens}
                       disabled={isLoading || !isConnected}
                       className="button-primary"
                       style={{ width: '100%' }}
                     >
-                      {!isConnected ? 'Connect Wallet' : isLoading ? 'Minting...' : 'Get 1,000 tS'}
+                      {!isConnected ? 'Connect Wallet' : isLoading ? 'Minting...' : 'Get 15,000 TEST_S'}
                     </button>
                   </div>
 
                   <div style={{ background: '#f8f9fa', padding: 20, borderRadius: 8, border: '1px solid #eaecef' }}>
                     <h3 style={{ margin: '0 0 12px 0' }}>🎟️ Mint Demo fNFT</h3>
-                    <p style={{ margin: '0 0 16px 0' }}>Create realistic demo fNFT (500 tS, 270 days vesting - like real Sonic airdrop)</p>
+                    <p style={{ margin: '0 0 16px 0' }}>Create demo fNFT (10,000 TEST_S, 270 days vesting)</p>
                     <button
                       onClick={mintfNFT}
                       disabled={isLoading || !isConnected}
                       className="button-primary"
                       style={{ width: '100%' }}
                     >
-                      {!isConnected ? 'Connect Wallet' : isLoading ? 'Minting...' : 'Mint Realistic Demo fNFT (500 tS)'}
+                      {!isConnected ? 'Connect Wallet' : isLoading ? 'Minting...' : 'Mint Demo fNFT (10,000 TEST_S)'}
                     </button>
                   </div>
                 </div>
@@ -637,10 +651,10 @@ const TestnetDemo: React.FC = () => {
                               {nft.progress}% unlocked
                             </div>
                           </div>
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: 8, marginBottom: 16, fontSize: 14 }}>
-                            <div><strong>Total:</strong> {Number(nft.totalAmount).toFixed(2)} tS</div>
-                            <div><strong>Claimed:</strong> {Number(nft.claimedAmount).toFixed(2)} tS</div>
-                            <div><strong>Available:</strong> {Number(nft.availableAmount).toFixed(2)} tS</div>
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 8, marginBottom: 16, fontSize: 14 }}>
+                            <div><strong>Total Value:</strong> {Number(nft.totalAmount).toFixed(0)} TEST_S</div>
+                            <div><strong>Vesting:</strong> 270 days</div>
+                            <div><strong>Status:</strong> {nft.progress}% unlocked</div>
                           </div>
                           
                           {nft.isDepositedInVault ? (
@@ -655,89 +669,26 @@ const TestnetDemo: React.FC = () => {
                               </div>
                             </div>
                           ) : (
-                            // NFT is still owned by user - show claim/deposit options
-                            <div style={{ display: 'flex', gap: 8 }}>
-                              <button
-                                onClick={() => claimVested(nft.tokenId)}
-                                disabled={isLoading || !nft.canClaimDirectly || !isConnected}
-                                className="button-primary"
-                                style={{ flex: 1, opacity: nft.canClaimDirectly ? 1 : 0.5 }}
-                                title={nft.canClaimDirectly ? '' : 'No tokens available to claim yet'}
-                              >
-                                {!isConnected ? 'Connect Wallet' : isLoading ? 'Claiming...' : 
-                                 nft.canClaimDirectly ? `Claim ${Number(nft.availableAmount).toFixed(2)} tS` : 
-                                 'Nothing to Claim Yet'}
-                              </button>
-                              <div style={{ display: 'flex', gap: 8 }}>
-                                {parseFloat(nft.totalAmount) > 1000 ? (
-                                  <>
-                                    <button
-                                      onClick={() => {
-                                        const confirmed = window.confirm(
-                                          `Deposit 10% of fNFT #${nft.tokenId}?\n\n` +
-                                          `• Get ${(parseFloat(nft.totalAmount) * 0.1).toFixed(1)} vS tokens\n` +
-                                          `• Much lower gas cost (~$1-3 instead of $20+)\n` +
-                                          `• You can deposit more later\n\n` +
-                                          `This is perfect for testing!`
-                                        );
-                                        if (confirmed) {
-                                          // TODO: Call depositFraction(nftId, 10) when implemented
-                                          alert('Fractional deposit coming soon! Use smaller fNFT for now.');
-                                        }
-                                      }}
-                                      disabled={isLoading || !nft.canDepositToVault || !isConnected}
-                                      className="button-primary"
-                                      style={{ flex: 1, background: '#28a745' }}
-                                    >
-                                      {!isConnected ? 'Connect Wallet' : isLoading ? 'Depositing...' : 'Deposit 10% (Low Gas)'}
-                                    </button>
-                                    <button
-                                      onClick={() => {
-                                        const confirmed = window.confirm(
-                                          `⚠️ EXPENSIVE TRANSACTION WARNING ⚠️\n\n` +
-                                          `Depositing all ${nft.totalAmount} tS will cost ~$15-25 in gas!\n\n` +
-                                          `Consider:\n` +
-                                          `• Minting smaller demo fNFT instead (~$1 gas)\n` +
-                                          `• Using "Deposit 10%" option\n` +
-                                          `• Most real users will have 100-1000 tS NFTs\n\n` +
-                                          `Continue with expensive full deposit?`
-                                        );
-                                        if (confirmed) {
-                                          depositToVault(nft.tokenId);
-                                        }
-                                      }}
-                                      disabled={isLoading || !nft.canDepositToVault || !isConnected}
-                                      className="button-primary"
-                                      style={{ flex: 1, background: '#dc3545' }}
-                                    >
-                                      {!isConnected ? 'Connect Wallet' : 'Full Deposit (💸 $15-25 Gas)'}
-                                    </button>
-                                  </>
-                                ) : (
-                                  <button
-                                    onClick={() => {
-                                      const confirmed = window.confirm(
-                                        `⚠️ PERMANENT DEPOSIT WARNING ⚠️\n\n` +
-                                        `Deposit fNFT #${nft.tokenId} to Vault?\n\n` +
-                                        `• Get ${nft.totalAmount} vS tokens right now\n` +
-                                        `• Low gas cost (under $2)\n` +
-                                        `• PERMANENT - fNFT transferred forever\n` +
-                                        `• You can only trade vS tokens after this\n\n` +
-                                        `Continue with permanent deposit?`
-                                      );
-                                      if (confirmed) {
-                                        depositToVault(nft.tokenId);
-                                      }
-                                    }}
-                                    disabled={isLoading || !nft.canDepositToVault || !isConnected}
-                                    className="button-primary"
-                                    style={{ width: '100%', background: '#28a745' }}
-                                  >
-                                    {!isConnected ? 'Connect Wallet' : isLoading ? 'Depositing...' : 'Deposit to Vault (Low Gas)'}
-                                  </button>
-                                )}
-                              </div>
-                            </div>
+                            // NFT is still owned by user - show simple deposit option
+                            <button
+                              onClick={() => {
+                                const confirmed = window.confirm(
+                                  `Deposit fNFT #${nft.tokenId} to Vault?\n\n` +
+                                  `• Get ${Number(nft.totalAmount).toFixed(0)} TEST_vS tokens immediately\n` +
+                                  `• Trade TEST_vS for instant liquidity\n` +
+                                  `• At day 270: Redeem TEST_vS → TEST_S at 1:1\n\n` +
+                                  `Continue?`
+                                );
+                                if (confirmed) {
+                                  depositToVault(nft.tokenId);
+                                }
+                              }}
+                              disabled={isLoading || !nft.canDepositToVault || !isConnected}
+                              className="button-primary"
+                              style={{ width: '100%', background: '#28a745', padding: '12px' }}
+                            >
+                              {!isConnected ? 'Connect Wallet' : isLoading ? 'Depositing...' : `Deposit → Get ${Number(nft.totalAmount).toFixed(0)} TEST_vS`}
+                            </button>
                           )}
                         </div>
                       ))}
