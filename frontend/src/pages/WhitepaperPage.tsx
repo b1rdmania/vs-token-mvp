@@ -94,6 +94,11 @@ export const WhitepaperPage: React.FC = () => {
                       <li><strong>Wait-and-Claim:</strong> Never claims early, preserves full backing</li>
                       <li><strong>Pure Infrastructure:</strong> Works forever without intervention</li>
                     </ul>
+                    <div className="contract-links">
+                      <a href="https://github.com/b1rdmania/vs-token-mvp/blob/main/src/ImmutableVault.sol" target="_blank" rel="noopener noreferrer" className="contract-link">
+                        View Contract →
+                      </a>
+                    </div>
                   </div>
                   
                   <div className="tech-card">
@@ -103,6 +108,11 @@ export const WhitepaperPage: React.FC = () => {
                       <li><strong>Vault-Only Minting:</strong> Only vault can mint (deposit) or burn (redemption)</li>
                       <li><strong>No Special Features:</strong> Clean, predictable token mechanics</li>
                     </ul>
+                    <div className="contract-links">
+                      <a href="https://github.com/b1rdmania/vs-token-mvp/blob/main/src/ImmutableVSToken.sol" target="_blank" rel="noopener noreferrer" className="contract-link">
+                        View Contract →
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
