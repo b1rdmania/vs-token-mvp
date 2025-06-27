@@ -17,9 +17,9 @@ export const LandingPage: React.FC = () => {
       <main>
         <section className="hero-section">
           <div className="container">
-            <h1 className="hero-title">Unlock Your Vesting Airdrop Rewards</h1>
+            <h1 className="hero-title">Get Full Value Now from Your Locked fNFTs</h1>
             <p className="hero-subtitle">
-              Deposit your vesting fNFT once, and as it vests, return to mint more vS tokens against its growing value. Unlock instant liquidity, trade, and participate in DeFi—all while your original rewards are securely locked.
+              Deposit your vesting fNFT and receive full-value vS tokens immediately. Trade them in the Shadow DEX pool for instant liquidity while your fNFT continues vesting in the vault.
             </p>
             <div className="hero-cta">
               <Link to="/app" className="button-primary button-hero">
@@ -41,12 +41,12 @@ export const LandingPage: React.FC = () => {
         <section className="features-section">
           <div className="container">
             <div className="feature-card">
-              <h3>Continuous Liquidity</h3>
-              <p>Deposit your fNFT once. As it vests over time, its claimable value grows—return to the dashboard at any time to mint more vS tokens against the same deposit.</p>
+              <h3>Instant Full Value</h3>
+              <p>Deposit your fNFT once and receive vS tokens equal to its total value immediately. No complex tracking - just simple, full-value liquidity you can use right away.</p>
             </div>
             <div className="feature-card">
-              <h3>Yield While You Wait</h3>
-              <p>Don't just hold—participate. Use your liquid vS tokens in the broader DeFi ecosystem. Provide liquidity to a vS/S pool to earn trading fees and boosted rewards.</p>
+              <h3>Market-Driven Pricing</h3>
+              <p>Trade your vS tokens in the Shadow DEX pool at market rates. Price naturally appreciates as your fNFT approaches full vesting, reflecting time value.</p>
             </div>
             <div className="feature-card">
               <h3>Zero Trust, Fully On-Chain</h3>

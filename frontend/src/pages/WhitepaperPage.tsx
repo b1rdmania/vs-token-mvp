@@ -4,94 +4,119 @@ import './WhitepaperPage.css';
 
 const markdownContent = `
 # vS Vault: Technical Whitepaper
-Version 1.1 – Last updated 20 Jun 2025
+Version 2.0 – Updated for Simplified Model
 
-## 1. Why vS Vault Exists
-Sonic's airdrop locks 75 % of rewards in 9-month vesting NFTs. Great for supply discipline, terrible for users who want to move capital. Most will dump their 25 % liquid slice and forget Sonic. vS Vault unlocks the locked share without breaking the vest schedule—turning dead capital into tradable, yield-bearing liquidity.
+## 1. The Problem
+Sonic's airdrop locks 75% of rewards in 9-month vesting NFTs (fNFTs). Users can only claim 25% now and must wait 9 months for full value. This creates:
+- **Dead Capital**: 75% of airdrop value sits idle for 9 months
+- **No DeFi Participation**: Locked assets can't be used in lending, LP pools, or other protocols
+- **Forced HODLing**: Users who need liquidity must sell at massive discounts on sketchy NFT marketplaces
 
-## 2. At-a-Glance
-- Total fNFTs in Season-1: 90 M S
-- User action: deposit fNFT → receive 1:1 vS tokens
-- vS tokens: standard ERC-20, tradable, LP-able, lendable
-- Underlying S continues vesting; unlocked S streams to vS holders daily
+## 2. The Solution: Simple Full-Value Tokenization
+vS Vault provides immediate liquidity through a beautifully simple model:
 
-## 3. How the Flow Works
-Deposit – user sends fNFT to the Vault contract
-Mint – Vault mints equal vS balance to the user
-Trade / LP – user swaps or LPs vS/S to earn fees
-Stream – Vault auto-claims newly-unlocked S each day and distributes pro-rata to vS balances
-Redeem – when vest hits 100 %, user burns vS to withdraw remaining S (early redemption allowed but pays the same penalty curve baked into the fNFT)
+1. **Deposit**: User deposits fNFT (worth 1000 S total) into vault
+2. **Mint**: Vault mints 1000 vS tokens immediately (full value)
+3. **Trade**: User trades vS in Shadow DEX pool at market rate (~0.25 S per vS initially)
+4. **Appreciate**: vS price naturally rises toward 1:1 as vesting approaches completion
+5. **Exit**: At month 9, vault claims all fNFTs and vS trades at ~1:1 with S
 
-## 4. Smart-Contract Anatomy
-### [vSVault.sol](https://github.com/b1rdmania/vs-token-mvp/blob/main/src/vSVault.sol)
-- ERC-4626 compliant, owns all fNFTs
-- Reads vesting schedule, tracks claimable S
-- Auto-stream function anyone can trigger (gas refund)
+## 3. Why This Works
+**Market Efficiency**: Instead of complex protocol engineering, we let the market price time value. Users get immediate access to their full future value, paying a time discount through market pricing.
 
-### [vSToken.sol](https://github.com/b1rdmania/vs-token-mvp/blob/main/src/vSToken.sol)
-- ERC-20 with EIP-2612 permits
-- Mint / burn controlled by the Vault only
+**No Cross-Subsidization**: Unlike complex models that track individual vesting progress, all vS tokens are fungible and backed by the same pooled fNFT assets.
 
-### [PenaltyCurveLib.sol](https://github.com/b1rdmania/vs-token-mvp/blob/main/src/PenaltyCurveLib.sol)
-- Pure library replicating Sonic's linear burn formula for early exits
+**Pure Liquidity**: Creates a deep, liquid market for vesting Sonic tokens without breaking the original vesting mechanics.
 
-## 5. Technical Implementation Roadmap
+## 4. Smart Contract Architecture
 
-### Phase 1: Testnet Deployment
-**Objective:** Deploy fully functional vS Vault MVP on Sepolia testnet.
-- Deploy \`MockSonicNFT.sol\` contract (public minting enabled).
-- Complete core functions in \`vSVault.sol\` (deposit, mint, redeem).
-- Deploy smart contracts to Sepolia testnet via Foundry.
-- Update frontend configuration (Wagmi/RainbowKit) for Sepolia.
-- Conduct comprehensive end-to-end testing.
+### vSVault.sol
+- **ERC-4626 Vault**: Standard interface for tokenized vaults
+- **Full-Value Minting**: Mints vS tokens equal to fNFT total value on deposit
+- **Pooled Assets**: All deposited fNFTs are pooled for maximum efficiency
+- **Claim Management**: Periodically claims vested tokens from all fNFTs
 
-### Phase 2: Decentralized Integration & Infrastructure
-**Objective:** Integrate robust, decentralized protocol components.
-- Implement Chainlink Automation for reward streaming.
-- Deploy production-ready Subgraph on The Graph for decentralized indexing.
-- Integrate Shadow AMM for liquidity provision and token swaps.
-- Finalize frontend to source data exclusively from decentralized components.
-- Complete internal testing and finalize user documentation.
+### vSToken.sol  
+- **Standard ERC-20**: Fully composable with all DeFi protocols
+- **Mint/Burn Control**: Only vault can mint (on deposit) or burn (on redemption)
+- **No Rebasing**: Simple, predictable token mechanics
 
-### Phase 3: Security Hardening & Mainnet Readiness
-**Objective:** Ensure rigorous security and prepare for mainnet launch.
-- Initiate external security audit engagement with leading firm.
-- Perform comprehensive internal security reviews using automated tools (Slither, Mythril).
-- Prepare and validate mainnet deployment scripts.
-- Establish initial liquidity seeding plan (250k S + 250k vS).
-- Finalize launch strategy and documentation, pending audit results.
+## 5. Market Dynamics
 
-This roadmap ensures robust deployment, decentralization, security, and strategic readiness for mainnet launch.
+### Initial State (Month 0)
+- fNFT deposited: 1000 S total value
+- vS minted: 1000 vS tokens
+- Market price: ~0.25 S per vS (75% time discount)
+- User gets: ~250 S immediate liquidity
 
-## 6. Deep DeFi Composability & The Flywheel Effect
-\`vS\` is more than a liquid token; it's a foundational building block for the Sonic ecosystem. By converting locked fNFTs into a standard, permissionless ERC-20, vS Vault unlocks immediate composability with other DeFi protocols.
+### Mid-Vesting (Month 4-5)
+- vS price: ~0.60 S per vS (40% time discount)
+- Arbitrage opportunities keep price efficient
+- Deep Shadow DEX liquidity enables large trades
 
-- **Lending & Borrowing:** \`vS\` can be listed as collateral on lending markets, allowing users to borrow against their vesting assets without selling.
-- **Yield Aggregation:** Vaults and yield aggregators can build strategies on top of the core \`vS\`/\`S\` liquidity pool.
-- **The Flywheel Engine: The \`vS\`/\`S\` Pool:** The heart of this ecosystem will be a deeply liquid \`vS\`/\`S\` pool, launching on our strategic partner, **Shadow DEX**. A significant portion of protocol incentives will be directed to this pool, creating a powerful flywheel:
-    1. High incentives attract LPs.
-    2. Deep liquidity ensures a tight price peg and low slippage for traders.
-    3. Reliable liquidity makes \`vS\` a trustworthy collateral asset across DeFi, driving more demand.
-    4. Increased utility and demand for \`vS\` encourages more fNFT holders to deposit, further deepening liquidity.
+### Near Maturity (Month 8-9)
+- vS price: ~0.95 S per vS (5% time discount)
+- Vault begins claiming mature fNFTs
+- Price converges toward full backing
 
-This model transforms static, vesting assets into a dynamic engine for ecosystem-wide liquidity and growth.
+## 6. No False Promises
+**Important**: The protocol does NOT guarantee 1:1 redemption. Market forces determine vS value at all times. At month 9:
+- Vault will hold claimed S tokens from matured fNFTs
+- vS tokens can be redeemed for proportional share of vault assets
+- Market price should approach 1:1, but this is market-driven, not protocol-guaranteed
 
-## 7. Decentralized & Battle-Hardened Architecture
-The vS Vault is engineered for maximum uptime, security, and transparency, removing all centralized points of failure.
+## 7. Shadow DEX Integration
+The vS/S pool on Shadow DEX is the heart of the system:
+- **Deep Liquidity**: Protocol incentives bootstrap initial liquidity
+- **Efficient Pricing**: Arbitrage bots keep prices aligned with time value
+- **Composability**: Standard AMM pool enables other protocols to integrate
+- **Fee Generation**: Trading fees benefit liquidity providers
 
-- **Immutable by Design:** The core contracts are non-upgradeable. The code deployed is final, ensuring predictable behavior and removing administrative risk.
-- **Reliable Automation via Keepers:** The daily \`auto-stream\` function is not run from a private server. It is driven by a decentralized automation network (e.g., Chainlink Automation) that guarantees execution.
-- **Public Incentivization:** As a backstop, the \`auto-stream\` function includes a gas incentive, making it profitable for any public user or bot to trigger it. This ensures the protocol is self-healing and perpetually live.
-- **Transparent Data via Subgraph:** All data for the user interface is indexed from on-chain events via a public Subgraph. This guarantees that what you see is a direct and verifiable reflection of on-chain reality.
+## 8. Risk Considerations
 
-## 8. Economic Impact for Sonic
-- Deep vS/S liquidity absorbs airdrop sell pressure
-- Locked capital becomes TVL, boosting headline metrics
-- Continuous swap volume drives fee burn, aligning with S token economics
-- More "things to do" on-chain keeps users active during the 9-month vest window
+### For Users
+- **Market Risk**: vS price determined by market, not protocol guarantees
+- **Liquidity Risk**: Pool depth affects trade size and slippage
+- **Smart Contract Risk**: Code is immutable and non-upgradeable
 
-## 9. Get Involved
-Seed liquidity, integrate vS in your dApp, or [review the code](https://github.com/b1rdmania/vs-token-mvp).
+### For the Ecosystem  
+- **Pool Death Scenario**: If selling pressure overwhelms liquidity, price could crash below fundamental value
+- **No Recovery Mechanism**: Protocol cannot intervene in market pricing
+- **Dependency on External LP**: Relies on Shadow DEX and external liquidity providers
+
+## 9. Why It's Still Valuable
+Despite risks, vS Vault provides massive value:
+- **Immediate Liquidity**: Get 25% of locked value instantly (vs 0% without vault)
+- **Time Optionality**: Can exit early at market rates vs waiting 9 months
+- **DeFi Composability**: Use vS in lending, as collateral, in other pools
+- **Price Appreciation**: Benefit from natural price appreciation over time
+
+## 10. Technical Implementation
+
+### Phase 1: Core Contracts ✅
+- vSVault.sol (ERC-4626 compliant)
+- vSToken.sol (standard ERC-20)
+- Deployed on Sonic Mainnet
+
+### Phase 2: Market Integration ✅  
+- Shadow DEX pool deployment
+- Initial liquidity seeding
+- Frontend integration
+
+### Phase 3: Ecosystem Growth
+- Integration with lending protocols
+- Additional LP incentives
+- Community governance (if needed)
+
+## 11. Get Involved
+- **Try the Demo**: [sonicvs.app/TestnetDemo](https://sonicvs.app/TestnetDemo)
+- **Review Code**: [GitHub Repository](https://github.com/b1rdmania/vs-token-mvp)
+- **Provide Liquidity**: Earn fees in the vS/S Shadow DEX pool
+- **Build on Top**: Integrate vS into your DeFi protocol
+
+---
+
+*vS Vault: Simple, honest, market-driven liquidity for vesting assets.*
 `;
 
 export const WhitepaperPage: React.FC = () => {
