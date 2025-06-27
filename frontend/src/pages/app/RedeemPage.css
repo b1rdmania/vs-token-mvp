@@ -12,6 +12,30 @@
   text-align: center;
 }
 
+.info-banner {
+  background-color: #e7f3ff;
+  color: #0c5460;
+  padding: 2rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.info-banner h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #0c5460;
+}
+
+.success-banner {
+  background-color: #d1e7dd;
+  color: #0a3622;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
 .redeem-form h3 {
   font-size: 1.25rem;
   margin-top: 0;

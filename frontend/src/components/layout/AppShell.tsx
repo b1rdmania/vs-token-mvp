@@ -2,21 +2,15 @@ import React, { useState } from 'react';
 import { NavLink, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { DepositPage } from '../../pages/app/DepositPage';
-import { DashboardPage } from '../../pages/app/DashboardPage';
 import { TradePage } from '../../pages/app/TradePage';
-import { PoolPage } from '../../pages/app/PoolPage';
-import { ActivityPage } from '../../pages/app/ActivityPage';
 import { RedeemPage } from '../../pages/app/RedeemPage';
 import './AppShell.css';
 import { useAccount } from 'wagmi';
 
 const navLinks = [
   { path: '/app/deposit', label: 'Deposit' },
-  { path: '/app/redeem', label: 'Redeem' },
-  { path: '/app/dashboard', label: 'Dashboard' },
   { path: '/app/trade', label: 'Trade' },
-  { path: '/app/pool', label: 'Pool' },
-  { path: '/app/activity', label: 'Protocol Activity' },
+  { path: '/app/redeem', label: 'Redeem' },
 ];
 
 export const AppShell: React.FC = () => {
@@ -66,10 +60,7 @@ export const AppShell: React.FC = () => {
         <div className="container">
           <Routes>
             <Route path="deposit" element={<DepositPage />} />
-            <Route path="dashboard" element={<DashboardPage />} />
             <Route path="trade" element={<TradePage />} />
-            <Route path="pool" element={<PoolPage />} />
-            <Route path="activity" element={<ActivityPage />} />
             <Route path="redeem" element={<RedeemPage />} />
             <Route index element={<Navigate to="deposit" replace />} />
           </Routes>

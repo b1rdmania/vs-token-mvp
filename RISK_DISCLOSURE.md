@@ -1,163 +1,143 @@
-# vS Protocol Risk Disclosure
+# vS Vault Risk Disclosure
 
-## ⚠️ **Important: Read Before Using vS Protocol**
+**Read this before using vS Vault. You could lose money.**
 
-**This document outlines the key risks of depositing fNFTs and trading vS tokens. By using the protocol, you acknowledge understanding these risks.**
+## What vS Vault Does
 
----
+You give us your locked NFT worth 1000 S tokens. We give you 1000 vS tokens. You sell vS tokens for cash today. We wait 9 months, then claim your S tokens.
 
-## **1. Market Price Risk**
+## Risks You Take
 
-### **vS Tokens Trade at Discount**
-- **Your vS tokens will likely trade below face value** (e.g., 1000 vS tokens may only sell for 250-750 S tokens)
-- **The market determines pricing**, not the protocol
-- **Discounts can be volatile** and may increase or decrease unpredictably
-- **No guarantee of price recovery** even as maturity approaches
+### 1. Market Risk - HIGH RISK ⚠️
 
-### **Example Scenario**
-- You deposit a 1000 S fNFT → Get 1000 vS tokens
-- You immediately sell vS tokens → Receive ~250 S tokens (75% discount)
-- **You lose 750 S tokens in exchange for immediate liquidity**
+**The Problem**: vS tokens trade at a discount
 
----
+**Example**: 
+- You get 1000 vS tokens today
+- Market price: 250 S tokens (75% discount)
+- You lose 750 S tokens vs waiting 9 months
 
-## **2. Liquidity Pool Risks**
+**Why This Happens**:
+- People want cash now, not later
+- Market prices in time value
+- Supply and demand set the price
 
-### **Impermanent Loss**
-- If you provide liquidity to vS/S pools, you face **impermanent loss**
-- As vS price changes relative to S, your LP position value changes
-- **You may receive fewer tokens back** than you originally deposited
+**Our Role**: We don't control the price. The market does.
 
-### **Pool Liquidity Crunch**
-- **Months 6-9 may see reduced liquidity** as buyers become scarce
-- Near maturity, few people want to buy vS at high prices
-- **You may not be able to sell** your vS tokens at favorable prices
+### 2. Smart Contract Risk - MEDIUM RISK ⚠️
 
----
+**The Problem**: Code might have bugs
 
-## **3. Redemption Window Risk**
+**What Could Go Wrong**:
+- Contracts could have security holes
+- Hackers could steal funds
+- Bugs could lock your tokens
 
-### **Limited Grace Period**
-- **180-day redemption window** after maturity (Month 9-15)
-- If you don't redeem within this window, **your S tokens are swept to treasury**
-- **No extensions or exceptions** - this is permanent
+**Our Protection**:
+- Professional audit before launch
+- Simple code (fewer bugs)
+- Battle-tested patterns
+- No admin keys (we can't steal funds)
 
-### **Gas Costs**
-- Redemption requires blockchain transactions with gas fees
-- **High gas periods may make small redemptions uneconomical**
-- Plan for gas costs when deciding redemption timing
+**Your Risk**: If contracts break, you lose money
 
----
+### 3. Liquidity Risk - MEDIUM RISK ⚠️
 
-## **4. Smart Contract Risks**
+**The Problem**: You might not be able to sell vS tokens
 
-### **Code Risk**
-- Smart contracts may contain **bugs or vulnerabilities**
-- **Funds could be lost** due to coding errors or exploits
-- Even audited contracts carry residual risk
+**When This Happens**:
+- Month 6-9: Few buyers (why buy vS at 95% when S costs 100%?)
+- Low trading volume
+- Big price swings
 
-### **Immutable Design**
-- Vault contracts are **immutable** - no upgrades possible
-- If issues are discovered, **they cannot be fixed**
-- This design choice prioritizes decentralization over flexibility
+**Result**: You might be stuck with vS tokens you can't sell
 
----
+### 4. External Contract Risk - MEDIUM RISK ⚠️
 
-## **5. Regulatory Risk**
+**The Problem**: We depend on Sonic's fNFT contract
 
-### **Changing Laws**
-- **Cryptocurrency regulations may change** in your jurisdiction
-- New laws could **restrict your ability** to use the protocol
-- **Tax implications** may be complex and subject to change
+**What Could Go Wrong**:
+- Sonic changes their contract
+- Their contract has bugs
+- Interface stops working
 
----
+**Result**: We might not be able to claim your S tokens
 
-## **6. Operational Risks**
+### 5. Redemption Risk - LOW RISK ⚠️
 
-### **Frontend Risks**
-- **Website may become unavailable** due to technical issues
-- You can still interact with contracts directly via Etherscan
-- **Always verify contract addresses** before interacting
+**The Problem**: You have 6 months to redeem after maturity
 
-### **Oracle/Price Feed Risks**
-- Protocol relies on **external price data**
-- Price feed failures could **impact trading or redemption**
+**Timeline**:
+- Month 9: Redemption opens
+- Month 15: Redemption closes
+- After Month 15: Leftover tokens get swept
 
----
+**Your Risk**: If you don't redeem in time, you lose your tokens
 
-## **7. Economic Model Risks**
+## What We Don't Control
 
-### **First Season Experiment**
-- This is the **first implementation** of the vS model
-- **User behavior may be unpredictable**
-- Market dynamics could evolve differently than expected
+### Price
+We don't set vS token prices. The market does. We can't promise any specific price.
 
-### **No Yield Generation**
-- vS tokens **do not generate yield** while held
-- Opportunity cost of **not earning on other investments**
+### Timing
+We don't control when Sonic's fNFTs mature. We follow their schedule.
 
----
+### External Contracts
+We don't control Sonic's contracts. If they break, we can't fix them.
 
-## **8. Counterparty Risks**
+### Market Conditions
+We don't control trading volumes, liquidity, or demand for vS tokens.
 
-### **Shadow DEX Dependency**
-- Trading relies heavily on **Shadow DEX liquidity**
-- If Shadow DEX faces issues, **trading may be impacted**
-- **No guaranteed alternative trading venues**
+## What We Do Control
 
-### **Treasury Management**
-- Protocol treasury decisions **may affect your interests**
-- Treasury-controlled funds could be **managed differently than expected**
+### Security
+We write secure code. We get audits. We use best practices.
 
----
+### Transparency
+We tell you exactly how everything works. No hidden fees or tricks.
 
-## **Risk Mitigation Strategies**
+### Immutability
+Once deployed, we can't change the contracts. No rug pulls possible.
 
-### **For Users**
-- ✅ **Only deposit what you can afford to lose**
-- ✅ **Understand the discount before depositing**
-- ✅ **Set calendar reminders** for redemption window
-- ✅ **Keep some ETH/S for gas costs**
-- ✅ **Diversify across multiple protocols/strategies**
+## Before You Use vS Vault
 
-### **For Liquidity Providers**
-- ✅ **Understand impermanent loss mechanics**
-- ✅ **Monitor pool health regularly**
-- ✅ **Have exit strategy prepared**
+### Ask Yourself:
+1. Do I need cash now more than full value later?
+2. Can I afford to lose 50-90% of my token value?
+3. Do I understand how this works?
+4. Am I comfortable with these risks?
 
----
+### If You Answer "No" to Any Question:
+Don't use vS Vault. Wait for your tokens to unlock naturally.
 
-## **Emergency Procedures**
+## Legal Stuff
 
-### **If Website is Down**
-- Contract addresses: [To be filled with mainnet addresses]
-- Interact directly via Etherscan "Write Contract" section
-- Always verify you're on the correct contract
+### No Promises
+We don't promise profits. We don't promise specific prices. We don't promise anything will work perfectly.
 
-### **If You Need Help**
-- Community Discord: [To be filled]
-- Documentation: [To be filled]
-- **Never share private keys or seed phrases**
+### Your Responsibility
+You decide if this is right for you. You take all the risks. You could lose money.
+
+### No Guarantees
+Past performance doesn't predict future results. Test tokens aren't real tokens. Demo results don't guarantee real results.
+
+### Jurisdiction
+This might be illegal where you live. Check your local laws.
+
+## Emergency Contacts
+
+**If something goes wrong:**
+- Check our website for updates
+- Join our Discord for support
+- Contact us at [email]
+
+**If you lose money:**
+- We're sorry, but we can't help
+- No insurance or guarantees
+- All sales are final
 
 ---
 
-## **Legal Disclaimer**
+**Bottom Line**: vS Vault is risky. You could lose most of your money. Only use money you can afford to lose. Don't invest more than you can handle losing.
 
-- **This protocol is experimental software**
-- **No warranties or guarantees** of any kind
-- **Use at your own risk**
-- **Past performance does not predict future results**
-- **Consult financial/legal advisors** before making significant investments
-
----
-
-## **Acknowledgment**
-
-By using the vS protocol, you confirm that you:
-- ✅ Have read and understood all risks outlined above
-- ✅ Are legally permitted to use cryptocurrency protocols in your jurisdiction
-- ✅ Are not relying on any promises of returns or guarantees
-- ✅ Understand that all losses are your responsibility
-
-**Last Updated**: [Date]
-**Version**: 1.0 
+**Last Updated**: June 2025 

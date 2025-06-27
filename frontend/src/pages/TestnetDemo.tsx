@@ -3,8 +3,8 @@ import { useAccount, usePublicClient, useWalletClient } from 'wagmi';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import DecayfNFTArtifact from '../abis/DecayfNFT.json';
 import MockTokenArtifact from '../abis/MockToken.json';
-import vSVaultArtifact from '../abis/vSVault.json';
-import vSTokenArtifact from '../abis/vSToken.json';
+import ImmutableVaultArtifact from '../abis/ImmutableVault.json';
+import ImmutableVSTokenArtifact from '../abis/ImmutableVSToken.json';
 import ShadowDEXPoolInfo from '../components/ShadowDEXIntegration';
 import '../styles/common.css';
 import { ethers } from 'ethers';
@@ -150,7 +150,7 @@ const TestnetDemo: React.FC = () => {
       try {
         const vsTokenBalance = await publicClient.readContract({
           address: VSTOKEN_ADDRESS as `0x${string}`,
-          abi: vSTokenArtifact.abi,
+          abi: ImmutableVSTokenArtifact.abi,
           functionName: 'balanceOf',
           args: [address],
         });
@@ -164,7 +164,7 @@ const TestnetDemo: React.FC = () => {
       try {
         const vaultAssets = await publicClient.readContract({
           address: VAULT_ADDRESS as `0x${string}`,
-          abi: vSVaultArtifact.abi,
+          abi: ImmutableVaultArtifact.abi,
           functionName: 'totalAssets',
           args: [],
         });
@@ -344,20 +344,17 @@ const TestnetDemo: React.FC = () => {
 
       setStatus('Step 3/3: Depositing to vault...');
 
-      // Get NFT value to choose optimal deposit method
+      // Get NFT value for status message
       const nftDetails = ownedNFTs.find(nft => nft.tokenId === tokenId);
       const nftValue = nftDetails ? parseFloat(nftDetails.totalAmount) : 0;
       
-      // Use ultra gas-optimized demo deposit for small NFTs
-      const depositFunction = nftValue <= 1000 ? 'demoDeposit' : 'deposit';
-      
-      setStatus(`Step 3/3: ${nftValue <= 1000 ? 'Ultra-low gas deposit (90% savings!)' : 'Depositing to vault'}...`);
+      setStatus(`Step 3/3: Depositing ${nftValue} TEST_S fNFT to vault...`);
 
       // Finally deposit to vault
       const depositHash = await walletClient.writeContract({
         address: VAULT_ADDRESS as `0x${string}`,
-        abi: vSVaultArtifact.abi,
-        functionName: depositFunction,
+        abi: ImmutableVaultArtifact.abi,
+        functionName: 'deposit',
         args: [tokenId],
       });
 
@@ -389,8 +386,8 @@ const TestnetDemo: React.FC = () => {
       
       const hash = await walletClient.writeContract({
         address: VAULT_ADDRESS as `0x${string}`,
-        abi: vSVaultArtifact.abi,
-        functionName: 'simpleRedeem',
+        abi: ImmutableVaultArtifact.abi,
+        functionName: 'redeem',
         args: [amountWei],
       });
 
@@ -420,9 +417,9 @@ const TestnetDemo: React.FC = () => {
     try {
       const hash = await walletClient.writeContract({
         address: VAULT_ADDRESS as `0x${string}`,
-        abi: vSVaultArtifact.abi,
-        functionName: 'claimVested',
-        args: [0, 10], // Claim first 10 NFTs
+        abi: ImmutableVaultArtifact.abi,
+        functionName: 'claimBatch',
+        args: [10], // Process 10 NFTs
       });
 
       setTxHash(hash);

@@ -16,6 +16,30 @@
   text-align: center;
 }
 
+.warning-banner {
+  background-color: #fff8e1;
+  color: #8a6914;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #ff9800;
+  margin-bottom: 2rem;
+}
+
+.warning-banner h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #e65100;
+}
+
+.warning-banner ul {
+  margin: 1rem 0 0 0;
+  padding-left: 1.5rem;
+}
+
+.warning-banner li {
+  margin-bottom: 0.5rem;
+}
+
 .nft-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -57,6 +81,11 @@
   font-weight: bold;
 }
 
+.vs-amount {
+  color: #28a745;
+  font-weight: bold;
+}
+
 .nft-card .button-primary {
   width: 100%;
 }
@@ -78,6 +107,16 @@
 .modal-content {
   width: 90%;
   max-width: 500px;
+}
+
+.modal-warning {
+  background-color: #fff3cd;
+  color: #664d03;
+  padding: 0.75rem;
+  border-radius: 6px;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+  border-left: 3px solid #ff9800;
 }
 
 .modal-details {

@@ -1,137 +1,80 @@
-# vS Vault: Instant Liquidity for Vesting NFTs
+# vS Vault
 
-**vS Vault transforms illiquid vesting NFTs into liquid ERC-20 tokens. Deposit your Sonic fNFT → Get full-value vS tokens → Trade immediately on Shadow DEX.**
+**Turn locked tokens into liquid tokens**
 
-**🔒 Truly Immutable Design: Zero admin control after deployment - operates as pure decentralized infrastructure.**
-
----
-
-## The Problem & Our Solution
-
-- **Problem:** Sonic's Season 1 airdrop locks 75% of tokens in 9-month vesting NFTs. Users can't access this value for DeFi, trading, or liquidity needs.
-- **Solution:** vS Vault lets users deposit their fNFT and receive full-value vS tokens immediately. These tokens can be traded on Shadow DEX at market rates, providing instant liquidity without waiting for vesting.
+Your fNFT locks 1000 S tokens for 9 months. Deposit it, get 1000 vS tokens now. Trade vS tokens anytime.
 
 ## How It Works
 
-1. **Deposit fNFT**: User deposits their Sonic vesting NFT into the vault
-2. **Get vS Tokens**: Vault mints full-value vS tokens (1000 S fNFT → 1000 vS tokens)
-3. **Trade for Liquidity**: User trades vS tokens on Shadow DEX for immediate Sonic tokens
-4. **Vault Waits**: Vault holds fNFTs until month 9 maturity (no early claiming, no penalty burns)
-5. **1:1 Redemption**: At month 9+, users can redeem vS → S at exactly 1:1 ratio through vault
+1. **Deposit** - Give us your locked fNFT
+2. **Get vS tokens** - We mint you the full amount  
+3. **Trade** - Sell vS tokens for cash anytime
+4. **Redeem** - After 9 months, swap vS back to S tokens at 1:1
 
-## Key Features
+## Why Use This
 
-- **Instant Full Value**: Get 1000 vS tokens for 1000 S fNFT immediately
-- **Market-Driven Pricing**: Let the market determine fair discount rates
-- **Shadow DEX Integration**: Trade on Sonic's leading DEX with deep liquidity
-- **Simple Economics**: No complex vesting tracking or proportional calculations
-- **🔒 Immutable Vault**: Zero admin control - no pause, no owner functions, no rug risk
-- **⚡ Pure Infrastructure**: Works forever without intervention, like a bridge or AMM
+- **Get cash now** instead of waiting 9 months
+- **No penalties** - we wait, you don't have to
+- **Fair price** - market sets the rate, not us
+- **No admin** - contract runs itself, no one controls it
 
-## Demo Experience
+## Example
 
-Our live demo shows the complete user journey:
+You have: 10,000 S tokens locked in fNFT for 270 days
+You get: 10,000 vS tokens today
+You sell: vS tokens at market rate (maybe 25% of face value)
+Result: Cash today instead of waiting 9 months
 
-1. **Mint Demo fNFT**: 1000 tS tokens, 9-month vesting
-2. **Deposit to Vault**: Get 1000 vS tokens instantly  
-3. **Trade on Shadow DEX**: Swap vS for tS at current market rate
-4. **Immediate Liquidity**: Access funds today instead of waiting 9 months
+## Technical Details
 
-**Live Demo**: [https://vs-vault-demo.netlify.app](https://vs-vault-demo.netlify.app)
+**Contracts:**
+- `ImmutableVault.sol` - Main vault (no admin, no upgrades)
+- `ImmutableVSToken.sol` - The vS token
+- `DecayfNFT.sol` - Test fNFT (for demos only)
+- `MockToken.sol` - Test S token (for demos only)
 
-## Smart Contract Architecture
+**Functions:**
+- `deposit(nftId)` - Put in fNFT, get vS tokens
+- `claimBatch(k)` - Anyone can harvest vested tokens (gets 0.05% tip)
+- `redeem(amount)` - Burn vS tokens, get S tokens (after maturity)
+- `sweepSurplus()` - Clean up leftover tokens (after 6 months grace)
 
-### Core Contracts
-- **ImmutableVault.sol**: Production vault with zero admin control (mainnet)
-- **vSVault.sol**: Demo vault with admin functions (testnet only)
-- **vSToken.sol**: Standard ERC-20 token representing vault shares
-- **DecayfNFT.sol**: Demo vesting NFT with Sonic-style mechanics
+**Timeline:**
+- Month 0-1: Deposit window open
+- Month 1-9: Keepers harvest vested tokens
+- Month 9+: Users can redeem vS for S at 1:1
+- Month 15+: Anyone can sweep leftover tokens
 
-### Key Functions
-- `deposit(nftId)`: Deposit fNFT and mint full-value vS tokens
-- `redeem(amount)`: Burn vS tokens for underlying assets (month 9+)
-- Shadow DEX integration for immediate trading
-
-## Economic Model
-
-### Simple & Honest
-- **True 1:1 backing**: Every vS token backed by exactly 1 S token at maturity
-- **No penalty burns**: Vault waits until month 9, claims at 0% penalty
-- **Market efficiency**: Shadow DEX pool handles price discovery during vesting period
-- **Guaranteed redemption**: Direct vS→S redemption at 1:1 ratio available at month 9+
-
-### Risk Disclosure
-- vS tokens trade at market discount before maturity (typically 20-80% of face value)
-- Protocol guarantees 1:1 redemption only at month 9+ maturity
-- Market liquidity depends on Shadow DEX pool depth during vesting period
-- Early exit via trading means accepting market discount
-
-## Technical Implementation
-
-### Deployment Status
-- ✅ **Sonic Mainnet**: Fully deployed and functional
-- ✅ **Shadow DEX**: Integrated liquidity pools
-- ✅ **Frontend**: Complete user interface
-- ✅ **Demo Flow**: End-to-end working demo
-
-### Contract Addresses (Sonic Mainnet)
-- **Demo fNFT**: `0xdf34078C9C8E5891320B780F6C8b8a54B784108C`
-- **Demo tS Token**: `0x4a201419ED3e4d6D58A434F1D077AD7B2ED71f49`
-- **vS Token**: `0x4dE74524A2cE5e2A310615a6aDe7eC35B0f81031`
-- **Vault**: `0x37BD20868FB91eB37813648F4D05F59e07A1bcfb`
-
-## Development Setup
+## Deploy
 
 ```bash
-# Install dependencies
-npm install
+forge script script/DeployImmutableVault.s.sol --broadcast
+```
 
-# Start frontend
-cd frontend && npm run dev
+## Test
 
-# Compile contracts
-forge build
-
-# Run tests
+```bash
 forge test
-
-# Deploy contracts
-forge script script/DeployDemo.s.sol --rpc-url sonic --broadcast
 ```
 
-## Testing
+## Security
+
+- **No admin keys** - no one can drain funds
+- **No upgrades** - code never changes
+- **No governance** - no voting, no proposals
+- **Gas safe** - batch processing prevents gas bombs
+- **1:1 backing** - every vS token backed by 1 S token at maturity
+
+See `SECURITY_ANALYSIS.md` for full audit.
+
+## Frontend
 
 ```bash
-# Run all tests
-forge test -vv
-
-# Test specific contract
-forge test --match-contract VaultTest
-
-# Test with gas reporting
-forge test --gas-report
+cd frontend && npm run dev
 ```
 
-## Innovation Highlights
+Local demo at `http://localhost:5173`
 
-1. **True Immutability**: Zero admin control after deployment - operates as pure infrastructure
-2. **Simplicity**: No complex vesting calculations or streaming mechanics
-3. **Market Efficiency**: Let Shadow DEX handle price discovery
-4. **Honest Messaging**: Clear about market risks and discounts
-5. **Instant Utility**: Immediate composability with DeFi ecosystem
-6. **Sonic Native**: Built specifically for Sonic's vesting NFT mechanics
-7. **Maximum Security**: No owner keys, no pause functions, no rug pull risk
+## License
 
-## Future Roadmap
-
-- [ ] Production deployment for real Sonic fNFTs
-- [ ] Additional DEX integrations beyond Shadow
-- [ ] Cross-chain bridging capabilities
-- [ ] Advanced trading strategies and automation
-- [ ] Governance token and DAO structure
-
----
-
-**Transform your locked fNFTs into liquid DeFi assets today.**
-
-**Built for Sonic** | **Powered by Shadow DEX** | **Instant Liquidity**
+MIT
