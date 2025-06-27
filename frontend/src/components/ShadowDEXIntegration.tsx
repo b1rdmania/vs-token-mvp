@@ -12,7 +12,7 @@ const CONTRACTS = {
 const SHADOW_DEX = {
   ROUTER: '0x1D368773735ee1E678950B7A97bcA2CafB330CDc', // Shadow Router
   FACTORY: '0x2dA25E7446A70D7be65fd4c053948BEcAA6374c8', // Shadow Factory  
-  POOL: '0x0516676e5f9f0253228483a5f61313a53b4be07f' // REAL D-vS/tS Pool!
+  POOL: '0x0516676e5f9f0253228483a5f61313a53b4be07f' // REAL vS/tS Pool!
 };
 
 const ERC20_ABI = [
@@ -111,8 +111,8 @@ const ShadowDEXPoolInfo: React.FC<ShadowDEXPoolInfoProps> = ({ dvsBalance }) => 
         }}>
           <h4 style={{ margin: '0 0 8px 0', color: '#047857' }}>✅ Live Pool</h4>
           <div style={{ fontSize: '14px', color: '#047857' }}>
-            <div><strong>Liquidity:</strong> {poolInfo.dvsReserve} D-vS / {poolInfo.tsReserve} tS</div>
-            <div><strong>Rate:</strong> 1 D-vS = {poolInfo.ratio.toFixed(4)} tS</div>
+            <div><strong>Liquidity:</strong> {poolInfo.dvsReserve} vS / {poolInfo.tsReserve} tS</div>
+            <div><strong>Rate:</strong> 1 vS = {poolInfo.ratio.toFixed(4)} tS</div>
             <div><strong>Discount:</strong> ~{((1 - poolInfo.ratio) * 100).toFixed(1)}% for immediate exit</div>
           </div>
         </div>
@@ -140,9 +140,9 @@ const ShadowDEXPoolInfo: React.FC<ShadowDEXPoolInfoProps> = ({ dvsBalance }) => 
       }}>
         <h4 style={{ margin: '0 0 8px 0', color: '#0369a1' }}>How It Works</h4>
         <div style={{ fontSize: '13px', color: '#0369a1' }}>
-          D-vS tokens (from fNFT) → Shadow DEX → Immediate tS tokens
+          vS tokens (from fNFT) → Shadow DEX → Immediate tS tokens
           <br />
-          Market rate: ~{poolInfo?.ratio.toFixed(2)} tS per D-vS
+                      Market rate: ~{poolInfo?.ratio.toFixed(2)} tS per vS
         </div>
       </div>
 
