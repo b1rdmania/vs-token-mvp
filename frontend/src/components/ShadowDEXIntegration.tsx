@@ -112,8 +112,8 @@ const ShadowDEXPoolInfo: React.FC<ShadowDEXPoolInfoProps> = ({ dvsBalance }) => 
           <h4 style={{ margin: '0 0 8px 0', color: '#047857' }}>✅ Live Pool</h4>
           <div style={{ fontSize: '14px', color: '#047857' }}>
             <div><strong>Liquidity:</strong> {poolInfo.dvsReserve} vS / {poolInfo.tsReserve} tS</div>
-            <div><strong>Rate:</strong> 1 vS = {poolInfo.ratio.toFixed(4)} tS</div>
-            <div><strong>Discount:</strong> ~{((1 - poolInfo.ratio) * 100).toFixed(1)}% for immediate exit</div>
+            <div><strong>Current Rate:</strong> 1 vS = {poolInfo.ratio.toFixed(4)} tS</div>
+            <div><strong>Real Market:</strong> Price determined by supply/demand, not fake discounts</div>
           </div>
         </div>
       ) : (
@@ -140,9 +140,9 @@ const ShadowDEXPoolInfo: React.FC<ShadowDEXPoolInfoProps> = ({ dvsBalance }) => 
       }}>
         <h4 style={{ margin: '0 0 8px 0', color: '#0369a1' }}>How It Works</h4>
         <div style={{ fontSize: '13px', color: '#0369a1' }}>
-          vS tokens (from fNFT) → Shadow DEX → Immediate tS tokens
+          vS tokens (from fNFT) → Shadow DEX → Immediate tS tokens at real market rates
           <br />
-                      Market rate: ~{poolInfo?.ratio.toFixed(2)} tS per vS
+          No artificial pricing - pure market discovery through trading
         </div>
       </div>
 

@@ -60,7 +60,7 @@ const TestnetDemo: React.FC = () => {
   const [ownedNFTs, setOwnedNFTs] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [txHash, setTxHash] = useState<string>('');
-  const [activeTab, setActiveTab] = useState<'mint' | 'vault' | 'trade'>('mint');
+  const [activeTab, setActiveTab] = useState<'mint' | 'trade'>('mint');
   const [status, setStatus] = useState<string>('');
   const [tradeAmount, setTradeAmount] = useState<string>('');
   const [tradeExecuted, setTradeExecuted] = useState<boolean>(false);
@@ -227,7 +227,7 @@ const TestnetDemo: React.FC = () => {
     // Simulate trade execution
     setTimeout(() => {
       setTradeExecuted(true);
-      setStatus(`Successfully traded ${tradeAmount} vS for ${(parseFloat(tradeAmount) * 0.25).toFixed(2)} tS on Shadow DEX!`);
+      setStatus(`Demo trade executed! In reality, you'd receive market rate from the Shadow DEX pool.`);
       setIsLoading(false);
     }, 2000);
   };
@@ -540,61 +540,48 @@ const TestnetDemo: React.FC = () => {
 
           {/* Main Tabs */}
           <div className="content-card" style={{ marginBottom: 16 }}>
-            <div style={{ display: 'flex', gap: 8, borderBottom: '1px solid #eaecef', marginBottom: 16 }}>
-              <button 
-                style={{ 
-                  padding: '12px 20px', 
-                  border: 'none', 
-                  background: activeTab === 'mint' ? '#1F6BFF' : 'transparent',
-                  color: activeTab === 'mint' ? 'white' : '#666',
-                  borderRadius: '8px 8px 0 0',
-                  cursor: 'pointer',
-                  fontWeight: activeTab === 'mint' ? 'bold' : 'normal'
-                }}
-                onClick={() => setActiveTab('mint')}
-              >
-                🎯 Steps 1-2: Get Assets & Stake fNFT
-              </button>
-              <button 
-                style={{ 
-                  padding: '12px 20px', 
-                  border: 'none', 
-                  background: activeTab === 'vault' ? '#1F6BFF' : 'transparent',
-                  color: activeTab === 'vault' ? 'white' : '#666',
-                  borderRadius: '8px 8px 0 0',
-                  cursor: 'pointer',
-                  fontWeight: activeTab === 'vault' ? 'bold' : 'normal'
-                }}
-                onClick={() => setActiveTab('vault')}
-              >
-                🏦 Steps 5-6: Manage vS & Exit
-              </button>
-              <button 
-                style={{ 
-                  padding: '12px 20px', 
-                  border: 'none', 
-                  background: activeTab === 'trade' ? '#1F6BFF' : 'transparent',
-                  color: activeTab === 'trade' ? 'white' : '#666',
-                  borderRadius: '8px 8px 0 0',
-                  cursor: 'pointer',
-                  fontWeight: activeTab === 'trade' ? 'bold' : 'normal'
-                }}
-                onClick={() => setActiveTab('trade')}
-              >
-                💰 Steps 3-4: Use in DeFi & Earn Fees
-              </button>
+            <div style={{ display: 'flex', marginBottom: 24 }}>
+              <div style={{ display: 'flex', background: '#f8f9fa', borderRadius: '8px 8px 0 0', overflow: 'hidden' }}>
+                <button 
+                  style={{ 
+                    padding: '12px 20px', 
+                    border: 'none', 
+                    background: activeTab === 'mint' ? '#1F6BFF' : 'transparent',
+                    color: activeTab === 'mint' ? 'white' : '#666',
+                    borderRadius: '8px 8px 0 0',
+                    cursor: 'pointer',
+                    fontWeight: activeTab === 'mint' ? 'bold' : 'normal'
+                  }}
+                  onClick={() => setActiveTab('mint')}
+                >
+                  🎯 Step 1: Deposit fNFT → Get vS
+                </button>
+                <button 
+                  style={{ 
+                    padding: '12px 20px', 
+                    border: 'none', 
+                    background: activeTab === 'trade' ? '#1F6BFF' : 'transparent',
+                    color: activeTab === 'trade' ? 'white' : '#666',
+                    borderRadius: '8px 8px 0 0',
+                    cursor: 'pointer',
+                    fontWeight: activeTab === 'trade' ? 'bold' : 'normal'
+                  }}
+                  onClick={() => setActiveTab('trade')}
+                >
+                  💰 Step 2: Trade vS for Immediate Liquidity
+                </button>
+              </div>
             </div>
 
             {activeTab === 'mint' && (
               <>
                 <div style={{ background: '#e8f5e8', padding: 16, borderRadius: 8, marginBottom: 20, border: '1px solid #4caf50' }}>
-                  <h3 style={{ margin: '0 0 8px 0', color: '#2e7d32' }}>🎯 Steps 1-2: Setup Your Position</h3>
+                  <h3 style={{ margin: '0 0 8px 0', color: '#2e7d32' }}>🎯 Step 1: Get Full-Value vS Tokens</h3>
                   <div style={{ fontSize: 15, marginBottom: 12 }}>
-                    <strong>Step 1:</strong> Get test tokens and mint a realistic fNFT (like real Sonic airdrop)<br/>
-                    <strong>Step 2:</strong> Deposit your fNFT in the vault → Get full-value vS tokens immediately!
+                    Mint test assets → Create demo fNFT → Deposit to vault → Receive full-value vS tokens immediately
                   </div>
                   <div style={{ background: '#d1f2eb', padding: 12, borderRadius: 6, border: '1px solid #7dcea0' }}>
-                    <strong>💡 What happens:</strong> Your fNFT gets deposited permanently, and you receive vS tokens equal to its TOTAL value (1000 vS for 1000 S fNFT). These trade at a market discount reflecting time to maturity, but give you immediate liquidity.
+                    <strong>💡 Simple:</strong> Deposit 1000 S fNFT → Get 1000 vS tokens. No complex tracking, no partial minting. Full value immediately, market determines the trading price.
                   </div>
                 </div>
 
@@ -758,79 +745,15 @@ const TestnetDemo: React.FC = () => {
               </>
             )}
 
-            {activeTab === 'vault' && (
-              <div>
-                <div style={{ background: '#e6f7ff', padding: 16, borderRadius: 8, marginBottom: 24 }}>
-                  <h3 style={{ margin: '0 0 8px 0' }}>🏦 Vault Management</h3>
-                  <div style={{ fontSize: 15, marginBottom: 12 }}>
-                    <strong>Redeem vS for tS tokens</strong> • Market rate pricing • Exit anytime safely
-                  </div>
-                  <div style={{ background: '#d1f2eb', padding: 12, borderRadius: 6, border: '1px solid #7dcea0', fontSize: 14 }}>
-                    <strong>✅ Safe:</strong> No funds lost - always get proportional value based on vesting progress
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginTop: 16 }}>
-                    <div>
-                                          <span style={{ color: '#666' }}>Your vS Balance:</span>
-                    <div style={{ fontSize: 18, fontWeight: 'bold' }}>{Number(vsBalance).toFixed(2)} vS</div>
-                    </div>
-                    <div>
-                      <span style={{ color: '#666' }}>Total Vault Assets:</span>
-                      <div style={{ fontSize: 18, fontWeight: 'bold' }}>{Number(vaultBalance).toFixed(2)} tS</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
-                  <div style={{ background: '#f8f9fa', padding: 20, borderRadius: 8, border: '1px solid #eaecef' }}>
-                    <h3 style={{ margin: '0 0 12px 0' }}>💰 Exchange vS for tS</h3>
-                    <p style={{ margin: '0 0 16px 0' }}>Trade your vS tokens back for real tS tokens at current market rate</p>
-                    <div style={{ display: 'flex', gap: 8 }}>
-                      <input
-                        type="number"
-                                                  placeholder="Amount of vS to redeem"
-                        id="redeem-amount"
-                        step="0.1"
-                        max={vsBalance}
-                        style={{ flex: 1, padding: 8, border: '1px solid #ccc', borderRadius: 4 }}
-                      />
-                      <button
-                        onClick={() => {
-                          const input = document.getElementById('redeem-amount') as HTMLInputElement;
-                          redeemFromVault(input.value);
-                        }}
-                        disabled={isLoading || parseFloat(vsBalance) === 0 || !isConnected}
-                        className="button-primary"
-                      >
-                        {!isConnected ? 'Connect Wallet' : isLoading ? 'Redeeming...' : 'Redeem'}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div style={{ background: '#f8f9fa', padding: 20, borderRadius: 8, border: '1px solid #eaecef' }}>
-                    <h3 style={{ margin: '0 0 12px 0' }}>⚡ Update Vault Balance</h3>
-                    <p style={{ margin: '0 0 16px 0' }}>Collect newly unlocked tS tokens from the vault's fNFTs (anyone can do this)</p>
-                    <button
-                      onClick={claimVaultVested}
-                      disabled={isLoading || !isConnected}
-                      className="button-primary"
-                      style={{ width: '100%' }}
-                    >
-                      {!isConnected ? 'Connect Wallet' : isLoading ? 'Claiming...' : 'Claim Vault Vested'}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
             {activeTab === 'trade' && (
               <div>
                 <div style={{ background: '#e8f5e8', padding: 16, borderRadius: 8, marginBottom: 24, border: '1px solid #4caf50' }}>
-                  <h3 style={{ margin: '0 0 8px 0', color: '#2e7d32' }}>💰 DeFi Integration</h3>
+                  <h3 style={{ margin: '0 0 8px 0', color: '#2e7d32' }}>💰 Step 2: Trade for Immediate Liquidity</h3>
                   <div style={{ fontSize: 15, marginBottom: 12 }}>
-                    <strong>Use liquid vS tokens in DeFi:</strong> Lending, collateral, LP pools, governance
+                    Trade your vS tokens in the Shadow DEX pool for immediate S tokens at current market rates
                   </div>
                   <div style={{ background: '#d1f2eb', padding: 12, borderRadius: 6, border: '1px solid #7dcea0' }}>
-                    <strong>Shadow DEX:</strong> Provide vS/tS liquidity → earn trading fees + Shadow incentives while maintaining vesting exposure
+                    <strong>Market-Driven:</strong> No fake pricing - the Shadow DEX pool determines real market rates based on supply, demand, and time to maturity
                   </div>
                 </div>
 
