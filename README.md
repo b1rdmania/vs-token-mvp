@@ -14,7 +14,8 @@
 1. **Deposit fNFT**: User deposits their Sonic vesting NFT into the vault
 2. **Get vS Tokens**: Vault mints full-value vS tokens (1000 S fNFT → 1000 vS tokens)
 3. **Trade for Liquidity**: User trades vS tokens on Shadow DEX for immediate Sonic tokens
-4. **Market Pricing**: Shadow DEX pool determines fair market price based on time remaining
+4. **Vault Waits**: Vault holds fNFTs until month 9 maturity (no early claiming, no penalty burns)
+5. **1:1 Redemption**: At month 9+, users can redeem vS → S at exactly 1:1 ratio through vault
 
 ## Key Features
 
@@ -49,16 +50,16 @@ Our live demo shows the complete user journey:
 ## Economic Model
 
 ### Simple & Honest
-- **No false promises**: Market determines pricing, not protocol guarantees
-- **Full value minting**: 1000 S fNFT → 1000 vS tokens
-- **Market efficiency**: Shadow DEX pool handles price discovery
-- **Optional redemption**: Direct vS→S redemption available at month 9
+- **True 1:1 backing**: Every vS token backed by exactly 1 S token at maturity
+- **No penalty burns**: Vault waits until month 9, claims at 0% penalty
+- **Market efficiency**: Shadow DEX pool handles price discovery during vesting period
+- **Guaranteed redemption**: Direct vS→S redemption at 1:1 ratio available at month 9+
 
 ### Risk Disclosure
-- vS tokens trade at market discount (typically 20-80% of face value)
-- No protocol guarantee of 1:1 redemption before maturity
-- Market liquidity depends on Shadow DEX pool depth
-- Early exit means accepting market discount
+- vS tokens trade at market discount before maturity (typically 20-80% of face value)
+- Protocol guarantees 1:1 redemption only at month 9+ maturity
+- Market liquidity depends on Shadow DEX pool depth during vesting period
+- Early exit via trading means accepting market discount
 
 ## Technical Implementation
 
