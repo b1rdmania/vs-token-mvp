@@ -8,6 +8,14 @@ const CONTRACTS = {
   VAULT: '0x2e17544f3E692a05F9c3C88049bca0eBCF27Bb6B'
 };
 
+// Contract addresses (Sonic Mainnet)
+const CONTRACTS = {
+  VS_TOKEN: '0x4dE74524A2cE5e2A310615a6aDe7eC35B0f81031',
+  TS_TOKEN: '0x4a201419ED3e4d6D58A434F1D077AD7B2ED71f49',
+  VAULT: '0x37BD20868FB91eB37813648F4D05F59e07A1bcfb',
+  FNFT: '0xdf34078C9C8E5891320B780F6C8b8a54B784108C'
+};
+
 // Shadow DEX addresses (REAL ADDRESSES ON SONIC MAINNET)
 const SHADOW_DEX = {
   ROUTER: '0x1D368773735ee1E678950B7A97bcA2CafB330CDc', // Shadow Router
@@ -20,10 +28,10 @@ const ERC20_ABI = [
 ];
 
 interface ShadowDEXPoolInfoProps {
-  dvsBalance: string;
+  vsBalance: string;
 }
 
-const ShadowDEXPoolInfo: React.FC<ShadowDEXPoolInfoProps> = ({ dvsBalance }) => {
+const ShadowDEXPoolInfo: React.FC<ShadowDEXPoolInfoProps> = ({ vsBalance }) => {
   const [poolInfo, setPoolInfo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -34,23 +42,23 @@ const ShadowDEXPoolInfo: React.FC<ShadowDEXPoolInfoProps> = ({ dvsBalance }) => 
   const loadPoolInfo = async () => {
     try {
       const provider = new ethers.JsonRpcProvider('https://sonic.drpc.org');
-      const dvsToken = new ethers.Contract(CONTRACTS.DVS_TOKEN, ERC20_ABI, provider);
+      const vsToken = new ethers.Contract(CONTRACTS.VS_TOKEN, ERC20_ABI, provider);
       const tsToken = new ethers.Contract(CONTRACTS.TS_TOKEN, ERC20_ABI, provider);
       
-      const [dvsReserve, tsReserve] = await Promise.all([
-        dvsToken.balanceOf(SHADOW_DEX.POOL),
+      const [vsReserve, tsReserve] = await Promise.all([
+        vsToken.balanceOf(SHADOW_DEX.POOL),
         tsToken.balanceOf(SHADOW_DEX.POOL)
       ]);
       
-      const dvsReserveFormatted = ethers.formatEther(dvsReserve);
+      const vsReserveFormatted = ethers.formatEther(vsReserve);
       const tsReserveFormatted = ethers.formatEther(tsReserve);
       
       setPoolInfo({
         address: SHADOW_DEX.POOL,
-        dvsReserve: dvsReserveFormatted,
+        vsReserve: vsReserveFormatted,
         tsReserve: tsReserveFormatted,
-        ratio: dvsReserve > 0 ? Number(tsReserveFormatted) / Number(dvsReserveFormatted) : 0,
-        tvl: (Number(dvsReserveFormatted) + Number(tsReserveFormatted)).toFixed(2)
+        ratio: vsReserve > 0 ? Number(tsReserveFormatted) / Number(vsReserveFormatted) : 0,
+        tvl: (Number(vsReserveFormatted) + Number(tsReserveFormatted)).toFixed(2)
       });
     } catch (error) {
       console.error('Error loading pool info:', error);
@@ -83,10 +91,10 @@ const ShadowDEXPoolInfo: React.FC<ShadowDEXPoolInfoProps> = ({ dvsBalance }) => 
           ⚠️ CRITICAL WARNING
         </h4>
         <p style={{ margin: '0 0 8px 0', fontSize: '14px', color: '#dc2626', fontWeight: 500 }}>
-          <strong>Claiming = Permanent fNFT Sale</strong>
+          <strong>Depositing = Permanent fNFT Transfer</strong>
         </p>
         <div style={{ fontSize: '13px', color: '#dc2626' }}>
-          • fNFT sold forever • No recovery possible • Immediate liquidity only
+          • fNFT transferred to vault forever • No recovery possible • Get vS tokens for trading
         </div>
       </div>
 
@@ -111,7 +119,7 @@ const ShadowDEXPoolInfo: React.FC<ShadowDEXPoolInfoProps> = ({ dvsBalance }) => 
         }}>
           <h4 style={{ margin: '0 0 8px 0', color: '#047857' }}>✅ Live Pool</h4>
           <div style={{ fontSize: '14px', color: '#047857' }}>
-            <div><strong>Liquidity:</strong> {poolInfo.dvsReserve} vS / {poolInfo.tsReserve} tS</div>
+            <div><strong>Liquidity:</strong> {poolInfo.vsReserve} vS / {poolInfo.tsReserve} tS</div>
             <div><strong>Current Rate:</strong> 1 vS = {poolInfo.ratio.toFixed(4)} tS</div>
             <div><strong>Real Market:</strong> Price determined by supply/demand, not fake discounts</div>
           </div>
