@@ -2,12 +2,17 @@
 
 ⚠️ **Immutable mainnet contracts. Test thoroughly before depositing real fNFTs.**
 
+⚠️ **Immutable. Zero admin keys. Four external functions.**  
+**Once deployed, nobody (including us) can change or pause the vault.**
+
 ## Why Use vS
 
 - **Get liquidity today** instead of waiting 9 months
 - **No penalty** – vault waits, you don't
 - **Market sets the price**, not us
 - **Zero admin keys, zero upgrades, zero governance**
+- **Early LP depth** seeded by protocol-owned liquidity; no rug risk
+- **Natural discount yield** as vS converges to S
 
 ## How It Works
 
@@ -38,9 +43,23 @@ Result: 2,500 S cash today instead of waiting 9 months
 
 ## Timeline
 
-**Deposit window:** Open until DEPOSIT_END_TS (approx. 30 days). After that no new NFTs accepted.  
-**Maturity:** 9 months after vault launch: MATURITY_TS = 2026-03-01 00:00 UTC  
-**Grace ends:** +180 days → surplus sweep to treasury
+**Deposit window closes:** 2025-08-01  
+**Maturity (redeem opens):** 2026-03-01  
+**Grace ends (surplus sweep):** 2026-08-28
+
+## Ultra-Minimal & Fully Immutable Design
+
+| Feature                     | Status |
+|-----------------------------|--------|
+| Admin keys / upgradability  | **None** – contracts ownerless & non-upgradeable |
+| External functions          | `deposit`, `claimBatch`, `redeem`, `sweepSurplus` |
+| Gas-bomb protection         | Bounded `claimBatch(k ≤ 50)` pointer loop |
+| 1:1 backing guarantee       | Vault claims fNFTs once, then redeem burns vS → transfers S |
+| Grace + sweep               | 180-day redemption window, permissionless surplus sweep |
+| Season isolation            | Vault rejects deposits after 30d – Season-2 gets a fresh vault |
+
+**Full security analysis** → [SECURITY_ANALYSIS.md](SECURITY_ANALYSIS.md) **(score: 9.5 / 10)**  
+**User risk sheet** → [RISK_DISCLOSURE.md](RISK_DISCLOSURE.md)
 
 ## Deploy / Test
 
@@ -60,17 +79,6 @@ Test:
 ```bash
 forge test
 ```
-
-## Security
-
-**No admin keys** • **No upgrades** • **1:1 backing**
-
-- **Gas safe** - batch processing prevents gas bombs
-- **Permissionless** - anyone can claim, redeem, sweep
-- **Immutable** - code never changes after deployment
-
-**Full audit summary** → [SECURITY_ANALYSIS.md](SECURITY_ANALYSIS.md)  
-**User risk sheet** → [RISK_DISCLOSURE.md](RISK_DISCLOSURE.md)
 
 ## Frontend
 
