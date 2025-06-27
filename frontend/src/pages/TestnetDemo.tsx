@@ -9,11 +9,11 @@ import ShadowDEXPoolInfo from '../components/ShadowDEXIntegration';
 import '../styles/common.css';
 import { ethers } from 'ethers';
 
-// Gas-Optimized Contracts (Ultra-Low Gas for Demo Deposits!)
-const DECAYFNFT_ADDRESS = '0xC6E821326AD497ba4987bA98057abEA7abC425cA';
-const MOCKTOKEN_ADDRESS = '0x16e5294Cc116819BfB79752C238a74c9f83a35f9';
-const VSTOKEN_ADDRESS = '0x2649125B1a683e3448F2BB15425AcD83aa2dfd35';
-const VAULT_ADDRESS = '0x2e17544f3E692a05F9c3C88049bca0eBCF27Bb6B';
+// Correct Contract Addresses (Sonic Mainnet)
+const DECAYFNFT_ADDRESS = '0xdf34078C9C8E5891320B780F6C8b8a54B784108C';
+const MOCKTOKEN_ADDRESS = '0x4a201419ED3e4d6D58A434F1D077AD7B2ED71f49';
+const VSTOKEN_ADDRESS = '0x4dE74524A2cE5e2A310615a6aDe7eC35B0f81031';
+const VAULT_ADDRESS = '0x37BD20868FB91eB37813648F4D05F59e07A1bcfb';
 
 const explorerBase = 'https://sonicscan.org/address/';
 
@@ -581,7 +581,7 @@ const TestnetDemo: React.FC = () => {
                     Mint test assets → Create demo fNFT → Deposit to vault → Receive full-value vS tokens immediately
                   </div>
                   <div style={{ background: '#d1f2eb', padding: 12, borderRadius: 6, border: '1px solid #7dcea0' }}>
-                    <strong>💡 Simple:</strong> Deposit 1000 S fNFT → Get 1000 vS tokens. No complex tracking, no partial minting. Full value immediately, market determines the trading price.
+                    <strong>💡 Simple:</strong> Deposit 500 tS fNFT → Get 500 vS tokens. Full value immediately, market determines the trading price.
                   </div>
                 </div>
 
@@ -650,8 +650,8 @@ const TestnetDemo: React.FC = () => {
                                 <strong>🏦 In Vault:</strong> This fNFT is deposited and you received full-value vS tokens.
                               </div>
                               <div style={{ fontSize: 13, color: '#666' }}>
-                                • Check "Manage vS & Exit" tab to see your vault balance<br/>
-                                • Use "Use in DeFi & Earn Fees" tab to provide liquidity
+                                • Check "Step 2" tab to trade your vS tokens<br/>
+                                • Use Shadow DEX to get immediate liquidity
                               </div>
                             </div>
                           ) : (
@@ -717,11 +717,13 @@ const TestnetDemo: React.FC = () => {
                                   <button
                                     onClick={() => {
                                       const confirmed = window.confirm(
+                                        `⚠️ PERMANENT DEPOSIT WARNING ⚠️\n\n` +
                                         `Deposit fNFT #${nft.tokenId} to Vault?\n\n` +
                                         `• Get ${nft.totalAmount} vS tokens right now\n` +
                                         `• Low gas cost (under $2)\n` +
-                                        `• Safe and reversible\n\n` +
-                                        `Continue?`
+                                        `• PERMANENT - fNFT transferred forever\n` +
+                                        `• You can only trade vS tokens after this\n\n` +
+                                        `Continue with permanent deposit?`
                                       );
                                       if (confirmed) {
                                         depositToVault(nft.tokenId);
@@ -758,7 +760,7 @@ const TestnetDemo: React.FC = () => {
                 </div>
 
                 <ShadowDEXPoolInfo
-                  dvsBalance={vsBalance}
+                  vsBalance={vsBalance}
                 />
               </div>
             )}
