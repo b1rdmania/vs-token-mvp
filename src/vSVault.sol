@@ -12,11 +12,21 @@ import {VSToken} from "./VSToken.sol";
 import {TestSonicDecayfNFT} from "./DecayfNFT.sol";
 
 /**
- * @title vSVault
- * @dev A vault that permanently locks Sonic vesting NFTs (fNFTs)
- * and mints vS tokens against their full future value.
- * This contract then collects vested tokens from the fNFTs over time,
- * allowing vS holders to redeem them for the underlying asset.
+ * @title vSVault - DEMO CONTRACT ONLY
+ * @dev ⚠️  WARNING: This contract contains admin functions and is for DEMO purposes only!
+ * 
+ * For production deployment, use ImmutableVault.sol which has:
+ * - Zero admin control
+ * - No pause mechanisms  
+ * - No owner functions
+ * - Immutable parameters
+ * 
+ * This demo vault contains admin functions that would be dangerous in production:
+ * - pause/unpause functions
+ * - setNFTContract owner function
+ * - emergencyMint function
+ * 
+ * DO NOT USE THIS CONTRACT FOR MAINNET DEPLOYMENT
  */
 contract vSVault is ERC721Holder, Ownable, ReentrancyGuard, Pausable {
     VSToken public vS;
