@@ -227,7 +227,7 @@ const TestnetDemo: React.FC = () => {
     // Simulate trade execution
     setTimeout(() => {
       setTradeExecuted(true);
-      setStatus(`Successfully traded ${tradeAmount} D-vS for ${(parseFloat(tradeAmount) * 0.85).toFixed(2)} tS on Shadow DEX!`);
+      setStatus(`Successfully traded ${tradeAmount} vS for ${(parseFloat(tradeAmount) * 0.25).toFixed(2)} tS on Shadow DEX!`);
       setIsLoading(false);
     }, 2000);
   };
@@ -368,7 +368,7 @@ const TestnetDemo: React.FC = () => {
       const receipt = await publicClient?.waitForTransactionReceipt({ hash: depositHash });
       console.log('Deposit confirmed:', receipt);
 
-      setStatus('✅ Deposited! You received Demo vS (D-vS) tokens.');
+      setStatus('✅ Deposited! You received full-value vS tokens (tradeable at market discount).');
       // Reload balances and NFT data
       await loadBalances();
     } catch (error) {
@@ -447,34 +447,34 @@ const TestnetDemo: React.FC = () => {
     <div className="page-container">
       {/* Value Proposition Header */}
       <div className="content-card" style={{ marginBottom: 24, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white', border: 'none' }}>
-        <h1 style={{ margin: '0 0 16px 0', fontSize: 32, color: 'white', textAlign: 'center' }}>🚀 vS Vault: Turn Locked fNFTs into Productive DeFi Assets</h1>
+        <h1 style={{ margin: '0 0 16px 0', fontSize: 32, color: 'white', textAlign: 'center' }}>🚀 vS Vault: Get Full Value Now, Pay Time Discount</h1>
         
         <div style={{ background: 'rgba(255,255,255,0.1)', padding: 20, borderRadius: 12, marginBottom: 20 }}>
-          <h2 style={{ margin: '0 0 16px 0', fontSize: 18, color: '#e8f4ff' }}>💡 The Complete Flow (9-Month Strategy)</h2>
+          <h2 style={{ margin: '0 0 16px 0', fontSize: 18, color: '#e8f4ff' }}>💡 The Simple Model</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
             <div style={{ background: 'rgba(255,255,255,0.15)', padding: 16, borderRadius: 8 }}>
-              <div style={{ fontSize: 24, marginBottom: 8 }}>1️⃣ <strong>Stake fNFT</strong></div>
-              <div style={{ fontSize: 14, opacity: 0.9 }}>Permanently deposit your vesting fNFT into the vault</div>
+              <div style={{ fontSize: 24, marginBottom: 8 }}>1️⃣ <strong>Deposit fNFT</strong></div>
+              <div style={{ fontSize: 14, opacity: 0.9 }}>Transfer your entire fNFT to the vault permanently</div>
             </div>
             <div style={{ background: 'rgba(255,255,255,0.15)', padding: 16, borderRadius: 8 }}>
-              <div style={{ fontSize: 24, marginBottom: 8 }}>2️⃣ <strong>Get D-vS Tokens</strong></div>
-              <div style={{ fontSize: 14, opacity: 0.9 }}>Withdraw liquid tokens equal to current vesting value</div>
+              <div style={{ fontSize: 24, marginBottom: 8 }}>2️⃣ <strong>Get Full Value vS</strong></div>
+              <div style={{ fontSize: 14, opacity: 0.9 }}>Receive vS tokens equal to fNFT's TOTAL value (1000 vS for 1000 S fNFT)</div>
             </div>
             <div style={{ background: 'rgba(255,255,255,0.15)', padding: 16, borderRadius: 8 }}>
-              <div style={{ fontSize: 24, marginBottom: 8 }}>3️⃣ <strong>Use in DeFi</strong></div>
-              <div style={{ fontSize: 14, opacity: 0.9 }}>Put D-vS tokens to work immediately in protocols</div>
+              <div style={{ fontSize: 24, marginBottom: 8 }}>3️⃣ <strong>Market Prices Time</strong></div>
+              <div style={{ fontSize: 14, opacity: 0.9 }}>vS trades at discount (0.25 S) reflecting time to maturity</div>
             </div>
             <div style={{ background: 'rgba(255,255,255,0.15)', padding: 16, borderRadius: 8 }}>
-              <div style={{ fontSize: 24, marginBottom: 8 }}>4️⃣ <strong>Earn LP Fees</strong></div>
-              <div style={{ fontSize: 14, opacity: 0.9 }}>Stake in Shadow DEX pools to earn trading fees</div>
+              <div style={{ fontSize: 24, marginBottom: 8 }}>4️⃣ <strong>Price Appreciates</strong></div>
+              <div style={{ fontSize: 14, opacity: 0.9 }}>As months pass, vS price approaches 1:1 with S</div>
             </div>
             <div style={{ background: 'rgba(255,255,255,0.15)', padding: 16, borderRadius: 8 }}>
-              <div style={{ fontSize: 24, marginBottom: 8 }}>5️⃣ <strong>Auto-Unlock</strong></div>
-              <div style={{ fontSize: 14, opacity: 0.9 }}>More D-vS unlocks as your fNFT vests over time</div>
+              <div style={{ fontSize: 24, marginBottom: 8 }}>5️⃣ <strong>Exit Anytime</strong></div>
+              <div style={{ fontSize: 14, opacity: 0.9 }}>Sell vS on DEX at current market rate for immediate liquidity</div>
             </div>
             <div style={{ background: 'rgba(255,255,255,0.15)', padding: 16, borderRadius: 8 }}>
-              <div style={{ fontSize: 24, marginBottom: 8 }}>6️⃣ <strong>Exit at 100%</strong></div>
-              <div style={{ fontSize: 14, opacity: 0.9 }}>At 9 months, sell D-vS for full S token value</div>
+              <div style={{ fontSize: 24, marginBottom: 8 }}>6️⃣ <strong>Month 9: 1:1</strong></div>
+              <div style={{ fontSize: 14, opacity: 0.9 }}>Redeem vS for S at 1:1 ratio when fNFTs fully vest</div>
             </div>
           </div>
         </div>
@@ -484,18 +484,18 @@ const TestnetDemo: React.FC = () => {
             <h3 style={{ margin: '0 0 8px 0', color: '#ffcccb' }}>😵 Without vS Vault</h3>
             <div style={{ fontSize: 14, lineHeight: 1.5 }}>
               • fNFT locked for 9 months<br/>
-              • No DeFi opportunities<br/>
-              • No yield while waiting<br/>
-              • Assets sitting idle
+              • Can only claim 25% now<br/>
+              • Must wait for full value<br/>
+              • No immediate liquidity
             </div>
           </div>
           <div style={{ background: 'rgba(255,255,255,0.1)', padding: 16, borderRadius: 8 }}>
             <h3 style={{ margin: '0 0 8px 0', color: '#90ee90' }}>🚀 With vS Vault</h3>
             <div style={{ fontSize: 14, lineHeight: 1.5 }}>
-              • Instant liquidity from day 1<br/>
-              • Earn LP fees for 9 months<br/>
-              • Use in other DeFi protocols<br/>
-              • Keep full vesting upside
+              • Get full value vS tokens now<br/>
+              • Trade at market discount (0.25x)<br/>
+              • Price appreciates over time<br/>
+              • Immediate DeFi liquidity
             </div>
           </div>
         </div>
@@ -521,7 +521,7 @@ const TestnetDemo: React.FC = () => {
             <div style={{ fontSize: 24, fontWeight: 'bold', color: '#1976d2' }}>{isConnected ? Number(underlyingBalance).toFixed(0) : '--'}</div>
           </div>
           <div style={{ background: '#e8f5e8', padding: 16, borderRadius: 8, border: '1px solid #4caf50', textAlign: 'center' }}>
-            <div style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>D-vS Balance</div>
+                                <div style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>vS Balance</div>
             <div style={{ fontSize: 24, fontWeight: 'bold', color: '#2e7d32' }}>{isConnected ? Number(vsBalance).toFixed(0) : '--'}</div>
           </div>
           <div style={{ background: '#f3e5f5', padding: 16, borderRadius: 8, border: '1px solid #9c27b0', textAlign: 'center' }}>
@@ -567,7 +567,7 @@ const TestnetDemo: React.FC = () => {
                 }}
                 onClick={() => setActiveTab('vault')}
               >
-                🏦 Steps 5-6: Manage D-vS & Exit
+                🏦 Steps 5-6: Manage vS & Exit
               </button>
               <button 
                 style={{ 
@@ -591,10 +591,10 @@ const TestnetDemo: React.FC = () => {
                   <h3 style={{ margin: '0 0 8px 0', color: '#2e7d32' }}>🎯 Steps 1-2: Setup Your Position</h3>
                   <div style={{ fontSize: 15, marginBottom: 12 }}>
                     <strong>Step 1:</strong> Get test tokens and mint a realistic fNFT (like real Sonic airdrop)<br/>
-                    <strong>Step 2:</strong> Stake your fNFT in the vault → Get liquid D-vS tokens immediately!
+                    <strong>Step 2:</strong> Deposit your fNFT in the vault → Get full-value vS tokens immediately!
                   </div>
                   <div style={{ background: '#d1f2eb', padding: 12, borderRadius: 6, border: '1px solid #7dcea0' }}>
-                    <strong>💡 What happens:</strong> Your fNFT gets deposited permanently, but you receive D-vS tokens equal to its current vesting value. You can now use these tokens in DeFi while your original fNFT continues vesting in the background.
+                    <strong>💡 What happens:</strong> Your fNFT gets deposited permanently, and you receive vS tokens equal to its TOTAL value (1000 vS for 1000 S fNFT). These trade at a market discount reflecting time to maturity, but give you immediate liquidity.
                   </div>
                 </div>
 
@@ -660,10 +660,10 @@ const TestnetDemo: React.FC = () => {
                             // NFT is deposited in vault - show vault status
                             <div style={{ background: '#e8f5e8', padding: 12, borderRadius: 6, border: '1px solid #28a745' }}>
                               <div style={{ fontSize: 14, marginBottom: 8 }}>
-                                <strong>🏦 In Vault:</strong> This fNFT is deposited and earning you D-vS tokens as it vests.
+                                <strong>🏦 In Vault:</strong> This fNFT is deposited and you received full-value vS tokens.
                               </div>
                               <div style={{ fontSize: 13, color: '#666' }}>
-                                • Check "Manage D-vS & Exit" tab to see your vault balance<br/>
+                                • Check "Manage vS & Exit" tab to see your vault balance<br/>
                                 • Use "Use in DeFi & Earn Fees" tab to provide liquidity
                               </div>
                             </div>
@@ -688,7 +688,7 @@ const TestnetDemo: React.FC = () => {
                                       onClick={() => {
                                         const confirmed = window.confirm(
                                           `Deposit 10% of fNFT #${nft.tokenId}?\n\n` +
-                                          `• Get ${(parseFloat(nft.totalAmount) * 0.1).toFixed(1)} D-vS tokens\n` +
+                                          `• Get ${(parseFloat(nft.totalAmount) * 0.1).toFixed(1)} vS tokens\n` +
                                           `• Much lower gas cost (~$1-3 instead of $20+)\n` +
                                           `• You can deposit more later\n\n` +
                                           `This is perfect for testing!`
@@ -731,7 +731,7 @@ const TestnetDemo: React.FC = () => {
                                     onClick={() => {
                                       const confirmed = window.confirm(
                                         `Deposit fNFT #${nft.tokenId} to Vault?\n\n` +
-                                        `• Get ${nft.totalAmount} D-vS tokens right now\n` +
+                                        `• Get ${nft.totalAmount} vS tokens right now\n` +
                                         `• Low gas cost (under $2)\n` +
                                         `• Safe and reversible\n\n` +
                                         `Continue?`
@@ -763,15 +763,15 @@ const TestnetDemo: React.FC = () => {
                 <div style={{ background: '#e6f7ff', padding: 16, borderRadius: 8, marginBottom: 24 }}>
                   <h3 style={{ margin: '0 0 8px 0' }}>🏦 Vault Management</h3>
                   <div style={{ fontSize: 15, marginBottom: 12 }}>
-                    <strong>Redeem D-vS for tS tokens</strong> • Proportional to vesting progress • Exit anytime safely
+                    <strong>Redeem vS for tS tokens</strong> • Market rate pricing • Exit anytime safely
                   </div>
                   <div style={{ background: '#d1f2eb', padding: 12, borderRadius: 6, border: '1px solid #7dcea0', fontSize: 14 }}>
                     <strong>✅ Safe:</strong> No funds lost - always get proportional value based on vesting progress
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginTop: 16 }}>
                     <div>
-                      <span style={{ color: '#666' }}>Your D-vS Balance:</span>
-                      <div style={{ fontSize: 18, fontWeight: 'bold' }}>{Number(vsBalance).toFixed(2)} D-vS</div>
+                                          <span style={{ color: '#666' }}>Your vS Balance:</span>
+                    <div style={{ fontSize: 18, fontWeight: 'bold' }}>{Number(vsBalance).toFixed(2)} vS</div>
                     </div>
                     <div>
                       <span style={{ color: '#666' }}>Total Vault Assets:</span>
@@ -782,12 +782,12 @@ const TestnetDemo: React.FC = () => {
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
                   <div style={{ background: '#f8f9fa', padding: 20, borderRadius: 8, border: '1px solid #eaecef' }}>
-                    <h3 style={{ margin: '0 0 12px 0' }}>💰 Exchange D-vS for tS</h3>
-                    <p style={{ margin: '0 0 16px 0' }}>Trade your D-vS tokens back for real tS tokens (proportional to what's unlocked)</p>
+                    <h3 style={{ margin: '0 0 12px 0' }}>💰 Exchange vS for tS</h3>
+                    <p style={{ margin: '0 0 16px 0' }}>Trade your vS tokens back for real tS tokens at current market rate</p>
                     <div style={{ display: 'flex', gap: 8 }}>
                       <input
                         type="number"
-                        placeholder="Amount of D-vS to redeem"
+                                                  placeholder="Amount of vS to redeem"
                         id="redeem-amount"
                         step="0.1"
                         max={vsBalance}
@@ -827,10 +827,10 @@ const TestnetDemo: React.FC = () => {
                 <div style={{ background: '#e8f5e8', padding: 16, borderRadius: 8, marginBottom: 24, border: '1px solid #4caf50' }}>
                   <h3 style={{ margin: '0 0 8px 0', color: '#2e7d32' }}>💰 DeFi Integration</h3>
                   <div style={{ fontSize: 15, marginBottom: 12 }}>
-                    <strong>Use liquid D-vS tokens in DeFi:</strong> Lending, collateral, LP pools, governance
+                    <strong>Use liquid vS tokens in DeFi:</strong> Lending, collateral, LP pools, governance
                   </div>
                   <div style={{ background: '#d1f2eb', padding: 12, borderRadius: 6, border: '1px solid #7dcea0' }}>
-                    <strong>Shadow DEX:</strong> Provide D-vS/tS liquidity → earn trading fees + Shadow incentives while maintaining vesting exposure
+                    <strong>Shadow DEX:</strong> Provide vS/tS liquidity → earn trading fees + Shadow incentives while maintaining vesting exposure
                   </div>
                 </div>
 
@@ -867,7 +867,7 @@ const TestnetDemo: React.FC = () => {
           <div style={{ display: 'grid', gap: 4, fontSize: 12, textAlign: 'left', maxWidth: 600, margin: '0 auto' }}>
             <AddressRow label="fNFT" address={DECAYFNFT_ADDRESS} />
             <AddressRow label="tS Token" address={MOCKTOKEN_ADDRESS} />
-            <AddressRow label="Demo vS Token (D-vS)" address={VSTOKEN_ADDRESS} />
+            <AddressRow label="vS Token" address={VSTOKEN_ADDRESS} />
             <AddressRow label="Vault" address={VAULT_ADDRESS} />
           </div>
         </div>
