@@ -38,19 +38,55 @@ export const LandingPage: React.FC = () => {
           </div>
         </section>
 
-        <section className="features-section">
+        <section className="explainer-section">
           <div className="container">
-            <div className="feature-card">
-              <h3>Get Full Value Now</h3>
-              <p>Put in your fNFT. Get tokens worth the full amount. No waiting, no penalties.</p>
+            <div className="explainer-header">
+              <h2 className="explainer-title">🚀 vS Vault: Get Full Value Now, Pay Time Discount</h2>
+              <p className="explainer-subtitle">The Simple Model</p>
             </div>
-            <div className="feature-card">
-              <h3>Market Sets Price</h3>
-              <p>Sell vS tokens at whatever price buyers will pay. We don't control the price - the market does.</p>
+            
+            <div className="process-grid">
+              <div className="process-card">
+                <div className="step-number">1</div>
+                <h3>Deposit fNFT</h3>
+                <p>Transfer your entire fNFT to the vault permanently</p>
+              </div>
+              <div className="process-card">
+                <div className="step-number">2</div>
+                <h3>Get Full Value vS</h3>
+                <p>Receive vS tokens equal to fNFT's TOTAL value (1000 vS for 1000 S fNFT)</p>
+              </div>
+              <div className="process-card">
+                <div className="step-number">3</div>
+                <h3>Market Prices Time</h3>
+                <p>vS trades at discount (0.25 S) reflecting time to maturity</p>
+              </div>
+              <div className="process-card">
+                <div className="step-number">4</div>
+                <h3>Prices Should Converge</h3>
+                <p>As months pass, vS price should converge toward full S value</p>
+              </div>
             </div>
-            <div className="feature-card">
-              <h3>No Admin Control</h3>
-              <p>No one can steal your money. No one can change the rules. No one controls the vault after we deploy it.</p>
+
+            <div className="comparison-grid">
+              <div className="comparison-card without">
+                <h3>😔 Without vS Vault</h3>
+                <ul>
+                  <li>fNFT locked for 9 months</li>
+                  <li>Can only claim 25% now</li>
+                  <li>Must wait for full value</li>
+                  <li>No immediate liquidity</li>
+                </ul>
+              </div>
+              <div className="comparison-card with">
+                <h3>🚀 With vS Vault</h3>
+                <ul>
+                  <li>Get full value vS tokens now</li>
+                  <li>Trade at market discount (0.25x)</li>
+                  <li>Prices should converge over time</li>
+                  <li>Immediate DeFi liquidity</li>
+                </ul>
+              </div>
             </div>
           </div>
         </section>
@@ -63,8 +99,8 @@ export const LandingPage: React.FC = () => {
               GitHub
             </a>
             <span style={{ margin: '0 8px' }}>|</span>
-            <Link to="/TestnetDemo">
-              Demo
+            <Link to="/app">
+              Launch App
             </Link>
           </div>
           <p>&copy; {new Date().getFullYear()} vS Vault. All rights reserved.</p>

@@ -6,7 +6,7 @@ import { sonicMainnet } from './config/chains';
 import { AppShell } from './components/layout/AppShell';
 import { LandingPage } from './pages/LandingPage';
 import { WhitepaperPage } from './pages/WhitepaperPage';
-import TestnetDemo from './pages/TestnetDemo';
+
 import '@rainbow-me/rainbowkit/styles.css';
 
 const projectId = import.meta.env.VITE_PROJECT_ID;
@@ -40,7 +40,7 @@ export function App() {
               <Route path="/" element={<LandingPage />} />
               <Route path="/whitepaper" element={<WhitepaperPage />} />
               <Route path="/app/*" element={<AppShell />} />
-              <Route path="/TestnetDemo" element={<TestnetDemo />} />
+  
             </Routes>
           </Router>
         </RainbowKitProvider>
