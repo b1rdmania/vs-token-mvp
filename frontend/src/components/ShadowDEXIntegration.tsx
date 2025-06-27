@@ -68,7 +68,7 @@ const ShadowDEXPoolInfo: React.FC<ShadowDEXPoolInfoProps> = ({ dvsBalance }) => 
       marginTop: '20px'
     }}>
       <h3 style={{ margin: '0 0 16px 0', color: '#374151' }}>
-        🌚 Shadow DEX Liquidity Pool
+        🌚 Shadow DEX Pool
       </h3>
 
       {/* CRITICAL WARNING */}
@@ -80,23 +80,14 @@ const ShadowDEXPoolInfo: React.FC<ShadowDEXPoolInfoProps> = ({ dvsBalance }) => 
         marginBottom: '20px' 
       }}>
         <h4 style={{ margin: '0 0 8px 0', color: '#dc2626', fontWeight: 'bold' }}>
-          ⚠️ CRITICAL: Read Before Claiming
+          ⚠️ CRITICAL WARNING
         </h4>
         <p style={{ margin: '0 0 8px 0', fontSize: '14px', color: '#dc2626', fontWeight: 500 }}>
-          <strong>CLAIMING SONIC TOKENS IS IRREVERSIBLE!</strong>
+          <strong>Claiming = Permanent fNFT Sale</strong>
         </p>
-        <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: '#dc2626' }}>
-          • When you claim Sonic tokens, your fNFT is <strong>permanently sold</strong>
-        </p>
-        <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: '#dc2626' }}>
-          • You <strong>cannot get your fNFT back</strong> after claiming
-        </p>
-        <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: '#dc2626' }}>
-          • This funds your immediate liquidity at a discount
-        </p>
-        <p style={{ margin: 0, fontSize: '13px', color: '#dc2626' }}>
-          • Only claim if you need <strong>immediate access</strong> to tokens
-        </p>
+        <div style={{ fontSize: '13px', color: '#dc2626' }}>
+          • fNFT sold forever • No recovery possible • Immediate liquidity only
+        </div>
       </div>
 
       {/* Pool Status */}
@@ -108,7 +99,7 @@ const ShadowDEXPoolInfo: React.FC<ShadowDEXPoolInfoProps> = ({ dvsBalance }) => 
           marginBottom: '16px',
           textAlign: 'center' 
         }}>
-          Loading pool information...
+          Loading pool data...
         </div>
       ) : poolInfo ? (
         <div style={{ 
@@ -118,20 +109,11 @@ const ShadowDEXPoolInfo: React.FC<ShadowDEXPoolInfoProps> = ({ dvsBalance }) => 
           borderRadius: '8px', 
           marginBottom: '16px' 
         }}>
-          <h4 style={{ margin: '0 0 8px 0', color: '#047857' }}>✅ Live Shadow DEX Pool</h4>
+          <h4 style={{ margin: '0 0 8px 0', color: '#047857' }}>✅ Live Pool</h4>
           <div style={{ fontSize: '14px', color: '#047857' }}>
-            <div style={{ marginBottom: '4px' }}>
-              <strong>Pool Liquidity:</strong> {poolInfo.dvsReserve} D-vS / {poolInfo.tsReserve} tS
-            </div>
-            <div style={{ marginBottom: '4px' }}>
-              <strong>Current Rate:</strong> 1 D-vS = {poolInfo.ratio.toFixed(4)} tS
-            </div>
-            <div style={{ marginBottom: '4px' }}>
-              <strong>Total Value:</strong> ~{poolInfo.tvl} tokens
-            </div>
-            <div>
-              <strong>Discount:</strong> ~{((1 - poolInfo.ratio) * 100).toFixed(1)}% for immediate liquidity
-            </div>
+            <div><strong>Liquidity:</strong> {poolInfo.dvsReserve} D-vS / {poolInfo.tsReserve} tS</div>
+            <div><strong>Rate:</strong> 1 D-vS = {poolInfo.ratio.toFixed(4)} tS</div>
+            <div><strong>Discount:</strong> ~{((1 - poolInfo.ratio) * 100).toFixed(1)}% for immediate exit</div>
           </div>
         </div>
       ) : (
@@ -142,9 +124,9 @@ const ShadowDEXPoolInfo: React.FC<ShadowDEXPoolInfoProps> = ({ dvsBalance }) => 
           borderRadius: '8px', 
           marginBottom: '16px' 
         }}>
-          <h4 style={{ margin: '0 0 8px 0', color: '#996f00' }}>⚠️ Pool Loading Failed</h4>
+          <h4 style={{ margin: '0 0 8px 0', color: '#996f00' }}>⚠️ Pool Unavailable</h4>
           <p style={{ margin: 0, fontSize: '14px', color: '#996f00' }}>
-            Unable to load pool information. Please check your connection.
+            Check connection or try again later.
           </p>
         </div>
       )}
@@ -156,34 +138,26 @@ const ShadowDEXPoolInfo: React.FC<ShadowDEXPoolInfoProps> = ({ dvsBalance }) => 
         borderRadius: '8px', 
         marginBottom: '16px' 
       }}>
-        <h4 style={{ margin: '0 0 12px 0', color: '#0369a1' }}>💡 How Liquidity Claims Work</h4>
-        <div style={{ fontSize: '13px', color: '#0369a1', lineHeight: '1.5' }}>
-          <div style={{ marginBottom: '8px' }}>
-            <strong>1. You have D-vS tokens</strong> (from depositing your fNFT)
-          </div>
-          <div style={{ marginBottom: '8px' }}>
-            <strong>2. Shadow DEX pool provides liquidity</strong> for D-vS ↔ tS trades
-          </div>
-          <div style={{ marginBottom: '8px' }}>
-            <strong>3. Market sets the exchange rate</strong> (currently ~{poolInfo?.ratio.toFixed(2)} tS per D-vS)
-          </div>
-          <div>
-            <strong>4. You get immediate tokens</strong> instead of waiting for vesting
-          </div>
+        <h4 style={{ margin: '0 0 8px 0', color: '#0369a1' }}>How It Works</h4>
+        <div style={{ fontSize: '13px', color: '#0369a1' }}>
+          D-vS tokens (from fNFT) → Shadow DEX → Immediate tS tokens
+          <br />
+          Market rate: ~{poolInfo?.ratio.toFixed(2)} tS per D-vS
         </div>
       </div>
 
-      {/* Pool Links */}
+      {/* Links */}
       <div style={{ 
         padding: '12px', 
         backgroundColor: '#f9fafb', 
         border: '1px solid #e5e7eb',
-        borderRadius: '6px' 
+        borderRadius: '6px',
+        marginBottom: '16px'
       }}>
         <div style={{ marginBottom: '8px', fontSize: '13px', fontWeight: 500 }}>
-          External Pool Links:
+          External Links:
         </div>
-        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
           <a
             href={`https://www.shadow.so/liquidity/manage/${SHADOW_DEX.POOL}`}
             target="_blank"
@@ -197,7 +171,7 @@ const ShadowDEXPoolInfo: React.FC<ShadowDEXPoolInfoProps> = ({ dvsBalance }) => 
               borderRadius: '4px'
             }}
           >
-            View on Shadow DEX →
+            Shadow DEX →
           </a>
           <a
             href={`https://sonicscan.org/address/${SHADOW_DEX.POOL}`}
@@ -212,14 +186,13 @@ const ShadowDEXPoolInfo: React.FC<ShadowDEXPoolInfoProps> = ({ dvsBalance }) => 
               borderRadius: '4px'
             }}
           >
-            View on Explorer →
+            Explorer →
           </a>
         </div>
       </div>
 
-      {/* Implementation Status */}
+      {/* Status */}
       <div style={{ 
-        marginTop: '16px', 
         padding: '12px', 
         backgroundColor: '#ecfdf5', 
         border: '1px solid #22c55e',
@@ -227,15 +200,7 @@ const ShadowDEXPoolInfo: React.FC<ShadowDEXPoolInfoProps> = ({ dvsBalance }) => 
         fontSize: '12px',
         color: '#047857'
       }}>
-        <strong>🎉 LIVE IMPLEMENTATION:</strong>
-        <br />
-        • Contracts: ✅ Deployed on Sonic Mainnet
-        <br />
-        • Shadow DEX Pool: ✅ LIVE and functional
-        <br />
-        • Liquidity Claims: ✅ Available via vault interface
-        <br />
-        • Pool Address: {SHADOW_DEX.POOL.slice(0, 20)}...
+        <strong>Status:</strong> Live on Sonic Mainnet | Pool: {SHADOW_DEX.POOL.slice(0, 10)}...{SHADOW_DEX.POOL.slice(-6)}
       </div>
     </div>
   );
