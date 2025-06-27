@@ -1,11 +1,11 @@
 # Table of contents
 
 * [vS Vault – Turn locked Sonic fNFTs into liquid DeFi collateral](README.md)
-* [vS Vault Risk Disclosure](RISK_DISCLOSURE.md)
-* [vS Vault Security Analysis](SECURITY_ANALYSIS.md)
 * [vS Vault Whitepaper](WHITEPAPER.md)
+* [vS Vault Risk Disclosure](RISK_DISCLOSURE.md)
+* [vS Vault Security Analysis (pre-audit)](SECURITY_ANALYSIS.md)
 * [React + TypeScript + Vite](frontend/README.md)
-* [lib](lib/README.md)
+* [Library](lib/README.md)
   * [Forge Standard Library •](lib/forge-std/README.md)
     * [Contributing to Foundry](lib/forge-std/CONTRIBUTING.md)
   * [openzeppelin-contracts](lib/openzeppelin-contracts/README.md)
