@@ -74,6 +74,33 @@ You give us your locked NFT worth 1000 S tokens. We give you 1000 vS tokens. You
 
 **Your Risk**: If you don't redeem in time, you lose your tokens
 
+## What Happens If You Miss Redemption
+
+**The Window**: You have exactly 180 days after maturity to redeem your vS tokens
+
+**Timeline Example**:
+- March 1, 2026: Maturity hits, redemption opens
+- September 1, 2026: Grace period ends (180 days later)
+- September 2, 2026: All leftover S tokens swept to treasury
+
+**If You Miss It**:
+- Your vS tokens become worthless
+- The S tokens backing them get swept to protocol treasury
+- **No admin rescue** - we cannot help you recover them
+- **No exceptions** - the contract is immutable
+
+**Why No Extensions**:
+- Contract has no admin functions
+- Code cannot be changed after deployment
+- No governance to vote on exceptions
+- Immutable design prevents any manual intervention
+
+**How to Avoid This**:
+- Set calendar reminders for maturity date
+- Check the vault regularly after month 9
+- Don't wait until the last minute
+- Remember: there is no early redemption option
+
 ## What We Don't Control
 
 ### Price
