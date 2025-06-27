@@ -69,33 +69,125 @@
   border-radius: 8px;
 }
 
-.features-section {
+.explainer-section {
   padding: 4rem 0;
-  background-color: #F7F9FC;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
 }
 
-.features-section .container {
-  display: flex;
-  gap: 2rem;
-  justify-content: space-between;
-  align-items: flex-start;
+.explainer-header {
   text-align: center;
+  margin-bottom: 3rem;
 }
 
-.feature-card {
-  background-color: white;
-  padding: 2rem;
-  border-radius: 16px;
-  border: 1px solid #EAECEF;
+.explainer-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  color: white;
 }
-.feature-card h3 {
-  font-size: 1.5rem;
+
+.explainer-subtitle {
+  font-size: 1.25rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.process-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.process-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.process-card:hover {
+  transform: translateY(-4px);
+}
+
+.step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  font-weight: bold;
+  font-size: 1.25rem;
   margin-bottom: 1rem;
 }
 
-.feature-card p {
-  line-height: 1.6;
-  opacity: 0.8;
+.process-card h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: white;
+}
+
+.process-card p {
+  opacity: 0.9;
+  line-height: 1.5;
+}
+
+.comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.comparison-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 2rem;
+}
+
+.comparison-card.without {
+  border-left: 4px solid #ff6b6b;
+}
+
+.comparison-card.with {
+  border-left: 4px solid #51cf66;
+}
+
+.comparison-card h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.comparison-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.comparison-card li {
+  padding: 0.5rem 0;
+  opacity: 0.9;
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.comparison-card li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .partner-banner {
@@ -169,13 +261,18 @@
     align-items: center;
   }
 
-  .features-section .container {
-    flex-direction: column;
+  .explainer-title {
+    font-size: 2rem;
+  }
+
+  .process-grid {
+    grid-template-columns: 1fr;
     gap: 1.5rem;
   }
 
-  .feature-card {
-    width: 100%;
+  .comparison-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 
   .hero-section {
@@ -185,5 +282,9 @@
   .hero-subtitle {
     max-width: 100%;
     padding: 0 1rem;
+  }
+
+  .explainer-section {
+    padding: 3rem 0;
   }
 } 

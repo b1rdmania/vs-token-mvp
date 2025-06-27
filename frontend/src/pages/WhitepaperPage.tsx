@@ -248,8 +248,8 @@ export const WhitepaperPage: React.FC = () => {
               GitHub
             </a>
             <span style={{ margin: '0 8px' }}>|</span>
-            <Link to="/TestnetDemo">
-              Demo
+            <Link to="/app">
+              Launch App
             </Link>
           </div>
           <p>&copy; {new Date().getFullYear()} vS Vault. All rights reserved.</p>
