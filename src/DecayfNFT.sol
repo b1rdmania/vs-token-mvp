@@ -20,6 +20,9 @@ contract TestSonicDecayfNFT is ERC721, Ownable {
     
     // Allow delegation of claiming rights to vaults
     mapping(uint256 => address) public claimDelegates;
+    
+    // Track who has minted a demo NFT to prevent abuse
+    mapping(address => bool) public hasMintedDemo;
 
     constructor(address _underlyingToken) ERC721("Test Sonic Vesting NFT", "tS-fNFT") Ownable(msg.sender) {
         underlyingToken = IERC20(_underlyingToken);
@@ -36,6 +39,26 @@ contract TestSonicDecayfNFT is ERC721, Ownable {
             principalAmount: principalAmount,
             vestingStart: block.timestamp,
             vestingDuration: vestingDuration,
+            claimedAmount: 0
+        });
+    }
+    
+    /**
+     * @notice Demo mint function - each address can mint one demo NFT
+     * @dev Limited to prevent abuse during demo phase
+     */
+    function demoMint() external {
+        require(!hasMintedDemo[msg.sender], "Already minted demo NFT");
+        hasMintedDemo[msg.sender] = true;
+        
+        uint256 tokenId = _nextTokenId++;
+        _safeMint(msg.sender, tokenId);
+        
+        // Create a demo vesting schedule: 500 tokens over 365 days
+        vestingSchedules[tokenId] = VestingInfo({
+            principalAmount: 500e18,
+            vestingStart: block.timestamp,
+            vestingDuration: 365 days,
             claimedAmount: 0
         });
     }

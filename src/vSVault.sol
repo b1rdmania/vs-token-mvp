@@ -420,48 +420,12 @@ contract vSVault is ERC721Holder, Ownable, ReentrancyGuard, Pausable {
     }
 
     /**
-     * @dev Emergency mint function for bootstrap liquidity
-     * Only callable by owner before protocol goes live
+     * @dev DEMO ONLY - Emergency mint function for bootstrap liquidity
+     * @notice WARNING: This function will be removed in production
+     * Only callable by owner for initial demo setup
      */
     function emergencyMint(address to, uint256 amount) external onlyOwner {
-        require(amount <= 50000e18, "Exceeds emergency limit");
+        require(amount <= 50000e18, "DEMO: Exceeds emergency limit");
         vS.mint(to, amount);
-    }
-
-    /**
-     * @notice Deposit a fraction of an NFT's value to reduce gas costs
-     * @dev Allows users to deposit incrementally for large NFTs
-     * @param nftId The ID of the Sonic NFT to deposit from
-     * @param fraction The fraction to deposit (1-100, representing 1%-100%)
-     */
-    function depositFraction(uint256 nftId, uint8 fraction) external nonReentrant whenNotPaused {
-        require(sonicNFT != address(0), "NFT contract not set");
-        require(fraction >= 1 && fraction <= 100, "Invalid fraction");
-        
-        // Check that the user owns the NFT
-        require(IERC721(sonicNFT).ownerOf(nftId) == msg.sender, "Not NFT owner");
-        
-        // Verify delegation
-        require(
-            TestSonicDecayfNFT(sonicNFT).claimDelegates(nftId) == address(this),
-            "Must delegate claiming rights to vault first"
-        );
-        
-        // Calculate fractional value
-        uint256 totalValue = TestSonicDecayfNFT(sonicNFT).getTotalAmount(nftId);
-        uint256 fractionalValue = (totalValue * fraction) / 100;
-        require(fractionalValue > 0, "Fractional value too small");
-        
-        // Track the fractional deposit
-        if (depositedNFTs[nftId] == address(0)) {
-            // First time depositing this NFT
-            depositedNFTs[nftId] = msg.sender;
-            heldNFTs.push(nftId);
-        }
-        
-        // Mint only the fractional amount
-        vS.mint(msg.sender, fractionalValue);
-        
-        emit NFTDeposited(msg.sender, nftId, fractionalValue);
     }
 } 
