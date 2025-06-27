@@ -5,6 +5,15 @@ import {ERC721} from "openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
 import {Ownable} from "openzeppelin-contracts/contracts/access/Ownable.sol";
 import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
+/**
+ * @title TestSonicDecayfNFT - DEMO CONTRACT ONLY
+ * @dev ⚠️  This contract is for DEMO purposes only!
+ * 
+ * Simulates Sonic's vesting NFT mechanics for testing and demonstration.
+ * Contains owner functions for demo setup and faucet functionality.
+ * 
+ * DO NOT USE THIS CONTRACT FOR MAINNET DEPLOYMENT
+ */
 contract TestSonicDecayfNFT is ERC721, Ownable {
     uint256 private _nextTokenId;
     IERC20 public immutable underlyingToken;

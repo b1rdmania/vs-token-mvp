@@ -4,6 +4,21 @@ pragma solidity ^0.8.20;
 import {ERC20} from "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import {Ownable} from "openzeppelin-contracts/contracts/access/Ownable.sol";
 
+/**
+ * @title VSToken - DEMO CONTRACT ONLY
+ * @dev ⚠️  WARNING: This contract contains admin functions and is for DEMO purposes only!
+ * 
+ * For production deployment, use ImmutableVSToken.sol which has:
+ * - No owner functions
+ * - No admin control
+ * - Immutable minter address
+ * 
+ * This demo token contains admin functions that would be dangerous in production:
+ * - setMinter owner function
+ * - emergencyMint function
+ * 
+ * DO NOT USE THIS CONTRACT FOR MAINNET DEPLOYMENT
+ */
 contract VSToken is ERC20, Ownable {
     address public minter;
 
