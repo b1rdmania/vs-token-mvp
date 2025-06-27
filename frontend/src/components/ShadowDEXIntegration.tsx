@@ -1,12 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
-
-// Updated contract addresses (Gas-Optimized Deployment)
-const CONTRACTS = {
-  DVS_TOKEN: '0x2649125B1a683e3448F2BB15425AcD83aa2dfd35',
-  TS_TOKEN: '0x16e5294Cc116819BfB79752C238a74c9f83a35f9',
-  VAULT: '0x2e17544f3E692a05F9c3C88049bca0eBCF27Bb6B'
-};
 
 // Contract addresses (Sonic Mainnet)
 const CONTRACTS = {
@@ -16,11 +9,11 @@ const CONTRACTS = {
   FNFT: '0xdf34078C9C8E5891320B780F6C8b8a54B784108C'
 };
 
-// Shadow DEX addresses (REAL ADDRESSES ON SONIC MAINNET)
+// Shadow DEX addresses (Sonic Mainnet)
 const SHADOW_DEX = {
-  ROUTER: '0x1D368773735ee1E678950B7A97bcA2CafB330CDc', // Shadow Router
-  FACTORY: '0x2dA25E7446A70D7be65fd4c053948BEcAA6374c8', // Shadow Factory  
-  POOL: '0x0516676e5f9f0253228483a5f61313a53b4be07f' // REAL vS/tS Pool!
+  ROUTER: '0x1D368773735ee1E678950B7A97bcA2CafB330CDc',
+  FACTORY: '0x2dA25E7446A70D7be65fd4c053948BEcAA6374c8',
+  POOL: '0x0516676e5f9f0253228483a5f61313a53b4be07f'
 };
 
 const ERC20_ABI = [
@@ -58,7 +51,7 @@ const ShadowDEXPoolInfo: React.FC<ShadowDEXPoolInfoProps> = ({ vsBalance }) => {
         vsReserve: vsReserveFormatted,
         tsReserve: tsReserveFormatted,
         ratio: vsReserve > 0 ? Number(tsReserveFormatted) / Number(vsReserveFormatted) : 0,
-        tvl: (Number(vsReserveFormatted) + Number(tsReserveFormatted)).toFixed(2)
+        hasLiquidity: vsReserve > 0 && tsReserve > 0
       });
     } catch (error) {
       console.error('Error loading pool info:', error);
@@ -79,136 +72,103 @@ const ShadowDEXPoolInfo: React.FC<ShadowDEXPoolInfoProps> = ({ vsBalance }) => {
         🌚 Shadow DEX Pool
       </h3>
 
-      {/* CRITICAL WARNING */}
-      <div style={{ 
-        padding: '16px', 
-        backgroundColor: '#fef2f2', 
-        border: '2px solid #dc2626', 
-        borderRadius: '8px', 
-        marginBottom: '20px' 
-      }}>
-        <h4 style={{ margin: '0 0 8px 0', color: '#dc2626', fontWeight: 'bold' }}>
-          ⚠️ CRITICAL WARNING
-        </h4>
-        <p style={{ margin: '0 0 8px 0', fontSize: '14px', color: '#dc2626', fontWeight: 500 }}>
-          <strong>Depositing = Permanent fNFT Transfer</strong>
-        </p>
-        <div style={{ fontSize: '13px', color: '#dc2626' }}>
-          • fNFT transferred to vault forever • No recovery possible • Get vS tokens for trading
-        </div>
-      </div>
-
       {/* Pool Status */}
       {loading ? (
         <div style={{ 
-          padding: '12px', 
+          padding: '16px', 
           backgroundColor: '#f3f4f6', 
           borderRadius: '8px', 
-          marginBottom: '16px',
-          textAlign: 'center' 
+          textAlign: 'center',
+          marginBottom: '16px'
         }}>
           Loading pool data...
         </div>
-      ) : poolInfo ? (
+      ) : poolInfo?.hasLiquidity ? (
         <div style={{ 
-          padding: '12px', 
+          padding: '16px', 
           backgroundColor: '#d1fae5', 
           border: '1px solid #34d399', 
           borderRadius: '8px', 
           marginBottom: '16px' 
         }}>
-          <h4 style={{ margin: '0 0 8px 0', color: '#047857' }}>✅ Live Pool</h4>
-          <div style={{ fontSize: '14px', color: '#047857' }}>
-            <div><strong>Liquidity:</strong> {poolInfo.vsReserve} vS / {poolInfo.tsReserve} tS</div>
-            <div><strong>Current Rate:</strong> 1 vS = {poolInfo.ratio.toFixed(4)} tS</div>
-            <div><strong>Real Market:</strong> Price determined by supply/demand, not fake discounts</div>
+          <h4 style={{ margin: '0 0 12px 0', color: '#047857' }}>✅ Live Pool</h4>
+          <div style={{ fontSize: '14px', color: '#047857', marginBottom: '8px' }}>
+            <strong>Current Rate:</strong> 1 vS = {poolInfo.ratio.toFixed(4)} tS
+          </div>
+          <div style={{ fontSize: '13px', color: '#047857' }}>
+            Market-determined pricing • Trade anytime
           </div>
         </div>
       ) : (
         <div style={{ 
-          padding: '12px', 
+          padding: '16px', 
           backgroundColor: '#fff3cd', 
           border: '1px solid #ffd60a', 
           borderRadius: '8px', 
           marginBottom: '16px' 
         }}>
-          <h4 style={{ margin: '0 0 8px 0', color: '#996f00' }}>⚠️ Pool Unavailable</h4>
-          <p style={{ margin: 0, fontSize: '14px', color: '#996f00' }}>
-            Check connection or try again later.
-          </p>
+          <h4 style={{ margin: '0 0 8px 0', color: '#996f00' }}>⚠️ Pool Needs Liquidity</h4>
+          <div style={{ fontSize: '14px', color: '#996f00' }}>
+            Pool exists but needs initial liquidity to enable trading
+          </div>
         </div>
       )}
 
-      {/* How It Works */}
+      {/* Trade Links */}
       <div style={{ 
         padding: '16px', 
         backgroundColor: '#f0f9ff', 
         borderRadius: '8px', 
         marginBottom: '16px' 
       }}>
-        <h4 style={{ margin: '0 0 8px 0', color: '#0369a1' }}>How It Works</h4>
-        <div style={{ fontSize: '13px', color: '#0369a1' }}>
-          vS tokens (from fNFT) → Shadow DEX → Immediate tS tokens at real market rates
-          <br />
-          No artificial pricing - pure market discovery through trading
-        </div>
-      </div>
-
-      {/* Links */}
-      <div style={{ 
-        padding: '12px', 
-        backgroundColor: '#f9fafb', 
-        border: '1px solid #e5e7eb',
-        borderRadius: '6px',
-        marginBottom: '16px'
-      }}>
-        <div style={{ marginBottom: '8px', fontSize: '13px', fontWeight: 500 }}>
-          External Links:
-        </div>
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+        <h4 style={{ margin: '0 0 12px 0', color: '#0369a1' }}>Trade Your vS Tokens</h4>
+        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
           <a
-            href={`https://www.shadow.so/liquidity/manage/${SHADOW_DEX.POOL}`}
+            href={`https://www.shadow.so/swap?from=${CONTRACTS.VS_TOKEN}&to=${CONTRACTS.TS_TOKEN}`}
             target="_blank"
             rel="noopener noreferrer"
             style={{ 
-              color: '#1f2937', 
-              fontSize: '12px', 
-              textDecoration: 'underline',
-              padding: '4px 8px',
-              backgroundColor: '#e5e7eb',
-              borderRadius: '4px'
+              display: 'inline-block',
+              padding: '8px 16px',
+              backgroundColor: '#1f6bff',
+              color: 'white',
+              textDecoration: 'none',
+              borderRadius: '6px',
+              fontSize: '14px',
+              fontWeight: 500
             }}
           >
-            Shadow DEX →
+            Trade on Shadow DEX →
           </a>
           <a
             href={`https://sonicscan.org/address/${SHADOW_DEX.POOL}`}
             target="_blank"
             rel="noopener noreferrer"
             style={{ 
-              color: '#1f2937', 
-              fontSize: '12px', 
-              textDecoration: 'underline',
-              padding: '4px 8px',
+              display: 'inline-block',
+              padding: '8px 16px',
               backgroundColor: '#e5e7eb',
-              borderRadius: '4px'
+              color: '#1f2937',
+              textDecoration: 'none',
+              borderRadius: '6px',
+              fontSize: '14px'
             }}
           >
-            Explorer →
+            View Pool →
           </a>
         </div>
       </div>
 
-      {/* Status */}
+      {/* Simple Status */}
       <div style={{ 
         padding: '12px', 
-        backgroundColor: '#ecfdf5', 
-        border: '1px solid #22c55e',
+        backgroundColor: '#f8f9fa', 
         borderRadius: '6px',
         fontSize: '12px',
-        color: '#047857'
+        color: '#6b7280',
+        textAlign: 'center'
       }}>
-        <strong>Status:</strong> Live on Sonic Mainnet | Pool: {SHADOW_DEX.POOL.slice(0, 10)}...{SHADOW_DEX.POOL.slice(-6)}
+        Pool: {SHADOW_DEX.POOL.slice(0, 10)}...{SHADOW_DEX.POOL.slice(-6)}
       </div>
     </div>
   );
