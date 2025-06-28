@@ -56,12 +56,14 @@ contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
     uint256 public constant GRACE_PERIOD = 180 days;   // Grace period for surplus sweep
     uint256 public constant MAX_BATCH_SIZE = 20;       // Max NFTs per harvest batch
     uint256 public constant MIN_NFT_FACE = 100e18;     // 100 S minimum (prevents dust grief)
+    uint256 public constant MAX_NFTS = 10000;          // SECURITY: Max NFTs to prevent scale issues
     
     // ============ MINIMAL STATE ============
     uint256[] public heldNFTs;
     mapping(uint256 => address) public depositedNFTs;
     mapping(uint256 => bool) public processed;    // Track which NFTs successfully claimed
     uint256 public nextClaim = 0;                 // Rolling pointer for harvest batches
+    uint256 public processedCount = 0;            // SECURITY FIX: Track processed count to avoid loops
     bool public matured = false;
 
     // ============ EVENTS ============
@@ -121,6 +123,7 @@ contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
         require(block.timestamp <= vaultFreezeTimestamp, "Vault frozen - use new season vault");
         require(depositedNFTs[nftId] == address(0), "NFT already deposited");
         require(IERC721(sonicNFT).ownerOf(nftId) == msg.sender, "Not NFT owner");
+        require(heldNFTs.length < MAX_NFTS, "Vault at capacity"); // SECURITY: Prevent scale issues
         
         // Pull the NFT first
         IERC721(sonicNFT).safeTransferFrom(msg.sender, address(this), nftId);
@@ -129,6 +132,7 @@ contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
         _ensureDelegated(nftId);
         
         uint256 totalValue = IDecayfNFT(sonicNFT).getTotalAmount(nftId);
+        require(totalValue > 0, "NFT has no value");           // SECURITY: Prevent zero-value NFTs
         require(totalValue >= MIN_NFT_FACE, "NFT too small");
 
         // Store NFT info
@@ -170,6 +174,7 @@ contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
                 try IDecayfNFT(sonicNFT).claimVestedTokens(nftId) returns (uint256 claimed) {
                     if (claimed > 0) {
                         processed[nftId] = true;  // Mark as successfully claimed
+                        processedCount++;         // SECURITY FIX: Increment counter
                     }
                 } catch {
                     // Leave processed[nftId] = false, will retry later
@@ -190,16 +195,8 @@ contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
             }
         }
         
-        // Check if all NFTs are now processed
-        bool allProcessed = true;
-        for (uint256 i = 0; i < heldNFTs.length; i++) {
-            if (!processed[heldNFTs[i]]) {
-                allProcessed = false;
-                break;
-            }
-        }
-        
-        if (allProcessed) {
+        // Check if all NFTs are now processed (SECURITY FIX: Use counter instead of loop)
+        if (processedCount >= heldNFTs.length) {
             matured = true;  // Only mature when 100% harvested
         }
 
@@ -241,9 +238,9 @@ contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
         
         // Transfer fee to treasury and remaining to user
         if (feeAmount > 0) {
-            IERC20(underlyingToken).transfer(protocolTreasury, feeAmount);
+            require(IERC20(underlyingToken).transfer(protocolTreasury, feeAmount), "Treasury transfer failed");
         }
-        IERC20(underlyingToken).transfer(msg.sender, userAmount);
+        require(IERC20(underlyingToken).transfer(msg.sender, userAmount), "User transfer failed");
 
         emit Redeemed(msg.sender, amount, userAmount, feeAmount);
     }
@@ -259,7 +256,7 @@ contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
         require(surplus > 0, "No surplus to sweep");
         
         // Transfer surplus to treasury (or could burn if treasury is burn address)
-        IERC20(underlyingToken).transfer(protocolTreasury, surplus);
+        require(IERC20(underlyingToken).transfer(protocolTreasury, surplus), "Surplus transfer failed");
         
         emit SurplusSwept(msg.sender, surplus);
     }
@@ -267,12 +264,21 @@ contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
     /**
      * @notice Force delegation for NFTs (PERMISSIONLESS HELPER)
      * @dev Anyone can call to ensure NFTs remain claimable after potential upgrades
+     * @dev SECURITY: Only attempts delegation if vault owns the NFT (prevents gas griefing)
      * @param nftIds Array of NFT IDs to force delegate (max 50 to prevent gas bombs)
      */
     function forceDelegate(uint256[] calldata nftIds) external {
         require(nftIds.length <= 50, "Batch too large");
         for (uint256 i = 0; i < nftIds.length; i++) {
-            _ensureDelegated(nftIds[i]);
+            // SECURITY FIX: Only attempt delegation if vault owns the NFT
+            try IERC721(sonicNFT).ownerOf(nftIds[i]) returns (address owner) {
+                if (owner == address(this)) {
+                    _ensureDelegated(nftIds[i]);
+                }
+            } catch {
+                // NFT doesn't exist or call failed - skip it
+                continue;
+            }
         }
     }
 
@@ -337,13 +343,10 @@ contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
 
     /**
      * @notice Get harvest progress (how many NFTs processed vs total)
+     * @dev SECURITY FIX: Uses storage counter instead of unbounded loop for gas efficiency
      */
-    function getHarvestProgress() external view returns (uint256 processedCount, uint256 total) {
-        uint256 count = 0;
-        for (uint256 i = 0; i < heldNFTs.length; i++) {
-            if (processed[heldNFTs[i]]) count++;
-        }
-        return (count, heldNFTs.length);
+    function getHarvestProgress() external view returns (uint256 processedNFTs, uint256 total) {
+        return (processedCount, heldNFTs.length);
     }
 
     /**
