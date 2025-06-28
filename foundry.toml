@@ -11,3 +11,4 @@ via_ir = false
 sonic = "https://rpc.soniclabs.com"
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
+# Foundry configuration for vS Vault Protocol
