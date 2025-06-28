@@ -9,7 +9,7 @@ import { useAccount } from 'wagmi';
 
 const navLinks = [
   { path: '/app/deposit', label: 'Deposit' },
-  { path: '/app/trade', label: 'Trade' },
+  { path: '/app/trade', label: 'vS / S Pool' },
   { path: '/app/redeem', label: 'Redeem' },
 ];
 
