@@ -487,3 +487,202 @@ a:focus {
 ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(135deg, #4f46e5, #7c3aed);
 }
+
+/* Mobile-First StepIndicator Styles */
+.step-indicator-container {
+  padding: 2rem 0;
+}
+
+.step-indicator-title {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+  color: #374151;
+}
+
+.steps-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.step-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.step-circle-container {
+  position: relative;
+}
+
+.step-circle {
+  width: 3rem;
+  height: 3rem;
+  background: linear-gradient(to right, #635BFF, #00C6FF);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 0.875rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  min-height: 44px; /* iOS touch target */
+  min-width: 44px;
+}
+
+.step-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  max-width: 120px;
+  text-align: center;
+}
+
+.step-arrow {
+  margin-left: 0.5rem;
+  color: #9CA3AF;
+  font-size: 1.25rem;
+}
+
+.step-tooltip {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 0.5rem;
+  background-color: #1F2937;
+  color: white;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  z-index: 10;
+  max-width: 200px;
+  white-space: normal;
+  text-align: center;
+}
+
+.progress-container {
+  margin-top: 1.5rem;
+  height: 0.5rem;
+  background-color: #E5E7EB;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(to right, #635BFF, #00C6FF);
+}
+
+/* iOS 14+ Specific Mobile Optimizations */
+@media (max-width: 768px) {
+  /* StepIndicator Mobile Layout */
+  .steps-container {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .step-wrapper {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 280px;
+  }
+  
+  .step-arrow {
+    transform: rotate(90deg);
+    margin: 0.5rem 0;
+  }
+  
+  .step-label {
+    max-width: 240px;
+    font-size: 0.8rem;
+    line-height: 1.3;
+  }
+  
+  .step-tooltip {
+    max-width: 180px;
+    font-size: 0.7rem;
+  }
+  
+  .step-indicator-title {
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Better mobile spacing */
+  .page-container-modern {
+    padding: 16px 12px;
+  }
+  
+  /* Improved mobile buttons */
+  .button-primary-modern,
+  .button-secondary-modern,
+  .cta-button-primary,
+  .cta-button-secondary {
+    min-height: 48px; /* Larger touch targets for mobile */
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
+  /* Better modal experience on mobile */
+  .modal-content {
+    margin: 16px;
+    max-height: calc(100vh - 32px);
+    border-radius: 16px;
+  }
+  
+  /* Improved mobile navigation */
+  .mobile-nav a {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .step-circle {
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 0.8rem;
+  }
+  
+  .step-label {
+    font-size: 0.75rem;
+  }
+  
+  /* Extra small screen optimizations */
+  .hero-title-modern {
+    font-size: 2rem !important;
+  }
+  
+  .page-title-modern {
+    font-size: 2rem !important;
+  }
+}
+
+/* iOS Safari specific improvements */
+@supports (-webkit-touch-callout: none) {
+  /* Prevent rubber band scrolling on iOS */
+  body {
+    overscroll-behavior: none;
+  }
+  
+  /* Better iOS input styling */
+  input, textarea, select {
+    -webkit-appearance: none;
+    border-radius: 8px;
+  }
+  
+  /* Fix iOS Safari 100vh issue */
+  .app-shell {
+    min-height: -webkit-fill-available;
+  }
+}
