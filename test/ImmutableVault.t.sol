@@ -115,12 +115,15 @@ contract ImmutableVaultTest is Test {
     MockSonicNFT public mockNFT;
     MockERC20 public mockToken;
     
-    address public treasury = address(0x1234);
+    // Test constants (based on July 15, 2025 launch)
+    uint256 constant LAUNCH_TIMESTAMP = 1752534000;     // July 15, 2025 00:00:00 UTC
+    uint256 constant FREEZE_TIMESTAMP = 1773532800;     // March 15, 2026 00:00:00 UTC (freeze deposits)
+    uint256 constant MATURITY_TIMESTAMP = 1776207600;   // April 15, 2026 00:00:00 UTC (274 days after launch)
+    
+    address constant treasury = 0x0000000000000000000000000000000000001234;
+    
     address public user1 = address(0x5678);
     address public user2 = address(0x9abc);
-    
-    uint256 public constant MATURITY_TIMESTAMP = 1000000000;
-    uint256 public constant FREEZE_TIMESTAMP = 900000000;
     
     function setUp() public {
         // Deploy mock contracts
@@ -143,8 +146,8 @@ contract ImmutableVaultTest is Test {
         // Set vault as minter for mock vS token
         vsToken.setVault(address(vault));
         
-        // Set timestamp before freeze
-        vm.warp(800000000);
+        // Set initial timestamp to launch date
+        vm.warp(LAUNCH_TIMESTAMP);
     }
     
     function testDepositWithCorrectDelegation() public {
@@ -159,8 +162,12 @@ contract ImmutableVaultTest is Test {
         vm.prank(user1);
         vault.deposit(1);
         
-        // Check vS tokens minted
-        assertEq(vsToken.balanceOf(user1), 1000e18);
+        // Check vS tokens minted (1% fee to treasury, 99% to user)
+        uint256 expectedUserAmount = 1000e18 - (1000e18 * 100) / 10_000; // 990e18
+        uint256 expectedFeeAmount = (1000e18 * 100) / 10_000; // 10e18
+        
+        assertEq(vsToken.balanceOf(user1), expectedUserAmount);
+        assertEq(vsToken.balanceOf(treasury), expectedFeeAmount);
         assertEq(vault.getHeldNFTCount(), 1);
         assertEq(vault.depositedNFTs(1), user1);
     }
@@ -177,8 +184,9 @@ contract ImmutableVaultTest is Test {
         vm.prank(user1);
         vault.deposit(1);
         
-        // Check vS tokens minted and delegation fixed
-        assertEq(vsToken.balanceOf(user1), 1000e18);
+        // Check vS tokens minted and delegation fixed (with 1% fee)
+        uint256 expectedUserAmount = 1000e18 - (1000e18 * 100) / 10_000; // 990e18
+        assertEq(vsToken.balanceOf(user1), expectedUserAmount);
         assertEq(mockNFT.claimDelegates(1), address(vault));
     }
     
@@ -215,13 +223,17 @@ contract ImmutableVaultTest is Test {
         vault.deposit(3);
         vm.stopPrank();
         
-        // Total vS minted: 3000e18
-        assertEq(vsToken.totalSupply(), 3000e18);
+        // Total vS minted: 3000e18 - 3% mint fees = 2970e18 to user + 30e18 to treasury
+        uint256 totalMintFees = (3000e18 * 100) / 10_000; // 30e18
+        uint256 userVsBalance = 3000e18 - totalMintFees; // 2970e18
+        assertEq(vsToken.totalSupply(), 3000e18); // Total supply includes fees
+        assertEq(vsToken.balanceOf(user1), userVsBalance);
+        assertEq(vsToken.balanceOf(treasury), totalMintFees);
         
         // Make NFT #2 fail on claim
         mockNFT.setShouldRevert(2, true);
         
-        // Set claimable amounts for successful NFTs
+        // Set claimable amounts for all NFTs
         mockNFT.setClaimable(1, 1000e18);
         mockNFT.setClaimable(2, 1000e18); // This will fail
         mockNFT.setClaimable(3, 1000e18);
@@ -229,24 +241,50 @@ contract ImmutableVaultTest is Test {
         // Advance to maturity
         vm.warp(MATURITY_TIMESTAMP);
         
-        // First redemption triggers maturity
-        vm.prank(user1);
-        vault.redeem(1000e18); // Redeem 1/3 of vS supply
+        // Harvest batch - NFT #2 will fail but others succeed
+        vault.harvestBatch(3);
         
-        // Check backing ratio: only 2000e18 S claimed out of 3000e18 expected
-        uint256 backingRatio = vault.getBackingRatio();
-        // Should be approximately 2/3 (0.666... in 18 decimal)
-        assertTrue(backingRatio < 1e18); // Less than 100%
-        assertTrue(backingRatio > 0.6e18); // Greater than 60%
+        // Vault should not be matured yet (NFT #2 failed)
+        assertFalse(vault.matured());
+        
+        // Check harvest progress: 2 processed, 3 total
+        (uint256 processedCount, uint256 total) = vault.getHarvestProgress();
+        assertEq(processedCount, 2);
+        assertEq(total, 3);
+        
+        // Check individual NFT processing status
+        assertTrue(vault.isProcessed(1));
+        assertFalse(vault.isProcessed(2)); // Failed
+        assertTrue(vault.isProcessed(3));
+        
+        // Users can redeem pro-rata even with failed NFT
+        // Vault balance: 2000e18, Total supply: 3000e18
+        // Backing ratio: ~66.67%
+        vm.prank(user1);
+        vault.redeem(990e18); // Redeem 1/3 of user's vS balance
         
         // Check user received proportional amount
-        // User redeemed 1000e18 vS out of 3000e18 total supply
-        // Available balance was 2000e18 S
-        // User should get approximately 2/3 of their redemption (minus 1% fee)
+        // Expected: (990e18 * 2000e18) / 3000e18 = 660e18 gross
+        // Minus 2% redeem fee = ~646.8e18
         uint256 userBalance = mockToken.balanceOf(user1);
-        assertTrue(userBalance > 0); // Got something
-        assertTrue(userBalance < 1000e18); // Less than full redemption (due to partial claims)
-        assertTrue(userBalance > 600e18); // More than 60% (approximately 2/3 minus fees)
+        assertTrue(userBalance > 645e18 && userBalance < 650e18);
+        
+        // Fix NFT #2 and retry harvest
+        mockNFT.setShouldRevert(2, false);
+        vault.harvestBatch(3); // Will process the failed NFT #2
+        
+        // Now vault should be matured with over-backing due to pro-rata redemption
+        assertTrue(vault.matured());
+        
+        // Expected backing ratio calculation:
+        // After redemption: 2010e18 total supply, 1340e18 vault balance
+        // After final harvest: 2010e18 total supply, 2340e18 vault balance  
+        // Backing ratio: 2340e18 / 2010e18 = 1.164179... (116.4%)
+        uint256 backingRatio = vault.getBackingRatio();
+        assertTrue(backingRatio > 1.16e18 && backingRatio < 1.17e18); // ~116.4%
+        
+        // This over-backing is correct behavior - early redeemers got pro-rata value
+        // and remaining vS tokens become more valuable as harvest completes
     }
     
     function testForceDelegateHelper() public {
@@ -290,24 +328,30 @@ contract ImmutableVaultTest is Test {
             mockNFT.setClaimable(i, 100e18);
         }
         
-        // Try to claim more than MAX_BATCH_SIZE
-        vm.expectRevert("Invalid batch size");
-        vault.claimBatch(21);
+        // Advance to maturity
+        vm.warp(MATURITY_TIMESTAMP);
         
-        // Claim maximum allowed batch size
-        vault.claimBatch(20);
+        // Try to harvest more than MAX_BATCH_SIZE
+        vm.expectRevert("Invalid batch size");
+        vault.harvestBatch(21);
+        
+        // Harvest maximum allowed batch size
+        vault.harvestBatch(20);
         
         // Check progress
-        (uint256 processed, uint256 total) = vault.getClaimProgress();
+        (uint256 processed, uint256 total) = vault.getHarvestProgress();
         assertEq(processed, 20);
         assertEq(total, 21);
         
-        // Claim remaining NFT
-        vault.claimBatch(1);
+        // Harvest remaining NFT
+        vault.harvestBatch(1);
         
-        (processed, total) = vault.getClaimProgress();
+        (processed, total) = vault.getHarvestProgress();
         assertEq(processed, 21);
         assertEq(total, 21);
+        
+        // Vault should now be matured
+        assertTrue(vault.matured());
     }
     
     function testRedemptionAfterMaturity() public {
@@ -319,22 +363,22 @@ contract ImmutableVaultTest is Test {
         // Set claimable
         mockNFT.setClaimable(1, 1000e18);
         
-        // Try to redeem before maturity
-        vm.prank(user1);
-        uint256 redeemAmount = 500e18;
-        
-        // Should work but not trigger maturity
-        assertFalse(vault.matured());
-        
         // Advance to maturity
         vm.warp(MATURITY_TIMESTAMP);
         
-        // Now redemption should trigger maturity
+        // Try to redeem before any harvest (should fail due to no balance)
         vm.prank(user1);
+        uint256 redeemAmount = 500e18;
+        vm.expectRevert("No tokens available for redemption");
         vault.redeem(redeemAmount);
         
-        // Check maturity triggered
+        // Harvest first to create balance
+        vault.harvestBatch(1);
         assertTrue(vault.matured());
+        
+        // Now redemption should work with full backing
+        vm.prank(user1);
+        vault.redeem(redeemAmount);
         
         // Check backing ratio is 1:1 (perfect)
         assertEq(vault.getBackingRatio(), 1e18);
@@ -391,11 +435,40 @@ contract ImmutableVaultTest is Test {
         mockNFT.setClaimable(1, 1000e18);
         vm.warp(MATURITY_TIMESTAMP);
         
+        // Harvest first
+        vault.harvestBatch(1);
+        
         // Redeem tiny amount
         vm.prank(user1);
         vault.redeem(1); // 1 wei of vS
         
         // Should work without reverting
+        assertTrue(vault.matured());
+    }
+    
+    function testHarvestBeforeMaturity() public {
+        // Setup: Deposit NFTs and make them claimable
+        mockNFT.mint(user1, 1, 1000e18);
+        mockNFT.mint(user1, 2, 1000e18);
+        
+        vm.startPrank(user1);
+        vault.deposit(1);
+        vault.deposit(2);
+        vm.stopPrank();
+        
+        // Set claimable amounts
+        mockNFT.setClaimable(1, 1000e18);
+        mockNFT.setClaimable(2, 1000e18);
+        
+        // Try to harvest before maturity
+        vm.expectRevert("Too early - wait for maturity");
+        vault.harvestBatch(2);
+        
+        // Advance to maturity
+        vm.warp(MATURITY_TIMESTAMP);
+        
+        // Now harvest should work
+        vault.harvestBatch(2);
         assertTrue(vault.matured());
     }
     
@@ -413,18 +486,120 @@ contract ImmutableVaultTest is Test {
         mockNFT.setClaimable(1, 1000e18);
         mockNFT.setClaimable(2, 1000e18);
         
+        // Advance to maturity
+        vm.warp(MATURITY_TIMESTAMP);
+        
         // Check keeper balance before
         uint256 keeperBalanceBefore = mockToken.balanceOf(user2);
         assertEq(keeperBalanceBefore, 0);
         
-        // Keeper calls claimBatch
+        // Keeper calls harvestBatch (no incentive in self-keeper mode)
         vm.prank(user2);
-        vault.claimBatch(2);
+        vault.harvestBatch(2);
         
-        // Check keeper received incentive
+        // Check keeper received no incentive (KEEPER_INCENTIVE_BPS = 0)
         uint256 keeperBalanceAfter = mockToken.balanceOf(user2);
-        uint256 expectedIncentive = (2000e18 * 5) / 10_000; // 0.05% of 2000e18 claimed
-        assertEq(keeperBalanceAfter, expectedIncentive);
-        assertTrue(expectedIncentive > 0); // Ensure non-zero reward
+        assertEq(keeperBalanceAfter, 0); // No reward in self-keeper mode
+        
+        // Vault should be matured
+        assertTrue(vault.matured());
+    }
+    
+    function testMintAndRedeemFees() public {
+        // Test comprehensive fee structure: 1% mint + 2% redeem
+        uint256 nftValue = 1000e18;
+        mockNFT.mint(user1, 1, nftValue);
+        
+        // Deposit NFT (1% mint fee)
+        vm.prank(user1);
+        vault.deposit(1);
+        
+        uint256 mintFee = (nftValue * 100) / 10_000; // 10e18
+        uint256 userVsAmount = nftValue - mintFee; // 990e18
+        
+        // Verify mint fee went to treasury
+        assertEq(vsToken.balanceOf(treasury), mintFee);
+        assertEq(vsToken.balanceOf(user1), userVsAmount);
+        
+        // Make NFT claimable and advance to maturity
+        mockNFT.setClaimable(1, nftValue);
+        vm.warp(MATURITY_TIMESTAMP);
+        
+        // Harvest first
+        vault.harvestBatch(1);
+        assertTrue(vault.matured());
+        
+        // Record treasury balance before redemption
+        uint256 treasuryBalanceBefore = mockToken.balanceOf(treasury);
+        
+        // Redeem all vS tokens (2% redeem fee)
+        vm.prank(user1);
+        vault.redeem(userVsAmount);
+        
+        // Calculate expected redemption: proportional share minus 2% fee
+        uint256 totalVsSupply = userVsAmount + mintFee; // 1000e18 total
+        uint256 vaultBalance = nftValue; // 1000e18 claimed
+        uint256 proportionalShare = (userVsAmount * vaultBalance) / totalVsSupply; // 990e18
+        uint256 redeemFee = (proportionalShare * 200) / 10_000; // ~19.8e18 (2%)
+        uint256 expectedUserReceived = proportionalShare - redeemFee; // ~970.2e18
+        
+        // Verify user received correct amount after redeem fee
+        assertEq(mockToken.balanceOf(user1), expectedUserReceived);
+        
+        // Verify redeem fee went to treasury
+        uint256 treasuryBalanceAfter = mockToken.balanceOf(treasury);
+        assertEq(treasuryBalanceAfter - treasuryBalanceBefore, redeemFee);
+    }
+    
+    function testProRataRedemptionPreventsHostageAttack() public {
+        // Setup: Deposit 3 NFTs, make 1 permanently fail
+        mockNFT.mint(user1, 1, 1000e18);
+        mockNFT.mint(user1, 2, 1000e18);
+        mockNFT.mint(user1, 3, 1000e18);
+        
+        vm.startPrank(user1);
+        vault.deposit(1);
+        vault.deposit(2);
+        vault.deposit(3);
+        vm.stopPrank();
+        
+        // Make NFT #2 permanently fail (simulating hostage NFT)
+        mockNFT.setShouldRevert(2, true);
+        
+        // Set claimable amounts for all NFTs
+        mockNFT.setClaimable(1, 1000e18);
+        mockNFT.setClaimable(2, 1000e18); // This will fail permanently
+        mockNFT.setClaimable(3, 1000e18);
+        
+        // Advance to maturity
+        vm.warp(MATURITY_TIMESTAMP);
+        
+        // Harvest partial batch - NFT #2 will fail but others succeed
+        vault.harvestBatch(3);
+        
+        // Vault balance should be 2000e18 (2 out of 3 NFTs claimed)
+        uint256 vaultBalance = vault.totalAssets();
+        assertEq(vaultBalance, 2000e18);
+        
+        // Check backing ratio: 2000e18 / 3000e18 = 66.67%
+        uint256 backingRatio = vault.getBackingRatio();
+        assertTrue(backingRatio > 0.666e18 && backingRatio < 0.667e18);
+        
+        // Users can still redeem pro-rata despite failed NFT #2
+        uint256 userVsBalance = vsToken.balanceOf(user1); // 2970e18
+        
+        // Redeem half of user's vS tokens
+        vm.prank(user1);
+        vault.redeem(userVsBalance / 2);
+        
+        // User should receive proportional amount based on current backing
+        uint256 userBalance = mockToken.balanceOf(user1);
+        
+        // Expected: (1485e18 * 2000e18) / 3000e18 = 990e18 gross
+        // Minus 2% redeem fee = ~970e18
+        assertTrue(userBalance > 965e18 && userBalance < 975e18);
+        
+        // Vault is still functional despite permanent NFT failure
+        // No "hostage NFT" blocking all redemptions
     }
 } 

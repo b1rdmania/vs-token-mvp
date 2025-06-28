@@ -4,167 +4,116 @@
 
 ## What vS Vault Does
 
-You give us your locked NFT worth 1000 S tokens. We give you 1000 vS tokens. You sell vS tokens for cash today. We wait 9 months, then claim your S tokens.
+You give us your locked fNFT worth 1000 S tokens. We give you 990 vS tokens (1% mint fee). You sell vS tokens for cash today. We wait until April 2026, then claim your S tokens.
 
-## Risks You Take
+## Key Risks
 
 ### 1. Market Risk - HIGH RISK ⚠️
 
 **The Problem**: vS tokens trade at a discount
 
 **Example**: 
-- You get 1000 vS tokens today
+- You get 990 vS tokens today (after 1% mint fee)
 - Market price: 250 S tokens (75% discount)
-- You lose 750 S tokens vs waiting 9 months
+- You lose 740 S tokens vs waiting 9 months
 
 **Why This Happens**:
 - People want cash now, not later
-- Market prices in time value
+- Market prices in time value of money
 - Supply and demand set the price
 
 **Our Role**: We don't control the price. The market does.
 
-### 2. Smart Contract Risk - MEDIUM RISK ⚠️
-
-**The Problem**: Code might have bugs
-
-**What Could Go Wrong**:
-- Contracts could have security holes
-- Hackers could steal funds
-- Bugs could lock your tokens
-
-**Our Protection**:
-- Professional audit before launch
-- Simple code (fewer bugs)
-- Battle-tested patterns
-- No admin keys (we can't steal funds)
-
-**Your Risk**: If contracts break, you lose money
-
-### 3. Liquidity Risk - MEDIUM RISK ⚠️
+### 2. Liquidity Risk - MEDIUM RISK ⚠️
 
 **The Problem**: You might not be able to sell vS tokens
 
 **When This Happens**:
-- Month 6-9: Few buyers (why buy vS at 95% when S costs 100%?)
-- Low trading volume
+- Months 6-9: Few buyers (why buy vS at 95% when S costs 100%?)
+- Low trading volume on Shadow DEX
 - Big price swings
 
 **Result**: You might be stuck with vS tokens you can't sell
 
-### 4. External Contract Risk - MEDIUM RISK ⚠️
+### 3. Smart Contract Risk - MEDIUM RISK ⚠️
+
+**The Problem**: Code might have bugs
+
+**What Could Go Wrong**:
+- Contracts could have security vulnerabilities
+- Hackers could exploit the system
+- Bugs could lock your tokens
+
+**Our Protection**:
+- Professional audit before launch
+- Simple, immutable code design
+- No admin keys (we can't steal funds)
+
+**Your Risk**: If contracts fail, you lose money
+
+### 4. External Dependency Risk - MEDIUM RISK ⚠️
 
 **The Problem**: We depend on Sonic's fNFT contract
 
 **What Could Go Wrong**:
-- Sonic changes their contract
-- Their contract has bugs
-- Interface stops working
+- Sonic changes their contract interface
+- Their contract has bugs or fails
+- Delegation system stops working
 
 **Result**: We might not be able to claim your S tokens
 
-### 5. Redemption Risk - LOW RISK ⚠️
+### 5. Redemption Window Risk - LOW RISK ⚠️
 
-**The Problem**: You have 6 months to redeem after maturity
+**The Problem**: You have 6 months to redeem after April 2026
 
 **Timeline**:
-- Month 9: Redemption opens
-- Month 15: Redemption closes
-- After Month 15: Leftover tokens get swept
+- April 15, 2026: Redemption opens (1:1 vS → S, minus 2% fee)
+- October 15, 2026: Grace period ends (180 days later)
+- After October 15, 2026: Leftover tokens swept to treasury
 
 **Your Risk**: If you don't redeem in time, you lose your tokens
 
-## What Happens If You Miss Redemption
+## Fee Structure
 
-**The Window**: You have exactly 180 days after maturity to redeem your vS tokens
+- **Mint Fee**: 1% (when depositing fNFT)
+- **Redeem Fee**: 2% (when redeeming vS for S)
+- **Total Cost**: ~3% for immediate liquidity vs. 9-month wait
 
-**Timeline Example**:
-- March 1, 2026: Maturity hits, redemption opens
-- September 1, 2026: Grace period ends (180 days later)
-- September 2, 2026: All leftover S tokens swept to treasury
-
-**If You Miss It**:
-- Your vS tokens become worthless
-- The S tokens backing them get swept to protocol treasury
-- **No admin rescue** - we cannot help you recover them
-- **No exceptions** - the contract is immutable
-
-**Why No Extensions**:
-- Contract has no admin functions
-- Code cannot be changed after deployment
-- No governance to vote on exceptions
-- Immutable design prevents any manual intervention
-
-**How to Avoid This**:
-- Set calendar reminders for maturity date
-- Check the vault regularly after month 9
-- Don't wait until the last minute
-- Remember: there is no early redemption option
+**Example**: 1000 S fNFT → 990 vS → ~970 S after redemption
 
 ## What We Don't Control
 
-### Price
-We don't set vS token prices. The market does. We can't promise any specific price.
-
-### Timing
-We don't control when Sonic's fNFTs mature. We follow their schedule.
-
-### External Contracts
-We don't control Sonic's contracts. If they break, we can't fix them.
-
-### Market Conditions
-We don't control trading volumes, liquidity, or demand for vS tokens.
+- **Price**: Market determines vS token value, not us
+- **Timing**: We follow Sonic's fNFT maturity schedule
+- **External Contracts**: We can't fix Sonic's systems if they break
+- **Market Conditions**: Trading volume and liquidity depend on users
 
 ## What We Do Control
 
-### Security
-We write secure code. We get audits. We use best practices.
-
-### Transparency
-We tell you exactly how everything works. No hidden fees or tricks.
-
-### Immutability
-Once deployed, we can't change the contracts. No rug pulls possible.
+- **Security**: Audited, immutable smart contracts
+- **Transparency**: Open source code and clear documentation
+- **Fee Structure**: Fixed 1% mint + 2% redeem fees (immutable)
 
 ## Before You Use vS Vault
 
 ### Ask Yourself:
-1. Do I need cash now more than full value later?
+1. Do I need cash now more than full value in April 2026?
 2. Can I afford to lose 50-90% of my token value?
-3. Do I understand how this works?
+3. Do I understand how market pricing works?
 4. Am I comfortable with these risks?
 
 ### If You Answer "No" to Any Question:
-Don't use vS Vault. Wait for your tokens to unlock naturally.
+Don't use vS Vault. Wait for your fNFTs to unlock naturally.
 
-## Legal Stuff
+## Legal Disclaimers
 
-### No Promises
-We don't promise profits. We don't promise specific prices. We don't promise anything will work perfectly.
-
-### Your Responsibility
-You decide if this is right for you. You take all the risks. You could lose money.
-
-### No Guarantees
-Past performance doesn't predict future results. Test tokens aren't real tokens. Demo results don't guarantee real results.
-
-### Jurisdiction
-This might be illegal where you live. Check your local laws.
-
-## Emergency Contacts
-
-**If something goes wrong:**
-- Check our website for updates
-- Join our Discord for support
-- Contact us at [email]
-
-**If you lose money:**
-- We're sorry, but we can't help
-- No insurance or guarantees
-- All sales are final
+- **No Promises**: We don't guarantee profits or specific prices
+- **Your Responsibility**: You decide if this is right for you and accept all risks
+- **No Insurance**: No guarantees, insurance, or refunds available
+- **Jurisdiction**: Check your local laws - this might be restricted where you live
 
 ---
 
-**Bottom Line**: vS Vault is risky. You could lose most of your money. Only use money you can afford to lose. Don't invest more than you can handle losing.
+**Bottom Line**: vS Vault is risky. You could lose most of your money. Only use money you can afford to lose.
 
-**Last Updated**: June 2025 
+**Timeline**: Launch July 2025, Maturity April 2026, Redemption ends October 2026 

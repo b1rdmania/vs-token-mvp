@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {ERC20} from "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
+import {ERC20} from "./base/ERC20.sol";
 
 /**
  * @title ImmutableVSToken - Production Token Contract
@@ -29,7 +29,7 @@ contract ImmutableVSToken is ERC20 {
         address _minter,
         string memory _name,
         string memory _symbol
-    ) ERC20(_name, _symbol) {
+    ) ERC20(_name, _symbol, 18) {
         require(_minter != address(0), "Minter cannot be zero address");
         minter = _minter;
     }

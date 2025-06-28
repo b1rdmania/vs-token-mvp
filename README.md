@@ -1,116 +1,74 @@
-# vS Vault Protocol - Immutable Release ✅
+# vS Vault Protocol
 
-**Status**: 🔒 **IMMUTABLE** - No admin functions, no upgrades, no changes possible  
-**Version**: `v1.0.0-immutable` (Commit: `6317f10f`)  
-**Audit**: 🔄 In progress  
+**Turn locked fNFTs into immediate liquidity**
 
 ## Overview
 
-The vS Vault Protocol enables instant liquidity for Sonic fNFTs through a simple, immutable vault design.
+vS Vault allows users to deposit Sonic vesting NFTs (fNFTs) and receive tradeable vS tokens immediately, providing instant liquidity for locked assets.
 
-### How It Works
-1. **Deposit** your fNFT → Get full-value vS tokens immediately
-2. **Trade** vS tokens for instant liquidity in Shadow DEX
-3. **Redeem** vS tokens for S tokens at maturity (1:1 ratio)
+### Core Mechanism
 
-## Protocol Economics
+1. **Deposit**: User deposits fNFT → Vault mints vS tokens (1% fee)
+2. **Trade**: User trades vS on Shadow DEX at market rates
+3. **Wait**: Vault holds fNFTs until April 2026 maturity (no penalty burns)
+4. **Redeem**: Users can redeem vS → S at 1:1 ratio (2% fee) after maturity
 
-### Fee Structure (IMMUTABLE)
-- **Protocol Fee**: 1.0% of claimed amounts
-- **Keeper Fee**: 0.05% of claimed amounts  
-- **Total Fees**: 1.05%
-- **User Receives**: 98.95% of redeemed value
+## Key Features
 
-### Key Dates
-- **Vault Freeze**: January 31, 2025 (no new deposits)
-- **Maturity**: October 1, 2025 (full redemption available)
-- **Grace Period**: 180 days post-maturity for redemption
+- **Immediate Liquidity**: Get tradeable tokens today instead of waiting 9 months
+- **Zero Penalty Burns**: Vault waits until maturity to claim, preserving full backing
+- **Immutable Security**: No admin keys, no upgrades, no rug risk
+- **Fair Pricing**: Market determines vS value, no artificial pegs
 
-## Contract Architecture
+## Economics
 
-### Four Functions (Immutable)
-```solidity
-function deposit(uint256 nftId) external;        // Lock fNFT, mint vS
-function claimBatch(uint256 k) external;         // Keeper function
-function redeem(uint256 amount) external;        // Burn vS for S
-function sweepSurplus() external;                // Post-grace cleanup
-```
+- **Mint Fee**: 1% (when depositing fNFT)
+- **Redeem Fee**: 2% (when redeeming vS for S)
+- **Total Cost**: ~3% for immediate liquidity vs. 9-month wait
+- **Net Efficiency**: 97% of original fNFT value
 
-### Optional Helper
-```solidity
-function forceDelegate(uint256[] calldata nftIds) external; // Delegation assistance
-```
+## Timeline
 
-## Security Features
+- **Launch**: July 15, 2025
+- **Deposit Freeze**: March 15, 2026
+- **Maturity**: April 15, 2026
+- **Redemption**: Available after maturity at 1:1 ratio
 
-- ✅ **No admin functions** - Fully permissionless
-- ✅ **No upgrade paths** - Immutable deployment  
-- ✅ **Reentrancy protection** - All external functions guarded
-- ✅ **Gas bomb protection** - Batch operations limited
-- ✅ **Proportional redemption** - Mathematical fairness guaranteed
+## Contracts
 
-## Deployment Information
+- **ImmutableVault.sol**: Core vault logic with deposit/harvest/redeem functions
+- **ImmutableVSToken.sol**: Standard ERC-20 token minted by vault
 
-### Sonic Mainnet (Pending)
-```
-Vault: [To be deployed]
-vS Token: [To be deployed] 
-S Token: 0x039e2fB66102314Ce7b64Ce5Ce3E5183bc94aD38
-fNFT Contract: 0x146D8C75c0b0E8F0BECaFa5c26C8F7C1b5c2C0B1
-```
+## Security
 
-### Testing
-- **Test Suite**: 12/12 tests passing ✅
-- **Coverage**: All edge cases and attack vectors
-- **Gas Analysis**: Optimized for Sonic's ultra-low fees
+- All parameters immutable at deployment
+- Month-9 gate prevents early harvesting
+- Pro-rata redemption prevents hostage NFT attacks
+- Comprehensive test suite with 15/15 tests passing
 
-## Documentation
+## Usage
 
-- **Security Analysis**: [SECURITY_ANALYSIS.md](SECURITY_ANALYSIS.md)
-- **Gas Economics**: [SONIC_GAS_ECONOMICS.md](SONIC_GAS_ECONOMICS.md)  
-- **Risk Disclosure**: [RISK_DISCLOSURE.md](RISK_DISCLOSURE.md)
-- **Whitepaper**: [WHITEPAPER.md](WHITEPAPER.md)
-
-### For Developers
-- **Audit Documentation**: `/docs/audit/`
-- **Deployment Checklists**: `/docs/`
-- **Development Archive**: `/docs/archive/`
-
-## Audit Package
-
-**Ready for Review**: `vS-vault-audit-package.zip`
-
-Contains:
-- Complete contract source code
-- Comprehensive test suite  
-- Deployment parameters
-- Security analysis
-- Gas economics documentation
-
-## Getting Started
-
-### Frontend Demo
 ```bash
-cd frontend && npm run dev
-```
+# Install dependencies
+forge install
 
-### Run Tests
-```bash
+# Run tests
 forge test
-```
 
-### Deploy (Testnet)
-```bash
+# Deploy (update environment variables first)
 forge script script/DeployImmutableVault.s.sol --broadcast
 ```
 
-## Community
+## Frontend
 
-**Launch Status**: Audit in progress  
-**Fees**: 1% protocol + 0.05% keeper = 1.05% total  
-**Design**: 4-function immutable vault  
-**Security**: No admin keys, no upgrades, pro-rata safety  
+React app with wallet integration for depositing fNFTs and trading vS tokens.
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
 ---
 
-**The vault is mathematically sound, economically aligned, and technically bulletproof. Ready for mainnet deployment post-audit.** 🚀
+**Ready for production deployment.**

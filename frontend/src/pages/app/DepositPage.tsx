@@ -14,46 +14,55 @@ const mockNfts: Nft[] = [
   {
     id: 1234,
     lockedAmount: 4800,
-    vestingEndDate: '16 Mar 2026',
+    vestingEndDate: '15 Apr 2026',
   },
   {
     id: 5678,
     lockedAmount: 10000,
-    vestingEndDate: '16 Mar 2026',
+    vestingEndDate: '15 Apr 2026',
   },
 ];
 
-const DepositModal = ({ nft, onClose }: { nft: Nft; onClose: () => void }) => (
-  <div className="modal-backdrop">
-    <div className="modal-content content-card">
-      <h2>Deposit NFT #{nft.id}</h2>
-      <p>Deposit your fNFT and receive the full value in vS tokens immediately.</p>
-      
-      <div className="modal-warning">
-        <strong>⚠️ Warning:</strong> This action is irreversible. Your fNFT will be permanently converted to vS tokens.
-      </div>
-      
-      <div className="modal-details">
-        <div>
-          <span>fNFT Value</span>
-          <strong>{nft.lockedAmount.toLocaleString()} S</strong>
+const DepositModal = ({ nft, onClose }: { nft: Nft; onClose: () => void }) => {
+  const mintFee = Math.floor(nft.lockedAmount * 0.01); // 1% mint fee
+  const userReceives = nft.lockedAmount - mintFee; // Amount after fee
+  
+  return (
+    <div className="modal-backdrop">
+      <div className="modal-content content-card">
+        <h2>Deposit NFT #{nft.id}</h2>
+        <p>Deposit your fNFT and receive vS tokens immediately (1% protocol fee applies).</p>
+        
+        <div className="modal-warning">
+          <strong>⚠️ Warning:</strong> This action is irreversible. Your fNFT will be permanently converted to vS tokens.
         </div>
-        <div>
-          <span>vS Tokens You Get</span>
-          <strong>{nft.lockedAmount.toLocaleString()} vS</strong>
+        
+        <div className="modal-details">
+          <div>
+            <span>fNFT Value</span>
+            <strong>{nft.lockedAmount.toLocaleString()} S</strong>
+          </div>
+          <div>
+            <span>Protocol Fee (1%)</span>
+            <strong className="fee-amount">-{mintFee.toLocaleString()} S</strong>
+          </div>
+          <div>
+            <span>vS Tokens You Get</span>
+            <strong className="vs-amount">{userReceives.toLocaleString()} vS</strong>
+          </div>
+          <div>
+            <span>Gas Estimate</span>
+            <strong>~0.005 S</strong>
+          </div>
         </div>
-        <div>
-          <span>Gas Estimate</span>
-          <strong>~0.005 S</strong>
+        <div className="modal-actions">
+          <button className="button-secondary" onClick={onClose}>Cancel</button>
+          <button className="button-primary">Confirm Deposit</button>
         </div>
-      </div>
-      <div className="modal-actions">
-        <button className="button-secondary" onClick={onClose}>Cancel</button>
-        <button className="button-primary">Confirm Deposit</button>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export const DepositPage: React.FC = () => {
   const { isConnected } = useAccount();
@@ -92,26 +101,32 @@ export const DepositPage: React.FC = () => {
       )}
 
       <div className="nft-grid">
-        {mockNfts.map((nft) => (
-          <div key={nft.id} className="content-card nft-card">
-            <h3>Token ID: {nft.id}</h3>
-            <div className="nft-details">
-              <div>
-                <span>Locked Amount</span>
-                <strong>{nft.lockedAmount.toLocaleString()} S</strong>
+        {mockNfts.map((nft) => {
+          const mintFee = Math.floor(nft.lockedAmount * 0.01); // 1% mint fee
+          const userReceives = nft.lockedAmount - mintFee; // Amount after fee
+          
+          return (
+            <div key={nft.id} className="content-card nft-card">
+              <h3>Token ID: {nft.id}</h3>
+              <div className="nft-details">
+                <div>
+                  <span>Locked Amount</span>
+                  <strong>{nft.lockedAmount.toLocaleString()} S</strong>
+                </div>
+                <div>
+                  <span>Vesting End Date</span>
+                  <strong>{nft.vestingEndDate}</strong>
+                </div>
+                <div>
+                  <span>vS Tokens You Get</span>
+                  <strong className="vs-amount">{userReceives.toLocaleString()} vS</strong>
+                  <small className="fee-note">(after 1% fee)</small>
+                </div>
               </div>
-              <div>
-                <span>Vesting End Date</span>
-                <strong>{nft.vestingEndDate}</strong>
-              </div>
-              <div>
-                <span>vS Tokens You Get</span>
-                <strong className="vs-amount">{nft.lockedAmount.toLocaleString()} vS</strong>
-              </div>
+              <button className="button-primary" onClick={() => handleDepositClick(nft)}>Deposit</button>
             </div>
-            <button className="button-primary" onClick={() => handleDepositClick(nft)}>Deposit</button>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {selectedNft && <DepositModal nft={selectedNft} onClose={() => setSelectedNft(null)} />}

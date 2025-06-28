@@ -1,20 +1,22 @@
-# Node
-node_modules
-npm-debug.log
-yarn-error.log
-.npm-cache
+# Dependencies
+node_modules/
 
-# Hardhat
-cache
-artifacts
-coverage
-coverage.json
-typechain-types
+# Build artifacts
+out/
+cache/
+broadcast/
 
-# Editor
-.vscode
-.idea
+# IDE
+.vscode/
+.idea/
 
 # OS
 .DS_Store
-Thumbs.db 
+Thumbs.db
+
+# Environment
+.env
+.env.local
+
+# Logs
+*.log 

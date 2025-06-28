@@ -118,6 +118,44 @@ export const WhitepaperPage: React.FC = () => {
               </div>
 
               <div className="section">
+                <h2>Fee Structure</h2>
+                
+                <div className="fee-breakdown">
+                  <div className="fee-card">
+                    <h3>Protocol Fees (Immutable)</h3>
+                    <ul>
+                      <li><strong>Mint Fee:</strong> 1% when depositing fNFT → vS</li>
+                      <li><strong>Redeem Fee:</strong> 2% when redeeming vS → S</li>
+                      <li><strong>Keeper Fee:</strong> 0% (self-keeper mode)</li>
+                    </ul>
+                  </div>
+
+                  <div className="fee-card">
+                    <h3>User Economics</h3>
+                    <p><strong>Full Cycle Cost:</strong> ~3% total protocol fees</p>
+                    <p><strong>Net Efficiency:</strong> ~97% of original fNFT value</p>
+                    <p><strong>Example:</strong> Deposit 1000 S fNFT → Get 990 vS → Redeem for ~970 S</p>
+                  </div>
+
+                  <div className="fee-card">
+                    <h3>Fee Justification</h3>
+                    <ul>
+                      <li><strong>Protocol Sustainability:</strong> Fees fund ongoing development and infrastructure</li>
+                      <li><strong>Market Competitive:</strong> 3% total cost vs 9-month opportunity cost</li>
+                      <li><strong>Value Creation:</strong> Immediate liquidity worth the small fee</li>
+                      <li><strong>Immutable:</strong> Fee rates locked forever, no surprise changes</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="highlight-box">
+                  <h3>Fee Transparency</h3>
+                  <p><strong>Fees</strong>: 1% when you mint vS, 2% when you redeem. Net cost ≈ 3% for nine-month liquidity.</p>
+                  <p>All fees are clearly displayed in the UI before any transaction. No hidden costs, no surprise deductions.</p>
+                </div>
+              </div>
+
+              <div className="section">
                 <h2>Risk Disclosure</h2>
                 
                 <div className="risk-grid">
@@ -133,9 +171,10 @@ export const WhitepaperPage: React.FC = () => {
                   <div className="risk-card guarantees">
                     <h3>What We Guarantee</h3>
                     <ul>
-                      <li><strong>1:1 Redemption:</strong> At month 9+, redeem vS → S at exactly 1:1 ratio</li>
+                      <li><strong>1:1 Redemption:</strong> At month 9+, redeem vS → S at 1:1 ratio (minus 2% fee)</li>
                       <li><strong>Full Backing:</strong> Every vS backed by 1 S token (zero penalty burns)</li>
                       <li><strong>No Rug Risk:</strong> Immutable contracts, no admin control</li>
+                      <li><strong>Fixed Fees:</strong> 1% mint + 2% redeem rates locked forever</li>
                     </ul>
                   </div>
 
