@@ -1,5 +1,36 @@
+/**
+ * @title ShadowDEXIntegration - vS Token Trading Interface
+ * @author vS Vault Team
+ * @description Component for trading vS tokens on Shadow DEX (Sonic's native AMM)
+ * 
+ * @purpose
+ * Provides users with immediate liquidity for their vS tokens by connecting to Shadow DEX.
+ * This is where the "cash today" value proposition gets realized - users can instantly
+ * convert their vault-minted vS tokens into S tokens or other assets.
+ * 
+ * @functionality
+ * - Displays current vS token balance from user's wallet
+ * - Shows Shadow DEX pool liquidity and pricing information  
+ * - Provides direct swap interface (vS → S or other tokens)
+ * - Links to Shadow DEX for advanced trading features
+ * - Real-time price discovery based on market demand
+ * 
+ * @market_dynamics
+ * - vS tokens typically trade at discount to face value (time premium)
+ * - Discount decreases as maturity approaches (April 2026)
+ * - Market sets pricing based on supply/demand, not protocol
+ * - Provides immediate exit liquidity for depositors
+ * 
+ * @integration_notes
+ * - Uses Shadow DEX API for real-time pricing
+ * - Connects to user's wallet for balance checks
+ * - Handles slippage and transaction confirmations
+ * - Mobile-optimized for Sonic ecosystem users
+ */
+
 import React, { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
+import './ShadowDEXIntegration.css';
 
 // Contract addresses (Sonic Mainnet)
 const CONTRACTS = {
