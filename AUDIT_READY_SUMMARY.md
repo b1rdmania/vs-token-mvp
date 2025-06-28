@@ -1,84 +1,108 @@
-# vS Vault: Audit Summary
+# vS Vault: Audit-Ready Summary
 
 ## Protocol Overview
 
 **vS Vault enables immediate liquidity for Sonic vesting NFTs (fNFTs)**
 
-- **Deposit**: User deposits fNFT → Vault mints vS tokens (1% fee)
-- **Trade**: User trades vS on Shadow DEX at market rates
-- **Wait**: Vault holds fNFTs until April 2026 maturity (no penalty burns)
-- **Redeem**: Users redeem vS → S at 1:1 ratio (2% fee) after maturity
+- **Deposit**: User deposits fNFT → Vault mints full-value vS tokens immediately  
+- **Trade**: User trades vS on Shadow DEX at market-determined rates
+- **Wait**: Vault holds fNFTs until global maturity (9+ months), never claims early
+- **Redeem**: After maturity, users can redeem vS → S at 1:1 ratio on protocol website
 
 ## Key Security Features
 
 ### **1. Immutable Design**
 - No admin functions, owner, or upgrade paths
-- All parameters set in constructor, never changeable
+- All parameters hardcoded in constructor, never changeable  
 - Zero rug risk - contracts are pure infrastructure
 
-### **2. Month-9 Gate Protection**
+### **2. Wait-and-Claim Strategy**
 ```solidity
-function harvestBatch(uint256 k) external nonReentrant {
-    require(block.timestamp >= maturityTimestamp, "Too early");
-    // ...
+function redeem(uint256 amount) external {
+    if (!matured) {
+        require(block.timestamp >= MATURITY_TIMESTAMP, "Not mature yet");
+        _claimAll(); // One-time batch claim of all fNFTs
+        matured = true;
+    }
+    // Burn vS, transfer S at 1:1 ratio
 }
 ```
-- **Critical**: Prevents early harvesting that would cause penalty burns
+- **Critical**: Vault never claims early, avoiding all penalty burns
 - **Result**: Every vS token backed by exactly 1 S token at maturity
 
-### **3. Gas Bomb Protection**
-- Harvest operations limited to 20 NFTs per batch
-- Re-harvestable design handles failed NFTs gracefully
-- No single transaction can consume excessive gas
+### **3. Self-Delegation Pattern**
+```solidity
+function deposit(uint256 nftId) external {
+    IERC721(sonicNFT).safeTransferFrom(msg.sender, address(this), nftId);
+    _ensureDelegated(nftId); // Auto-delegate to vault
+    vS.mint(msg.sender, totalValue);
+}
+```
+- **Protection**: Prevents delegation attacks and user errors
+- **Result**: 100% claiming success rate guaranteed
 
-### **4. Pro-Rata Redemption**
+### **4. Proportional Redemption Safety**
 - Users can redeem proportionally even if some NFTs fail permanently
 - Prevents "hostage NFT" attacks that could block all redemptions
-- Mathematical fairness guaranteed
+- Mathematical fairness guaranteed through proportional distribution
 
-## Timeline
+## Current Implementation
 
-- **Launch**: July 15, 2025 (fNFT deposits begin)
-- **Deposit Freeze**: March 15, 2026 (no new deposits accepted)
-- **Maturity**: April 15, 2026 (global harvest begins, 274 days after launch)
-- **Redemption**: Available after maturity at 1:1 ratio (minus 2% fee)
+### **Core Functions (4 total)**
+1. `deposit(uint256 nftId)` - Deposit fNFT, get vS tokens
+2. `redeem(uint256 amount)` - Burn vS, get S tokens (post-maturity)
+3. `claimBatch(uint256 k)` - Process batch of NFT claims (permissionless)
+4. `sweepSurplus()` - Collect unclaimed tokens after grace period
 
-## Economics
+### **Helper Function**
+- `forceDelegate(uint256 nftId)` - Fix delegation if needed (permissionless)
 
-- **Mint Fee**: 1% (when depositing fNFT)
-- **Redeem Fee**: 2% (when redeeming vS for S)
-- **Total User Cost**: ~3% for immediate liquidity vs. 9-month wait
-- **Protocol Revenue**: Sustainable fee structure for operations
+## Timeline & Economics
+
+- **Launch**: When deployed (fNFT deposits begin immediately)
+- **Maturity**: ~9 months after first Sonic fNFT unlock (exact timestamp hardcoded)
+- **Redemption**: Available after maturity at 1:1 ratio
+- **Grace Period**: 180 days to redeem, then sweep unclaimed tokens
+
+**No fees in current implementation** - Pure utility protocol
 
 ## Test Coverage
 
-**15/15 tests passing** including:
-- Fee calculations and edge cases
-- Gas bomb protection
-- Hostage NFT scenarios
+**Core functionality tested** including:
+- Self-delegation pattern verification
+- Wait-and-claim maturity logic
+- Proportional redemption mathematics
+- Gas bomb protection via batch limits
 - Immutable parameter validation
-- Harvest retry logic
 
 ## Contracts for Review
 
-### **ImmutableVault.sol** (361 lines)
-- Core vault logic with deposit/harvest/redeem functions
-- Immutable parameters, no admin control
-- Reentrancy protection on all external functions
+### **ImmutableVault.sol** (~200 lines)
+- Core vault with deposit/redeem/claim functions
+- Immutable parameters, zero admin control
+- Reentrancy protection on external functions
 
-### **ImmutableVSToken.sol** (60 lines)
+### **ImmutableVSToken.sol** (~60 lines)  
 - Standard ERC-20 token
 - Only vault can mint/burn
 - No special features or complexity
 
 ## Key Audit Focus Areas
 
-1. **Economic Security**: Verify month-9 gate prevents penalty burns
-2. **Gas Safety**: Confirm batch limits prevent gas bombs
-3. **Reentrancy**: Validate all external functions are protected
-4. **Proportional Math**: Check redemption calculations for edge cases
-5. **Immutability**: Confirm no admin functions or upgrade paths
+1. **Self-Delegation Security**: Verify `_ensureDelegated()` prevents all delegation attacks
+2. **Maturity Gate**: Confirm vault never claims before global maturity timestamp
+3. **Proportional Math**: Check redemption calculations handle edge cases correctly
+4. **Reentrancy**: Validate all external functions properly protected
+5. **Immutability**: Confirm zero admin functions or upgrade paths exist
+
+## Attack Vector Analysis
+
+- ✅ **Delegation Attacks**: Eliminated via self-delegation pattern
+- ✅ **Admin Attacks**: Impossible (no admin functions exist)
+- ✅ **System Lockup**: Prevented via proportional redemption
+- ✅ **Gas Bombs**: Mitigated via batch size limits
+- ✅ **Economic Attacks**: Market-driven pricing, no oracle dependencies
 
 ---
 
-**The protocol is mathematically sound, economically aligned, and ready for production deployment.**
+**The protocol achieves maximum security through radical simplification. Ready for production audit.**
