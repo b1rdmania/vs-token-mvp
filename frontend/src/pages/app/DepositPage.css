@@ -86,6 +86,19 @@
   font-weight: bold;
 }
 
+.fee-amount {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.fee-note {
+  display: block;
+  color: #6c757d;
+  font-size: 0.8rem;
+  font-weight: normal;
+  margin-top: 0.25rem;
+}
+
 .nft-card .button-primary {
   width: 100%;
 }

@@ -17,9 +17,9 @@ export const LandingPage: React.FC = () => {
       <main>
         <section className="hero-section">
           <div className="container">
-            <h1 className="hero-title">Turn Locked Tokens into Cash</h1>
+            <h1 className="hero-title">Immediate Liquidity for Locked Tokens</h1>
             <p className="hero-subtitle">
-              Deposit your locked fNFT. Get vS tokens worth the full amount. Sell them for cash today.
+              Deposit your fNFT, get vS tokens immediately, trade for cash today. 1:1 redemption available April 2026.
             </p>
             <div className="hero-cta">
               <Link to="/app" className="button-primary button-hero">
@@ -33,7 +33,7 @@ export const LandingPage: React.FC = () => {
               </Link>
             </div>
             <div className="hero-visual">
-              <img src="https://placehold.co/800x200/F7F9FC/0D111C?text=fNFT+%E2%86%92+Vault+%E2%86%92+vS+%E2%86%92+DeFi" alt="vS Token Protocol Flow" />
+              <img src="https://placehold.co/800x200/F7F9FC/0D111C?text=fNFT+%E2%86%92+Vault+%E2%86%92+vS+%E2%86%92+Cash" alt="vS Token Protocol Flow" />
             </div>
           </div>
         </section>
@@ -41,51 +41,82 @@ export const LandingPage: React.FC = () => {
         <section className="explainer-section">
           <div className="container">
             <div className="explainer-header">
-              <h2 className="explainer-title">🚀 vS Vault: Get Full Value Now, Pay Time Discount</h2>
-              <p className="explainer-subtitle">The Simple Model</p>
+              <h2 className="explainer-title">How It Works</h2>
+              <p className="explainer-subtitle">1. Deposit fNFT → 2. Get vS tokens → 3. Trade instantly → 4. Redeem 1:1 at maturity</p>
             </div>
             
             <div className="process-grid">
               <div className="process-card">
                 <div className="step-number">1</div>
-                <h3>Deposit fNFT</h3>
-                <p>Transfer your entire fNFT to the vault permanently</p>
+                <h3>Deposit Your fNFT</h3>
+                <p>Transfer your vesting NFT to the vault permanently. Get full value immediately.</p>
               </div>
               <div className="process-card">
                 <div className="step-number">2</div>
-                <h3>Get Full Value vS</h3>
-                <p>Receive vS tokens equal to fNFT's TOTAL value (1000 vS for 1000 S fNFT)</p>
+                <h3>Receive vS Tokens</h3>
+                <p>Vault mints 99% of face value as vS tokens (1% mint fee). Example: 1,000 S locked → 990 vS in your wallet</p>
               </div>
               <div className="process-card">
                 <div className="step-number">3</div>
-                <h3>Market Prices Time</h3>
-                <p>vS trades at discount (0.25 S) reflecting time to maturity</p>
+                <h3>Trade Immediately</h3>
+                <p>Swap vS for cash on Shadow DEX. Market determines price based on time to maturity.</p>
               </div>
               <div className="process-card">
                 <div className="step-number">4</div>
-                <h3>Prices Should Converge</h3>
-                <p>As months pass, vS price should converge toward full S value</p>
+                <h3>April 2026: Global Harvest</h3>
+                <p>Vault claims all fNFTs at 0% penalty burn. Perfect 1:1 backing achieved.</p>
               </div>
             </div>
 
-            <div className="comparison-grid">
-              <div className="comparison-card without">
-                <h3>😔 Without vS Vault</h3>
-                <ul>
-                  <li>fNFT locked for 9 months</li>
-                  <li>Can only claim 25% now</li>
-                  <li>Must wait for full value</li>
-                  <li>No immediate liquidity</li>
-                </ul>
+            <div className="features-section">
+              <h3>Key Benefits</h3>
+              <div className="features-grid">
+                <div className="feature-card">
+                  <h4>✅ Immediate Liquidity</h4>
+                  <p>Cash today, not 9 months from now</p>
+                </div>
+                <div className="feature-card">
+                  <h4>✅ Fair Pricing</h4>
+                  <p>Market sets rates, no artificial pegs</p>
+                </div>
+                <div className="feature-card">
+                  <h4>✅ Zero Penalty Burns</h4>
+                  <p>Vault waits until maturity</p>
+                </div>
+                <div className="feature-card">
+                  <h4>✅ DeFi Ready</h4>
+                  <p>Standard ERC-20, works everywhere</p>
+                </div>
+                <div className="feature-card">
+                  <h4>✅ No Rug Risk</h4>
+                  <p>Immutable contracts, no admin keys</p>
+                </div>
+                <div className="feature-card">
+                  <h4>✅ 1:1 Redemption</h4>
+                  <p>Guaranteed after April 2026 (minus 2% fee)</p>
+                </div>
               </div>
-              <div className="comparison-card with">
-                <h3>🚀 With vS Vault</h3>
-                <ul>
-                  <li>Get full value vS tokens now</li>
-                  <li>Trade at market discount (0.25x)</li>
-                  <li>Prices should converge over time</li>
-                  <li>Immediate DeFi liquidity</li>
-                </ul>
+            </div>
+
+            <div className="economics-section">
+              <h3>Economics</h3>
+              <div className="economics-table">
+                <div className="economics-row">
+                  <span>Mint Fee:</span>
+                  <span>1% (when depositing fNFT)</span>
+                </div>
+                <div className="economics-row">
+                  <span>Redeem Fee:</span>
+                  <span>2% (when redeeming vS for S)</span>
+                </div>
+                <div className="economics-row">
+                  <span>Total Cost:</span>
+                  <span>~3% for immediate liquidity vs. 9-month wait</span>
+                </div>
+                <div className="economics-row">
+                  <span>Net Efficiency:</span>
+                  <span>97% of original fNFT value</span>
+                </div>
               </div>
             </div>
           </div>
@@ -103,7 +134,7 @@ export const LandingPage: React.FC = () => {
               Launch App
             </Link>
           </div>
-          <p>&copy; {new Date().getFullYear()} vS Vault. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} vS Vault. Ready to turn waiting into doing.</p>
         </div>
       </footer>
     </div>

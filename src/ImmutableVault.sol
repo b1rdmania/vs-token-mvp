@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
-import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
-import {IERC721Receiver} from "openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol";
-import {ReentrancyGuard} from "openzeppelin-contracts/contracts/utils/ReentrancyGuard.sol";
+import {IERC20} from "./interfaces/IERC20.sol";
+import {IERC721} from "./interfaces/IERC721.sol";
+import {IERC721Receiver} from "./interfaces/IERC721Receiver.sol";
+import {ReentrancyGuard} from "./base/ReentrancyGuard.sol";
 import {ImmutableVSToken} from "./ImmutableVSToken.sol";
 
 interface IDecayfNFT is IERC721 {
@@ -16,9 +16,10 @@ interface IDecayfNFT is IERC721 {
 }
 
 /**
- * @title ImmutableVault - Ultra-Minimal Design with Self-Delegation
+ * @title ImmutableVault - Ultra-Minimal Design with Re-Harvestable Batch Pattern
  * @notice Truly immutable vault with zero admin controls after deployment
- * @dev Four functions: deposit, claimBatch, redeem, sweepSurplus + optional forceDelegate helper
+ * @dev Core functions: deposit, harvestBatch, redeem, sweepSurplus + optional forceDelegate helper
+ * @dev Uses wait-and-harvest strategy: no claiming until maturity, then retry-safe batch harvesting
  */
 contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
     // ============ IMMUTABLE STATE ============
@@ -30,24 +31,24 @@ contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
     uint256 public immutable vaultFreezeTimestamp;  // No deposits after this
     
     // ============ CONSTANTS ============
-    uint256 public constant KEEPER_INCENTIVE_BPS = 5;    // 0.05%
-    uint256 public constant PROTOCOL_FEE_BPS = 100;      // 1%
-    uint256 public constant GRACE_PERIOD = 180 days;     // Grace before sweep
-    uint256 public constant MAX_BATCH_SIZE = 20;         // Gas bomb prevention
+    uint256 public constant MINT_FEE_BPS = 100;        // 1% mint fee
+    uint256 public constant REDEEM_FEE_BPS = 200;      // 2% redeem fee (updated)
+    uint256 public constant KEEPER_INCENTIVE_BPS = 0;  // 0% keeper incentive (self-keeper mode)
+    uint256 public constant GRACE_PERIOD = 180 days;   // Grace period for surplus sweep
+    uint256 public constant MAX_BATCH_SIZE = 20;       // Max NFTs per harvest batch
     uint256 public constant MIN_NFT_FACE = 100e18;       // 100 S minimum (prevents dust grief)
     
     // ============ MINIMAL STATE ============
     uint256[] public heldNFTs;
     mapping(uint256 => address) public depositedNFTs;
-    uint256 public nextClaimIndex = 0;    // Rolling pointer for batch claims
+    mapping(uint256 => bool) public processed;    // Track which NFTs successfully claimed
+    uint256 public nextClaim = 0;                 // Rolling pointer for harvest batches
     bool public matured = false;
 
     // ============ EVENTS ============
-    event NFTDeposited(address indexed user, uint256 indexed nftId, uint256 amountMinted);
+    event NFTDeposited(address indexed user, uint256 indexed nftId, uint256 userAmount, uint256 feeAmount);
     event VestedTokensClaimed(address indexed caller, uint256 totalAmount, uint256 incentivePaid);
-    event Redeemed(address indexed user, uint256 vsAmount, uint256 underlyingAmount);
-    event MaturityTriggered(address indexed triggeredBy, uint256 totalClaimed);
-    event RedemptionBounty(address indexed redeemer, uint256 gasUsed);  // For manual tips
+    event Redeemed(address indexed user, uint256 vsAmount, uint256 underlyingAmount, uint256 feeAmount);
     event SurplusSwept(address indexed sweeper, uint256 amount);
     event DelegationForced(uint256 indexed nftId); // For forceDelegate calls
 
@@ -91,7 +92,7 @@ contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
     }
 
     /**
-     * @notice Deposit fNFT and mint full-value vS tokens
+     * @notice Deposit fNFT and mint vS tokens (1% fee taken at mint)
      * @dev Pulls NFT and immediately self-delegates to ensure claimability
      * @param nftId ID of the fNFT to deposit
      */
@@ -113,74 +114,85 @@ contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
         depositedNFTs[nftId] = msg.sender;
         heldNFTs.push(nftId);
 
-        // Mint 1:1 vS tokens for full future value
-        vS.mint(msg.sender, totalValue);
+        // Split 1% fee to treasury, rest to user
+        uint256 feeAmount = (totalValue * MINT_FEE_BPS) / 10_000;
+        uint256 userAmount = totalValue - feeAmount;
+        
+        // Mint vS tokens
+        vS.mint(protocolTreasury, feeAmount);
+        vS.mint(msg.sender, userAmount);
 
-        emit NFTDeposited(msg.sender, nftId, totalValue);
+        emit NFTDeposited(msg.sender, nftId, userAmount, feeAmount);
     }
 
     /**
-     * @notice Batch claim vested tokens using rolling pointer (gas-bomb proof)
-     * @dev Anyone can call - processes k NFTs from nextClaimIndex, updates pointer
+     * @notice Harvest vested tokens using re-harvestable batch pattern (gas-bomb proof)
+     * @dev Anyone can call after maturity - processes k NFTs with retry logic
      * @param k Number of NFTs to process (bounded for gas safety)
      */
-    function claimBatch(uint256 k) external nonReentrant {
+    function harvestBatch(uint256 k) external nonReentrant {
+        require(block.timestamp >= maturityTimestamp, "Too early - wait for maturity");
         require(k > 0 && k <= MAX_BATCH_SIZE, "Invalid batch size");
-        require(nextClaimIndex < heldNFTs.length, "All NFTs processed");
+        require(!matured, "All NFTs already processed");
         
-        uint256 totalClaimed = 0;
-        uint256 processed = 0;
+        uint256 processedNow = 0;
+        uint256 startIndex = nextClaim;
         
         // Process k NFTs starting from pointer
-        while (processed < k && nextClaimIndex < heldNFTs.length) {
-            uint256 nftId = heldNFTs[nextClaimIndex];
+        while (processedNow < k && processedNow < heldNFTs.length) {
+            uint256 nftId = heldNFTs[nextClaim];
             
-            uint256 claimableAmount = IDecayfNFT(sonicNFT).claimable(nftId);
-            if (claimableAmount > 0) {
-                try IDecayfNFT(sonicNFT).claimVestedTokens(nftId) returns (uint256 vested) {
-                    totalClaimed += vested;
+            // Only attempt if not already successfully processed
+            if (!processed[nftId]) {
+                try IDecayfNFT(sonicNFT).claimVestedTokens(nftId) returns (uint256 claimed) {
+                    if (claimed > 0) {
+                        processed[nftId] = true;  // Mark as successfully claimed
+                    }
                 } catch {
-                    // Skip failed claims, continue processing
+                    // Leave processed[nftId] = false, will retry later
                 }
             }
             
-            nextClaimIndex++;
-            processed++;
-        }
-        
-        if (totalClaimed == 0) return;
-
-        // Pay keeper incentive from vault balance
-        uint256 incentiveAmount = (totalClaimed * KEEPER_INCENTIVE_BPS) / 10_000;
-        if (incentiveAmount > 0) {
-            uint256 vaultBalance = IERC20(underlyingToken).balanceOf(address(this));
-            if (vaultBalance >= incentiveAmount) {
-                IERC20(underlyingToken).transfer(msg.sender, incentiveAmount);
+            nextClaim++;
+            processedNow++;
+            
+            // Wrap around if we reach the end but still have unprocessed NFTs
+            if (nextClaim >= heldNFTs.length) {
+                nextClaim = 0;
+                
+                // If we've wrapped around to where we started, we've checked all NFTs
+                if (nextClaim == startIndex || processedNow >= heldNFTs.length) {
+                    break;
+                }
             }
         }
+        
+        // Check if all NFTs are now processed
+        bool allProcessed = true;
+        for (uint256 i = 0; i < heldNFTs.length; i++) {
+            if (!processed[heldNFTs[i]]) {
+                allProcessed = false;
+                break;
+            }
+        }
+        
+        if (allProcessed) {
+            matured = true;  // Only mature when 100% harvested
+        }
 
-        emit VestedTokensClaimed(msg.sender, totalClaimed, incentiveAmount);
+        // No keeper incentive in self-keeper mode (KEEPER_INCENTIVE_BPS = 0)
+        emit VestedTokensClaimed(msg.sender, 0, 0);  // totalClaimed tracked per NFT now
     }
 
     /**
-     * @notice Redeem vS tokens for underlying S tokens (proportional redemption)
-     * @dev Triggers one-time maturity claim if not done yet
+     * @notice Redeem vS tokens for underlying S tokens (proportional redemption with 2% fee)
+     * @dev Pro-rata redemption based on current vault balance (no hostage NFT risk)
      * @param amount Amount of vS tokens to burn
      */
     function redeem(uint256 amount) external nonReentrant {
         require(amount > 0, "Cannot redeem 0");
         require(vS.balanceOf(msg.sender) >= amount, "Insufficient vS balance");
-        
-        uint256 gasStart = gasleft();
-        
-        // Trigger maturity if we've reached it and haven't claimed yet
-        if (!matured && block.timestamp >= maturityTimestamp) {
-            _triggerMaturity();
-            
-            // Emit gas bounty event for manual tips by front-ends
-            uint256 gasUsed = gasStart - gasleft();
-            emit RedemptionBounty(msg.sender, gasUsed);
-        }
+        require(block.timestamp >= maturityTimestamp, "Too early - wait for maturity");
         
         uint256 vsTotalSupply = vS.totalSupply();
         require(vsTotalSupply > 0, "No vS tokens in circulation");
@@ -191,25 +203,26 @@ contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
         
         uint256 redeemableValue = (amount * availableBalance) / vsTotalSupply;
         
-        // Calculate protocol fee (minimum 1 wei if redeemable > 0 to prevent rounding to zero)
-        uint256 protocolFee = (redeemableValue * PROTOCOL_FEE_BPS) / 10_000;
-        if (protocolFee == 0 && redeemableValue > 0) {
-            protocolFee = 1;
+        // Calculate 2% redemption fee
+        uint256 feeAmount = (redeemableValue * REDEEM_FEE_BPS) / 10_000;
+        
+        // Rounding guard: ensure minimum fee for non-zero redemptions
+        if (feeAmount == 0 && redeemableValue > 0) {
+            feeAmount = 1; // 1 wei minimum fee
         }
-        uint256 userAmount = redeemableValue - protocolFee;
+        
+        uint256 userAmount = redeemableValue - feeAmount;
         
         // Burn vS tokens
         vS.burn(msg.sender, amount);
         
-        // Transfer protocol fee to treasury
-        if (protocolFee > 0) {
-            IERC20(underlyingToken).transfer(protocolTreasury, protocolFee);
+        // Transfer fee to treasury and remaining to user
+        if (feeAmount > 0) {
+            IERC20(underlyingToken).transfer(protocolTreasury, feeAmount);
         }
-        
-        // Transfer tokens to user
         IERC20(underlyingToken).transfer(msg.sender, userAmount);
 
-        emit Redeemed(msg.sender, amount, userAmount);
+        emit Redeemed(msg.sender, amount, userAmount, feeAmount);
     }
 
     /**
@@ -241,31 +254,6 @@ contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
     }
 
     /**
-     * @notice Internal function to claim all remaining fNFTs at maturity (0% penalty)
-     * @dev Called automatically on first redemption after maturity
-     */
-    function _triggerMaturity() internal {
-        uint256 totalClaimed = 0;
-        
-        // Claim from all remaining fNFTs (from nextClaimIndex onward)
-        for (uint256 i = nextClaimIndex; i < heldNFTs.length; i++) {
-            uint256 nftId = heldNFTs[i];
-            try IDecayfNFT(sonicNFT).claimVestedTokens(nftId) returns (uint256 claimed) {
-                totalClaimed += claimed;
-            } catch {
-                continue; // Skip failed claims
-            }
-        }
-        
-        // Mark all as processed
-        nextClaimIndex = heldNFTs.length;
-        
-        // Always allow redemption - proportional to what was actually claimed
-        matured = true;
-        emit MaturityTriggered(msg.sender, totalClaimed);
-    }
-
-    /**
      * @notice Internal helper to ensure NFT delegates to this vault
      * @dev Only works if vault owns the NFT
      * @param nftId ID of the NFT to ensure delegation for
@@ -283,14 +271,27 @@ contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
     // ============ VIEW FUNCTIONS ============
     
     /**
-     * @notice Check if vault has matured
+     * @notice Check if vault has matured (all NFTs harvested)
      */
     function hasMatured() external view returns (bool) {
-        return matured || block.timestamp >= maturityTimestamp;
+        return matured;
     }
 
     /**
-     * @notice Get total assets held by vault
+     * @notice Get current backing ratio (vault balance / total vS supply)
+     * @return ratio Backing ratio in 18-decimal precision (1e18 = 100%)
+     */
+    function getBackingRatio() external view returns (uint256 ratio) {
+        uint256 totalSupply = vS.totalSupply();
+        if (totalSupply == 0) return 1e18; // 100% if no tokens issued
+        
+        uint256 vaultBalance = IERC20(underlyingToken).balanceOf(address(this));
+        return (vaultBalance * 1e18) / totalSupply;
+    }
+
+    /**
+     * @notice Get total assets under management (underlying tokens in vault)
+     * @return Total underlying token balance
      */
     function totalAssets() external view returns (uint256) {
         return IERC20(underlyingToken).balanceOf(address(this));
@@ -312,10 +313,21 @@ contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
     }
 
     /**
-     * @notice Get claim progress (how many NFTs processed)
+     * @notice Get harvest progress (how many NFTs processed vs total)
      */
-    function getClaimProgress() external view returns (uint256 processed, uint256 total) {
-        return (nextClaimIndex, heldNFTs.length);
+    function getHarvestProgress() external view returns (uint256 processedCount, uint256 total) {
+        uint256 count = 0;
+        for (uint256 i = 0; i < heldNFTs.length; i++) {
+            if (processed[heldNFTs[i]]) count++;
+        }
+        return (count, heldNFTs.length);
+    }
+
+    /**
+     * @notice Get next batch info for harvesting
+     */
+    function getNextBatch() external view returns (uint256 startIndex, uint256 remaining) {
+        return (nextClaim, heldNFTs.length > nextClaim ? heldNFTs.length - nextClaim : 0);
     }
 
     /**
@@ -326,33 +338,10 @@ contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
     }
 
     /**
-     * @notice Get backing ratio (vault balance / vS supply)
+     * @notice Check if specific NFT has been processed
      */
-    function getBackingRatio() external view returns (uint256) {
-        uint256 supply = vS.totalSupply();
-        if (supply == 0) return 0;
-        return (IERC20(underlyingToken).balanceOf(address(this)) * 1e18) / supply;
-    }
-
-    /**
-     * @notice Calculate keeper bounty for claiming a batch of NFTs
-     * @param batchSize Number of NFTs to claim
-     * @return bountyAmount Expected bounty in underlying tokens
-     */
-    function keeperBountyPerBatch(uint256 batchSize) external view returns (uint256 bountyAmount) {
-        require(batchSize > 0 && batchSize <= MAX_BATCH_SIZE, "Invalid batch size");
-        
-        uint256 totalClaimable = 0;
-        uint256 counted = 0;
-        
-        // Estimate claimable amount from next batch
-        for (uint256 i = nextClaimIndex; i < heldNFTs.length && counted < batchSize; i++) {
-            uint256 nftId = heldNFTs[i];
-            totalClaimable += IDecayfNFT(sonicNFT).claimable(nftId);
-            counted++;
-        }
-        
-        return (totalClaimable * KEEPER_INCENTIVE_BPS) / 10_000;
+    function isProcessed(uint256 nftId) external view returns (bool) {
+        return processed[nftId];
     }
 
     /**

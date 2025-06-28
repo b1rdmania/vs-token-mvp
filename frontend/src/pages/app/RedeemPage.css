@@ -96,6 +96,16 @@
   font-weight: 600;
 }
 
+.fee-amount {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.receive-amount {
+  color: #28a745;
+  font-weight: bold;
+}
+
 .full-width {
   width: 100%;
 } 
