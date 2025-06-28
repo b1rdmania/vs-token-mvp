@@ -56,3 +56,4 @@ export default tseslint.config({
   },
 })
 ```
+/* vS Vault Frontend Application */
