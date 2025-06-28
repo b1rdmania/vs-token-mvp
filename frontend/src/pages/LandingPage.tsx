@@ -18,11 +18,11 @@ export const LandingPage: React.FC = () => {
   }, []);
 
   const stepData = [
-    { id: 1, label: "Deposit", tooltip: "Send fNFT to vault" },
-    { id: 2, label: "Mint vS (-1% fee)", tooltip: "Get liquid tokens instantly" },
-    { id: 3, label: "Swap vS for S/USDC or LP — market discount applies.", tooltip: "Use in any DeFi protocol" },
-    { id: 4, label: "Month-9 harvest", tooltip: "Vault claims at 0% burn" },
-    { id: 5, label: "Redeem 1:1 (-2% fee)", tooltip: "Exchange vS for S tokens" }
+    { id: 1, label: "Send the NFT", tooltip: "Drop your locked Sonic NFT into the vault." },
+    { id: 2, label: "Get vS tokens", tooltip: "Vault mints 99% of the face value as vS (1% mint fee)." },
+    { id: 3, label: "Put vS to work", tooltip: "Swap vS for S or USDC, LP it for trading fees, or lend / farm it for yield—the whole Sonic DeFi stack now opens up to you. The market sets the discount." },
+    { id: 4, label: "Nine-month timer ends", tooltip: "Vault auto-claims every NFT once the burn penalty is 0%." },
+    { id: 5, label: "Swap vS back to S", tooltip: "Burn vS, pay a 2% exit fee, and receive the matching S one-for-one." }
   ];
 
   const benefitVariants = {
@@ -121,7 +121,30 @@ export const LandingPage: React.FC = () => {
         {/* Interactive Stepper */}
         <section className="stepper-section" style={{ color: '#1a1a1a', backgroundColor: 'white' }}>
           <div className="container">
-            <StepIndicator title="60-Second Flow" steps={stepData} />
+            <StepIndicator title="⚡ 60-Second Flow — ELI-15" steps={stepData} />
+            <motion.div 
+              style={{ 
+                marginTop: '48px', 
+                textAlign: 'center',
+                background: '#f8fafc',
+                padding: '24px 32px',
+                borderRadius: '12px',
+                border: '1px solid #e2e8f0'
+              }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
+              <p style={{ 
+                fontSize: '1.1rem', 
+                fontWeight: 600, 
+                color: '#1e293b',
+                margin: 0,
+                lineHeight: 1.6
+              }}>
+                <strong>Bottom line:</strong> skip the nine-month wait for roughly 3% total cost and let your value earn the whole time.
+              </p>
+            </motion.div>
           </div>
         </section>
 

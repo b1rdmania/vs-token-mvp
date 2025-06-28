@@ -33,14 +33,8 @@ const heroSub = "The vS / S pool lives on Shadow. Stake LP to earn trading fees 
 const feeBanner = "Mint fee 1% • Redeem fee 2% • LP earns 0.3% per trade";
 
 export const TradePage: React.FC = () => {
-  const [sellAmount, setSellAmount] = useState('');
-  const [buyAmount, setBuyAmount] = useState('');
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   
-  // Mock data
-  const availableToSell = 512.42;
-  const availableToBuy = 4051.89;
-
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 }
@@ -216,7 +210,7 @@ export const TradePage: React.FC = () => {
         </div>
       </motion.div>
 
-      {/* 5. Swap Boxes (greyed out with tooltip) */}
+      {/* 5. Swap Rate Mockups (clean design) */}
       <motion.div 
         className="trading-section"
         initial={{ opacity: 0, y: 20 }}
@@ -224,106 +218,71 @@ export const TradePage: React.FC = () => {
         transition={{ delay: 0.6, duration: 0.4 }}
       >
         <div className="trading-header">
-          <h3>Preview Swap Rates</h3>
-          <p className="trading-subtitle">Actual swaps take place on Shadow DEX</p>
+          <h3>Current Swap Rates</h3>
+          <p className="trading-subtitle">Live rates from Shadow DEX vS / S pool</p>
         </div>
         
-        <div className="trade-container-modern">
-          {/* Sell vS */}
+        <div className="rate-mockups-container">
+          {/* vS → S Rate */}
           <motion.div 
-            className="trade-card-modern disabled-card"
+            className="rate-mockup-card"
             variants={cardVariants}
+            whileHover={{ y: -2, scale: 1.01 }}
+            transition={{ type: "spring", stiffness: 300 }}
           >
-            <div className="trade-header">
-              <h4>Sell vS</h4>
-              <div className="rate-display">1 vS ≈ {poolData.vsPrice} S</div>
-            </div>
-            
-            <div className="trade-input-section">
-              <div className="input-group-modern">
-                <input 
-                  type="number" 
-                  placeholder="0.0" 
-                  value={sellAmount}
-                  onChange={(e) => setSellAmount(e.target.value)}
-                  className="amount-input-modern" 
-                  disabled
-                />
-                <div className="token-badge vs-badge">vS</div>
+            <div className="rate-header">
+              <div className="token-pair">
+                <span className="token-from">vS</span>
+                <span className="arrow">→</span>
+                <span className="token-to">S</span>
               </div>
-              
-              <div className="balance-row">
-                <span>Balance: {availableToSell} vS</span>
-                <button className="max-button" disabled>
-                  Max
-                </button>
-              </div>
+              <div className="rate-value">{poolData.vsPrice}</div>
             </div>
-
-            <div className="trade-details-modern">
-              <div className="detail-row">
-                <span>You receive</span>
-                <span className="value highlight">
-                  {sellAmount ? (parseFloat(sellAmount) * parseFloat(poolData.vsPrice)).toFixed(2) : '0.00'} S
-                </span>
-              </div>
-            </div>
-
-            <div className="disabled-overlay">
-              <span>Swaps take place on Shadow DEX</span>
+            <div className="rate-example">
+              <span>Example: 1,000 vS → {(1000 * parseFloat(poolData.vsPrice)).toLocaleString()} S</span>
             </div>
           </motion.div>
 
-          {/* Swap Arrow */}
-          <div className="swap-separator-modern">
-            <div className="swap-icon">⇄</div>
-          </div>
-
-          {/* Buy vS */}
+          {/* S → vS Rate */}
           <motion.div 
-            className="trade-card-modern disabled-card"
+            className="rate-mockup-card"
             variants={cardVariants}
+            whileHover={{ y: -2, scale: 1.01 }}
+            transition={{ type: "spring", stiffness: 300 }}
           >
-            <div className="trade-header">
-              <h4>Buy vS</h4>
-              <div className="rate-display">1 S ≈ {poolData.sPrice} vS</div>
-            </div>
-            
-            <div className="trade-input-section">
-              <div className="input-group-modern">
-                <input 
-                  type="number" 
-                  placeholder="0.0" 
-                  value={buyAmount}
-                  onChange={(e) => setBuyAmount(e.target.value)}
-                  className="amount-input-modern" 
-                  disabled
-                />
-                <div className="token-badge s-badge">S</div>
+            <div className="rate-header">
+              <div className="token-pair">
+                <span className="token-from">S</span>
+                <span className="arrow">→</span>
+                <span className="token-to">vS</span>
               </div>
-              
-              <div className="balance-row">
-                <span>Balance: {availableToBuy.toLocaleString()} S</span>
-                <button className="max-button" disabled>
-                  Max
-                </button>
-              </div>
+              <div className="rate-value">{poolData.sPrice}</div>
             </div>
-
-            <div className="trade-details-modern">
-              <div className="detail-row">
-                <span>You receive</span>
-                <span className="value highlight">
-                  {buyAmount ? (parseFloat(buyAmount) * parseFloat(poolData.sPrice)).toFixed(2) : '0.00'} vS
-                </span>
-              </div>
-            </div>
-
-            <div className="disabled-overlay">
-              <span>Swaps take place on Shadow DEX</span>
+            <div className="rate-example">
+              <span>Example: 1,000 S → {(1000 * parseFloat(poolData.sPrice)).toLocaleString()} vS</span>
             </div>
           </motion.div>
         </div>
+
+        {/* CTA to actual trading */}
+        <motion.div 
+          className="trade-cta-section"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.8, duration: 0.4 }}
+        >
+          <motion.a 
+            href="https://shadowdex.io/swap/vS/S" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="trade-now-button"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <span>Trade Now on Shadow DEX</span>
+            <span className="external-icon">↗</span>
+          </motion.a>
+        </motion.div>
       </motion.div>
 
       {/* 6. Footer Reminder Banner */}
