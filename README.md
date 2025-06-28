@@ -72,6 +72,15 @@ vS/
 └── docs/                         # Additional documentation
 ```
 
+## 📋 **Documentation Files**
+
+| File | Purpose |
+|------|---------|
+| **README.md** | Main protocol overview and getting started guide |
+| **SECURITY_ANALYSIS.md** | Comprehensive security audit and attack vector analysis |
+| **AUDIT_CHECKLIST.md** | Production readiness checklist for external auditors |
+| **DESIGN_SYSTEM.md** | UI/UX design system and component documentation |
+
 ## 📊 **Contract Addresses (Sonic Mainnet)**
 
 | Contract | Address | Purpose |
@@ -99,10 +108,9 @@ vS/
 
 ## 📚 **Additional Resources**
 
-- **[Security Analysis](./SECURITY_ANALYSIS.md)** - Comprehensive security audit
-- **[Risk Disclosure](./RISK_DISCLOSURE.md)** - Important risks and considerations  
-- **[Audit Summary](./AUDIT_READY_SUMMARY.md)** - Production readiness checklist
-- **[Marketing Copy](./MARKETING_COPY_FINAL.md)** - User-facing messaging
+- **[Security Analysis](./SECURITY_ANALYSIS.md)** - Comprehensive security audit and attack vector analysis
+- **[Audit Checklist](./AUDIT_CHECKLIST.md)** - Production readiness checklist for external auditors
+- **[Design System](./DESIGN_SYSTEM.md)** - UI/UX design system and component documentation
 
 ## 🤝 **Contributing**
 

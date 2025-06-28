@@ -1,4 +1,4 @@
-# vS Vault: Audit-Ready Summary
+# vS Vault: Audit Checklist
 
 ## Protocol Overview
 
