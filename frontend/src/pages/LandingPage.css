@@ -204,9 +204,11 @@
 
 /* Stepper Section */
 .stepper-section {
+  color: #1a1a1a;
   padding: 96px 0;
   background: white;
   scroll-margin-top: 120px;
+  color: #1a1a1a;
 }
 
 /* Benefits Section - Modern Cards */
@@ -214,6 +216,7 @@
   padding: 96px 0;
   background: #f8fafc;
   scroll-margin-top: 120px;
+  color: #1a1a1a;
 }
 
 .section-title {
@@ -221,7 +224,7 @@
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 64px;
-  color: #1e293b;
+  color: #1e293b !important;
 }
 
 .benefits-grid-modern {
@@ -284,6 +287,7 @@
   padding: 96px 0;
   background: white;
   scroll-margin-top: 120px;
+  color: #1a1a1a;
 }
 
 .sonic-benefits-grid {
@@ -341,6 +345,7 @@
   padding: 96px 0;
   background: #f8fafc;
   scroll-margin-top: 120px;
+  color: #1a1a1a;
 }
 
 .faq-accordion-modern {

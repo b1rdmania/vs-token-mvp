@@ -1,34 +1,6 @@
-/**
- * @title LandingPage - vS Vault Protocol Marketing Site
- * @author vS Vault Team
- * @description Main landing page for the vS Vault protocol - converts visitors to users
- * 
- * @overview
- * This component presents the vS Vault value proposition in ELI-15 simple language:
- * "Turn your locked Sonic airdrop into liquid vS tokens that trade immediately"
- * 
- * @sections
- * 1. Hero: Core value prop + CTA buttons (Launch App, GitHub, Whitepaper)
- * 2. Interactive Stepper: 60-second explanation with hover tooltips
- * 3. Benefits Grid: 6 key advantages with animations and modern cards  
- * 4. Sticky Economics Bar: Fee structure always visible
- * 5. Why Sonic: Ecosystem benefits in icon cards
- * 6. FAQ: Improved accordion with icons
- * 7. Final CTA: Gradient footer with primary action
- * 
- * @design_principles
- * - Modern DeFi aesthetic with gradients and animations
- * - Framer Motion for smooth interactions
- * - React Icons for crisp iconography
- * - Sticky economics bar for transparency
- * - Enhanced mobile responsiveness
- */
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { CheckCircleIcon, QuestionMarkCircleIcon } from 'react-icons/hi2';
-import { TrendingUpIcon, WaveIcon, PuzzlePieceIcon } from 'react-icons/hi';
 import { StepIndicator } from '../components/StepIndicator';
 import './LandingPage.css';
 
@@ -75,13 +47,22 @@ export const LandingPage: React.FC = () => {
         <motion.div
           initial={{ y: -100 }}
           animate={{ y: 0 }}
-          className="sticky top-0 z-30 bg-slate-900 text-white py-2 text-center text-sm md:text-base"
+          style={{
+            position: 'sticky',
+            top: 0,
+            zIndex: 30,
+            backgroundColor: '#0f172a',
+            color: 'white',
+            padding: '0.5rem 0',
+            textAlign: 'center',
+            fontSize: '0.875rem'
+          }}
         >
-          <span className="mx-2">Fees: 1% mint • 2% redeem</span>
-          <span className="mx-2">|</span>
-          <span className="mx-2">Total cost ≈3% to skip 9-month wait</span>
-          <span className="mx-2">|</span>
-          <span className="mx-2">Net to you ≈97%</span>
+          <span style={{ margin: '0 0.5rem' }}>Fees: 1% mint • 2% redeem</span>
+          <span style={{ margin: '0 0.5rem' }}>|</span>
+          <span style={{ margin: '0 0.5rem' }}>Total cost ≈3% to skip 9-month wait</span>
+          <span style={{ margin: '0 0.5rem' }}>|</span>
+          <span style={{ margin: '0 0.5rem' }}>Net to you ≈97%</span>
         </motion.div>
       )}
 
@@ -138,17 +119,18 @@ export const LandingPage: React.FC = () => {
         </section>
 
         {/* Interactive Stepper */}
-        <section className="stepper-section">
+        <section className="stepper-section" style={{ color: '#1a1a1a', backgroundColor: 'white' }}>
           <div className="container">
             <StepIndicator title="60-Second Flow" steps={stepData} />
           </div>
         </section>
 
         {/* Key Benefits - Animated Cards */}
-        <section className="benefits-section-modern">
+        <section className="benefits-section-modern" style={{ color: '#1a1a1a', backgroundColor: '#f8fafc' }}>
           <div className="container">
             <motion.h2 
               className="section-title"
+              style={{ color: '#1e293b' }}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -187,10 +169,11 @@ export const LandingPage: React.FC = () => {
         </section>
 
         {/* Why Sonic - Icon Cards */}
-        <section className="why-sonic-modern">
+        <section className="why-sonic-modern" style={{ color: '#1a1a1a' }}>
           <div className="container">
             <motion.h2 
               className="section-title"
+              style={{ color: '#1e293b' }}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -200,17 +183,17 @@ export const LandingPage: React.FC = () => {
             <div className="sonic-benefits-grid">
               {[
                 {
-                  icon: <TrendingUpIcon className="w-8 h-8" />,
+                  icon: <span style={{ fontSize: '2rem' }}>📈</span>,
                   title: "Adds TVL",
                   text: "Locked value turns into LP depth & swap fees"
                 },
                 {
-                  icon: <WaveIcon className="w-8 h-8" />,
+                  icon: <span style={{ fontSize: '2rem' }}>🌊</span>,
                   title: "Smoother Price",
                   text: "Sell pressure drips instead of nuking day-one"
                 },
                 {
-                  icon: <PuzzlePieceIcon className="w-8 h-8" />,
+                  icon: <span style={{ fontSize: '2rem' }}>🧩</span>,
                   title: "More DeFi Lego",
                   text: "Users stay to farm / lend → sticky ecosystem"
                 }
@@ -234,10 +217,11 @@ export const LandingPage: React.FC = () => {
         </section>
 
         {/* FAQ with Icons */}
-        <section className="faq-section-modern">
+        <section className="faq-section-modern" style={{ color: '#1a1a1a' }}>
           <div className="container">
             <motion.h2 
               className="section-title"
+              style={{ color: '#1e293b' }}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -247,21 +231,24 @@ export const LandingPage: React.FC = () => {
             <div className="faq-accordion-modern">
               <details open>
                 <summary>
-                  <QuestionMarkCircleIcon className="w-5 h-5" />
+                  {/* Replace the question mark icons with emoji */}
+                  {/* 🤔 */}
                   Can the fees change?
                 </summary>
                 <p>No. 1% in, 2% out are hard-coded in an upgrade-blocked contract.</p>
               </details>
               <details>
                 <summary>
-                  <QuestionMarkCircleIcon className="w-5 h-5" />
+                  {/* Replace the question mark icons with emoji */}
+                  {/* 🤔 */}
                   Is the 1:1 real?
                 </summary>
                 <p>Yes. Vault claims every S at 0% burn; redeem burns vS and releases S.</p>
               </details>
               <details>
                 <summary>
-                  <QuestionMarkCircleIcon className="w-5 h-5" />
+                  {/* Replace the question mark icons with emoji */}
+                  {/* 🤔 */}
                   What if a claim fails?
                 </summary>
                 <p>The harvest retries in 20-NFT batches until every token is collected. Redeems stay pro-rata meanwhile.</p>
