@@ -72,31 +72,6 @@ vS/
 └── docs/                         # Additional documentation
 ```
 
-## 🚀 **Quick Start**
-
-### **For Users**
-1. Visit the [live app](https://vs-vault.vercel.app)
-2. Connect your wallet with Sonic fNFTs
-3. Deposit fNFT → Receive vS tokens
-4. Trade vS on [Shadow DEX](https://shadow.so) for immediate liquidity
-
-### **For Developers**
-
-```bash
-# Clone repository
-git clone https://github.com/your-org/vS
-cd vS
-
-# Install dependencies
-forge install
-
-# Run tests
-forge test
-
-# Start frontend
-cd frontend && npm install && npm run dev
-```
-
 ## 📊 **Contract Addresses (Sonic Mainnet)**
 
 | Contract | Address | Purpose |
