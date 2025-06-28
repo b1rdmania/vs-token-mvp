@@ -16,10 +16,29 @@ interface IDecayfNFT is IERC721 {
 }
 
 /**
- * @title ImmutableVault - Ultra-Minimal Design with Re-Harvestable Batch Pattern
- * @notice Truly immutable vault with zero admin controls after deployment
- * @dev Core functions: deposit, harvestBatch, redeem, sweepSurplus + optional forceDelegate helper
- * @dev Uses wait-and-harvest strategy: no claiming until maturity, then retry-safe batch harvesting
+ * @title ImmutableVault - Vesting NFT Liquidity Protocol
+ * @author vS Vault Team
+ * @notice Converts illiquid vesting NFTs into liquid ERC-20 tokens (vS) that can be traded immediately
+ * 
+ * @dev CORE DESIGN PRINCIPLES:
+ * 1. IMMUTABLE: Zero admin functions, no upgrades, no parameter changes after deployment
+ * 2. WAIT-AND-HARVEST: Vault never claims early (avoiding penalty burns), waits until maturity
+ * 3. SELF-DELEGATION: Automatically delegates NFTs to vault on deposit to prevent delegation attacks
+ * 4. PROPORTIONAL REDEMPTION: Users get pro-rata share of harvested tokens, no hostage scenarios
+ * 5. GAS-BOMB PROOF: Bounded batch processing prevents DoS attacks
+ * 
+ * @dev ECONOMIC MODEL:
+ * - Users deposit vesting NFTs, get 99% of face value as vS tokens (1% mint fee)
+ * - vS tokens trade freely on secondary markets at market-determined discounts
+ * - At maturity (month 9), vault harvests all NFTs at 0% penalty burn
+ * - Users redeem vS tokens for underlying S tokens at 1:1 ratio (minus 2% redeem fee)
+ * 
+ * @dev SECURITY FEATURES:
+ * - Reentrancy protection on all external functions
+ * - Try-catch wrappers isolate external call failures
+ * - Bounded batch sizes prevent gas exhaustion attacks
+ * - Immutable parameters eliminate admin attack vectors
+ * - Self-delegation pattern prevents delegation manipulation
  */
 contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
     // ============ IMMUTABLE STATE ============
@@ -32,11 +51,11 @@ contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
     
     // ============ CONSTANTS ============
     uint256 public constant MINT_FEE_BPS = 100;        // 1% mint fee
-    uint256 public constant REDEEM_FEE_BPS = 200;      // 2% redeem fee (updated)
+    uint256 public constant REDEEM_FEE_BPS = 200;      // 2% redeem fee
     uint256 public constant KEEPER_INCENTIVE_BPS = 0;  // 0% keeper incentive (self-keeper mode)
     uint256 public constant GRACE_PERIOD = 180 days;   // Grace period for surplus sweep
     uint256 public constant MAX_BATCH_SIZE = 20;       // Max NFTs per harvest batch
-    uint256 public constant MIN_NFT_FACE = 100e18;       // 100 S minimum (prevents dust grief)
+    uint256 public constant MIN_NFT_FACE = 100e18;     // 100 S minimum (prevents dust grief)
     
     // ============ MINIMAL STATE ============
     uint256[] public heldNFTs;
@@ -54,11 +73,12 @@ contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
 
     /**
      * @notice Deploy immutable vault - all parameters fixed forever
-     * @param _vsToken Address of the vS token contract
-     * @param _sonicNFT Address of the Sonic fNFT contract  
+     * @dev This constructor sets all vault parameters permanently. No admin functions exist to change them.
+     * @param _vsToken Address of the vS token contract (must be ImmutableVSToken)
+     * @param _sonicNFT Address of the Sonic fNFT contract (decay NFT implementation)
      * @param _underlyingToken Address of the underlying S token
-     * @param _protocolTreasury Address to receive protocol fees (immutable)
-     * @param _maturityTimestamp When fNFTs can be claimed at 0% penalty
+     * @param _protocolTreasury Address to receive protocol fees (immutable, no admin control)
+     * @param _maturityTimestamp When fNFTs can be claimed at 0% penalty (April 2026)
      * @param _vaultFreezeTimestamp No deposits accepted after this (prevents season mixing)
      */
     constructor(
@@ -93,8 +113,9 @@ contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
 
     /**
      * @notice Deposit fNFT and mint vS tokens (1% fee taken at mint)
-     * @dev Pulls NFT and immediately self-delegates to ensure claimability
-     * @param nftId ID of the fNFT to deposit
+     * @dev CRITICAL: Self-delegates NFT immediately after transfer to prevent delegation attacks
+     * @dev Users get 99% of NFT face value as vS tokens, 1% goes to protocol treasury
+     * @param nftId ID of the fNFT to deposit (must be owned by msg.sender)
      */
     function deposit(uint256 nftId) external nonReentrant {
         require(block.timestamp <= vaultFreezeTimestamp, "Vault frozen - use new season vault");
@@ -127,8 +148,10 @@ contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
 
     /**
      * @notice Harvest vested tokens using re-harvestable batch pattern (gas-bomb proof)
-     * @dev Anyone can call after maturity - processes k NFTs with retry logic
-     * @param k Number of NFTs to process (bounded for gas safety)
+     * @dev WAIT-AND-HARVEST STRATEGY: Only callable after maturity to avoid penalty burns
+     * @dev Processes NFTs in bounded batches with retry logic for failed claims
+     * @dev Anyone can call this function - no admin required (permissionless harvesting)
+     * @param k Number of NFTs to process (bounded for gas safety, max 20)
      */
     function harvestBatch(uint256 k) external nonReentrant {
         require(block.timestamp >= maturityTimestamp, "Too early - wait for maturity");

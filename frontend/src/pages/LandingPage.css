@@ -1,290 +1,495 @@
-.landing-page .hero-section {
-  text-align: center;
-  padding: 6rem 0;
+/* Landing Page Redesign - Mobile First */
+.landing-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #1a1a1a;
 }
 
-.hero-section .container {
-  text-align: center;
-  padding-top: 4rem;
-  padding-bottom: 4rem;
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
 }
 
-.hero-title {
-  font-size: 3rem;
-  font-weight: 800;
-  margin-bottom: 1rem;
+/* Header */
+.landing-header {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
-.hero-subtitle {
-  max-width: 65ch;
-  margin: 0 auto 2rem auto;
-  font-size: 1.125rem;
-  line-height: 1.6;
-}
-
-.hero-cta {
+.header-content {
   display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-bottom: 3rem;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  height: 64px;
 }
 
-.button-primary, .button-secondary {
-  padding: 0.875rem 1.75rem;
-  border-radius: 8px;
-  font-weight: 600;
-  text-decoration: none;
-  transition: all 0.2s ease;
+.logo {
+  font-size: 28px;
+  font-weight: 700;
+  color: #6366f1;
 }
 
+/* Buttons */
 .button-primary {
-  background-color: var(--primary-color);
+  background: #6366f1;
   color: white;
-}
-.button-primary:hover {
-  opacity: 0.9;
+  padding: 12px 24px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 200ms ease;
+  border: none;
+  cursor: pointer;
+  display: inline-block;
 }
 
-.button-secondary {
-  background-color: transparent;
-  color: var(--primary-color);
-  border: 1px solid var(--primary-color);
-}
-.button-secondary:hover {
-  background-color: var(--primary-color);
-  color: white;
+.button-primary:hover {
+  background: #5855eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
 .button-hero {
-  padding: 1rem 2rem;
-  font-size: 1.125rem;
+  font-size: 18px;
+  padding: 16px 32px;
+  margin-top: 24px;
 }
 
-.hero-visual {
-  margin-top: 3rem;
+/* Hero Section - 50/50 Grid */
+.hero-section {
+  padding: 80px 0;
+  background: rgba(255, 255, 255, 0.1);
 }
 
-.hero-visual img {
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 48px;
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .hero-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.hero-content {
+  text-align: left;
+}
+
+.hero-title {
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: 24px;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 36px;
+  }
+}
+
+.hero-subtitle {
+  font-size: 20px;
+  line-height: 1.5;
+  margin-bottom: 16px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.hero-fees {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 24px;
+}
+
+.phone-mockup {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.phone-mockup img {
   max-width: 100%;
-  border-radius: 8px;
+  height: auto;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
 }
 
-.explainer-section {
-  padding: 4rem 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+/* How It Works - 4 Cards */
+.how-it-works {
+  padding: 80px 0;
+  background: white;
 }
 
-.explainer-header {
+.how-it-works h2 {
   text-align: center;
-  margin-bottom: 3rem;
-}
-
-.explainer-title {
-  font-size: 2.5rem;
-  font-weight: 800;
-  margin-bottom: 0.5rem;
-  color: white;
-}
-
-.explainer-subtitle {
-  font-size: 1.25rem;
-  opacity: 0.9;
-  margin: 0;
+  font-size: 36px;
+  margin-bottom: 48px;
+  color: #1a1a1a;
 }
 
 .process-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2rem;
-  margin-bottom: 3rem;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 640px) {
+  .process-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 1024px) {
+  .process-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 .process-card {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 16px;
-  padding: 2rem;
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e7eb;
   text-align: center;
-  transition: transform 0.2s ease;
+  transition: all 200ms ease;
 }
 
 .process-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
-.step-number {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-  font-weight: bold;
-  font-size: 1.25rem;
-  margin-bottom: 1rem;
+.card-emoji {
+  font-size: 32px;
+  margin-bottom: 16px;
 }
 
 .process-card h3 {
-  font-size: 1.25rem;
+  font-size: 18px;
   font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: white;
+  margin-bottom: 12px;
+  color: #1a1a1a;
 }
 
 .process-card p {
-  opacity: 0.9;
+  font-size: 14px;
   line-height: 1.5;
+  color: #6b7280;
+  margin: 0;
 }
 
-.comparison-grid {
+/* Benefits Section - 2x3 Grid */
+.benefits-section {
+  padding: 80px 0;
+  background: #f9fafb;
+}
+
+.benefits-section h2 {
+  text-align: center;
+  font-size: 36px;
+  margin-bottom: 48px;
+  color: #1a1a1a;
+}
+
+.benefits-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 640px) {
+  .benefits-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 1024px) {
+  .benefits-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.benefit-card {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e7eb;
+}
+
+.benefit-card h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #1a1a1a;
+}
+
+.benefit-card p {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Economics Banner */
+.economics-banner {
+  background: #1f2937;
+  color: white;
+  padding: 24px 0;
+}
+
+.economics-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .economics-content {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.economics-content span {
+  font-size: 14px;
+}
+
+/* FAQ Section */
+.faq-section {
+  padding: 80px 0;
+  background: white;
+}
+
+.faq-section h2 {
+  text-align: center;
+  font-size: 36px;
+  margin-bottom: 48px;
+  color: #1a1a1a;
+}
+
+.faq-accordion {
   max-width: 800px;
   margin: 0 auto;
 }
 
-.comparison-card {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 16px;
-  padding: 2rem;
+.faq-accordion details {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  overflow: hidden;
 }
 
-.comparison-card.without {
-  border-left: 4px solid #ff6b6b;
-}
-
-.comparison-card.with {
-  border-left: 4px solid #51cf66;
-}
-
-.comparison-card h3 {
-  font-size: 1.25rem;
+.faq-accordion summary {
+  background: #f9fafb;
+  padding: 20px;
+  cursor: pointer;
   font-weight: 600;
-  margin-bottom: 1rem;
+  color: #1a1a1a;
+  transition: background 200ms ease;
+}
+
+.faq-accordion summary:hover {
+  background: #f3f4f6;
+}
+
+.faq-accordion details[open] summary {
+  background: #6366f1;
   color: white;
 }
 
-.comparison-card ul {
+.faq-accordion p {
+  padding: 20px;
+  margin: 0;
+  background: white;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+/* Final CTA */
+.final-cta {
+  padding: 80px 0;
+  background: #f9fafb;
+  text-align: center;
+}
+
+.final-cta h2 {
+  font-size: 36px;
+  margin-bottom: 16px;
+  color: #1a1a1a;
+}
+
+.final-cta p {
+  font-size: 18px;
+  color: #6b7280;
+  margin-bottom: 16px;
+}
+
+.cta-tagline {
+  font-style: italic;
+  color: #9ca3af;
+  margin-bottom: 32px !important;
+}
+
+.risk-disclaimer {
+  font-size: 12px;
+  color: #9ca3af;
+  margin-top: 24px !important;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Footer */
+.landing-footer {
+  background: #1f2937;
+  color: white;
+  padding: 40px 0;
+  text-align: center;
+}
+
+.footer-links {
+  margin-bottom: 16px;
+}
+
+.footer-links a {
+  color: #9ca3af;
+  text-decoration: none;
+  transition: color 200ms ease;
+}
+
+.footer-links a:hover {
+  color: white;
+}
+
+.landing-footer p {
+  color: #6b7280;
+  margin: 0;
+  font-size: 14px;
+}
+
+/* Additional styles for new sections */
+
+/* Hero buttons */
+.hero-buttons {
+  display: flex;
+  gap: 16px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+.button-secondary {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 12px 24px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 200ms ease;
+}
+
+.button-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Mini Flow Banner */
+.mini-flow-banner {
+  background: #f8fafc;
+  padding: 32px 0;
+  text-align: center;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.mini-flow-banner h2 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #1a1a1a;
+}
+
+.mini-flow-banner p {
+  font-size: 16px;
+  color: #64748b;
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Why Sonic Section */
+.why-sonic-section {
+  padding: 80px 0;
+  background: white;
+}
+
+.why-sonic-section h2 {
+  text-align: center;
+  font-size: 36px;
+  margin-bottom: 48px;
+  color: #1a1a1a;
+}
+
+.why-sonic-section ul {
+  max-width: 600px;
+  margin: 0 auto;
   list-style: none;
   padding: 0;
-  margin: 0;
 }
 
-.comparison-card li {
-  padding: 0.5rem 0;
-  opacity: 0.9;
-  position: relative;
-  padding-left: 1.5rem;
+.why-sonic-section li {
+  font-size: 18px;
+  line-height: 1.6;
+  color: #475569;
+  margin-bottom: 16px;
+  max-width: 80ch; /* 80 character limit for readability */
 }
 
-.comparison-card li::before {
-  content: "•";
-  position: absolute;
-  left: 0;
-  color: rgba(255, 255, 255, 0.7);
+/* Enhanced benefit cards with subtle shadow */
+.benefit-card {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e5e7eb;
+  transition: all 200ms ease;
 }
 
-.partner-banner {
-  text-align: center;
-  padding: 2rem;
-  background-color: white;
-  border-radius: 16px;
-  margin: 4rem 0;
-  border: 1px solid #EAECEF;
+.benefit-card:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
 }
 
-.footer {
-  padding: 2rem 0;
-  border-top: 1px solid #EAECEF;
-  margin-top: 4rem;
-}
-.footer .container {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-}
-.footer a {
-  color: var(--secondary-color);
-  opacity: 0.8;
-  text-decoration: none;
-}
-.footer a:hover {
-  opacity: 1;
-}
-
-.github-cta-section {
-  background-color: white;
-  padding: 4rem 0;
-  text-align: center;
-  border-top: 1px solid #EAECEF;
-}
-
-.github-cta-section h2 {
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-}
-
-.github-cta-section p {
-  margin-bottom: 2rem;
-  opacity: 0.8;
-}
-
-.landing-footer {
-  background-color: #F7F9FC;
-  padding: 2rem 0;
-}
-
-.hero-buttons .button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.75rem 2rem;
-  border-radius: 8px;
-  font-size: 1rem;
-}
-
-/* Add media queries for mobile responsiveness */
+/* Mobile responsive adjustments */
 @media (max-width: 768px) {
-  .hero-title {
-    font-size: 2.5rem;
-  }
-
-  .hero-cta {
+  .hero-buttons {
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
   }
-
-  .explainer-title {
-    font-size: 2rem;
+  
+  .button-hero {
+    text-align: center;
   }
-
-  .process-grid {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
+  
+  .mini-flow-banner p {
+    font-size: 14px;
+    padding: 0 16px;
   }
-
-  .comparison-grid {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
+  
+  .why-sonic-section li {
+    font-size: 16px;
   }
-
-  .hero-section {
-    padding: 4rem 0;
-  }
-
-  .hero-subtitle {
-    max-width: 100%;
-    padding: 0 1rem;
-  }
-
-  .explainer-section {
-    padding: 3rem 0;
-  }
-} 
+}
