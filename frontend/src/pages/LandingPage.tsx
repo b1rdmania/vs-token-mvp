@@ -19,10 +19,10 @@ export const LandingPage: React.FC = () => {
 
   const stepData = [
     { id: 1, label: "Deposit", tooltip: "Send fNFT to vault" },
-    { id: 2, label: "Mint vS (-1%)", tooltip: "Get liquid tokens instantly" },
-    { id: 3, label: "Trade / LP", tooltip: "Use in any DeFi protocol" },
+    { id: 2, label: "Mint vS (-1% fee)", tooltip: "Get liquid tokens instantly" },
+    { id: 3, label: "Swap vS for S/USDC or LP — market discount applies.", tooltip: "Use in any DeFi protocol" },
     { id: 4, label: "Month-9 harvest", tooltip: "Vault claims at 0% burn" },
-    { id: 5, label: "Redeem 1:1 (-2%)", tooltip: "Exchange vS for S tokens" }
+    { id: 5, label: "Redeem 1:1 (-2% fee)", tooltip: "Exchange vS for S tokens" }
   ];
 
   const benefitVariants = {
@@ -87,10 +87,10 @@ export const LandingPage: React.FC = () => {
                 transition={{ duration: 0.8 }}
               >
                 <h1 className="hero-title-modern">
-                  Turn Locked Tokens into Cash
+                  Unlock liquidity today, 1:1 S tomorrow.
                 </h1>
                 <p className="hero-subtitle-modern">
-                  Deposit your locked fNFT. Get vS tokens worth the full amount. Sell them for cash today.
+                  Deposit your Sonic fNFT → mint vS → trade or farm right away.
                 </p>
                 <div className="hero-buttons-modern">
                   <Link to="/app" className="button-primary-modern">
@@ -146,7 +146,7 @@ export const LandingPage: React.FC = () => {
             >
               {[
                 { emoji: "⚡", title: "Immediate Liquidity", text: "Unlock full face value on day 0." },
-                { emoji: "⚖️", title: "Fair Pricing", text: "Market sets the time price, not us." },
+                { emoji: "⚖️", title: "Fair Discount", text: "Market sets the time price, not us." },
                 { emoji: "🔥", title: "Zero Penalty Burns", text: "Vault waits for 0% burn window." },
                 { emoji: "🧩", title: "DeFi Ready", text: "Pure ERC-20 plugs into any Sonic pool." },
                 { emoji: "🛡️", title: "No Rug Risk", text: "Immutable code, no admin keys." },
@@ -235,7 +235,7 @@ export const LandingPage: React.FC = () => {
                   {/* 🤔 */}
                   Can the fees change?
                 </summary>
-                <p>No. 1% in, 2% out are hard-coded in an upgrade-blocked contract.</p>
+                <p>1% in, 2% out, hard-coded & immutable.</p>
               </details>
               <details>
                 <summary>
@@ -251,7 +251,15 @@ export const LandingPage: React.FC = () => {
                   {/* 🤔 */}
                   What if a claim fails?
                 </summary>
-                <p>The harvest retries in 20-NFT batches until every token is collected. Redeems stay pro-rata meanwhile.</p>
+                <p>Vault keeps retrying in smaller batches until all fNFTs are successfully claimed. Harvest runs in 20-NFT batches; protocol triggers it automatically.</p>
+              </details>
+              <details>
+                <summary>
+                  {/* Replace the question mark icons with emoji */}
+                  {/* 🤔 */}
+                  Where's the code?
+                </summary>
+                <p>Verified contracts & audits: view on SonicScan → <a href="https://sonicscan.org/address/0x37BD20868FB91eB37813648F4D05F59e07A1bcfb" target="_blank" rel="noopener noreferrer" style={{ color: '#6366f1', textDecoration: 'underline' }}>Vault</a>, <a href="https://sonicscan.org/address/0x4dE74524A2cE5e2A310615a6aDe7eC35B0f81031" target="_blank" rel="noopener noreferrer" style={{ color: '#6366f1', textDecoration: 'underline' }}>vS</a>.</p>
               </details>
             </div>
           </div>
@@ -291,6 +299,9 @@ export const LandingPage: React.FC = () => {
             </Link>
           </div>
           <p>&copy; 2025 vS Vault. Ready to turn waiting into doing.</p>
+          <p style={{ fontSize: '0.875rem', color: '#64748b', marginTop: '8px' }}>
+            Open-source & community-run • MIT licence • Built for Sonic DeFi
+          </p>
         </div>
       </footer>
     </div>
