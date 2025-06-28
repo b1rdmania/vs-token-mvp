@@ -6,7 +6,6 @@ import './TradePage.css';
 const poolData = {
   tvl: "1,250,000",
   volume24h: "150,000",
-  fees7d: "2,500",
   apr: "12.5",
   vsPrice: "0.94",
   sPrice: "1.06"
@@ -135,19 +134,6 @@ export const TradePage: React.FC = () => {
             <div className="stat-content">
               <div className="stat-label">24h Volume</div>
               <div className="stat-value">${poolData.volume24h}</div>
-            </div>
-          </motion.div>
-          
-          <motion.div 
-            className="stat-card"
-            variants={cardVariants}
-            whileHover={{ y: -4, scale: 1.02 }}
-            transition={{ type: "spring", stiffness: 300 }}
-          >
-            <div className="stat-icon">💎</div>
-            <div className="stat-content">
-              <div className="stat-label">7-Day Fees</div>
-              <div className="stat-value">${poolData.fees7d}</div>
             </div>
           </motion.div>
           
