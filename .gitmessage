@@ -1,0 +1,11 @@
+# Clean commit message template
+
+# Format: <type>: <subject>
+# 
+# Types: feat, fix, docs, style, refactor, test, chore
+#
+# Examples:
+# feat: Add redemption timeline component  
+# fix: Correct mobile button sizing
+# docs: Update security documentation
+# style: Improve visual hierarchy
