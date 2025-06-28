@@ -12,7 +12,9 @@
 
 body {
   margin: 0;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--background-color);
@@ -201,3 +203,96 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Add other global styles here */
+
+/* CSS Reset and Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* iOS 14+ Specific Optimizations */
+@supports (padding: max(0px)) {
+  .app-shell {
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+  }
+  
+  .app-header {
+    padding-top: max(16px, env(safe-area-inset-top));
+  }
+  
+  .mobile-nav {
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+}
+
+/* iOS Safari specific fixes */
+@supports (-webkit-touch-callout: none) {
+  /* Fix for iOS Safari viewport height issues */
+  .app-shell {
+    min-height: -webkit-fill-available;
+  }
+  
+  /* Better touch targets for iOS */
+  button, .button-primary-modern, .button-secondary-modern, .cta-button-primary, .cta-button-secondary {
+    min-height: 44px; /* iOS recommended minimum touch target */
+    min-width: 44px;
+  }
+  
+  /* Prevent zoom on input focus in iOS Safari */
+  input, select, textarea {
+    font-size: 16px;
+  }
+  
+  /* Better iOS scrolling */
+  .modal-content, .faq-answer-content {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Enhanced mobile typography for better readability */
+@media (max-width: 768px) {
+  /* Improve text readability on small screens */
+  body {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  
+  /* Better spacing for mobile */
+  .container {
+    padding: 0 16px;
+  }
+  
+  /* Improved button spacing on mobile */
+  .hero-buttons-modern,
+  .cta-buttons,
+  .modal-actions {
+    gap: 16px;
+  }
+  
+  /* Better modal sizing for mobile */
+  .modal-content {
+    margin: 20px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+  }
+}
+
+/* iOS Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  /* We can add dark mode styles here if needed */
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #f8fafc;
+  color: #1a1a1a;
+  line-height: 1.6;
+}
