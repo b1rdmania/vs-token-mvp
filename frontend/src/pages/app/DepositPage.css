@@ -303,11 +303,43 @@
   width: 100%;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative;
 }
 
 .modal-header {
   text-align: center;
   margin-bottom: 24px;
+  position: relative;
+}
+
+.modal-close-button {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 600;
+  color: #64748b;
+  transition: all 200ms ease;
+  z-index: 10;
+}
+
+.modal-close-button:hover {
+  background: #e2e8f0;
+  color: #475569;
+  transform: scale(1.1);
+}
+
+.modal-close-button:active {
+  transform: scale(0.95);
 }
 
 .modal-header h2 {

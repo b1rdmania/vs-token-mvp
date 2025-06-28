@@ -34,7 +34,6 @@ const DepositModal = ({ nft, onClose }: { nft: Nft; onClose: () => void }) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      onClick={onClose}
     >
       <motion.div 
         className="modal-content modern-card"
@@ -42,12 +41,8 @@ const DepositModal = ({ nft, onClose }: { nft: Nft; onClose: () => void }) => {
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
         transition={{ type: "spring", duration: 0.3 }}
-        onClick={(e) => e.stopPropagation()}
       >
         <div className="modal-header">
-          <button className="modal-close-button" onClick={onClose}>
-            ×
-          </button>
           <h2>Deposit NFT #{nft.id}</h2>
           <p>Transform your locked fNFT into liquid vS tokens instantly</p>
         </div>
@@ -273,4 +268,4 @@ export const DepositPage: React.FC = () => {
       {selectedNft && <DepositModal nft={selectedNft} onClose={() => setSelectedNft(null)} />}
     </div>
   );
-};
+}; 
