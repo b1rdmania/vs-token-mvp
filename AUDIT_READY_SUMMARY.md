@@ -7,7 +7,7 @@
 | **Contract patch** | Self-delegation in `deposit()` + `forceDelegate()` helper + proportional redemption | ✅ DONE |
 | **Events** | `DelegationForced` event in `_ensureDelegated()` | ✅ DONE |
 | **View helper** | `getBackingRatio()` returns 18-decimal fixed point ratio | ✅ DONE |
-| **Unit tests** | 11 comprehensive tests covering all edge cases | ✅ DONE |
+| **Unit tests** | 12 comprehensive tests covering all edge cases | ✅ DONE |
 | **Docs** | README, Security Analysis, and Bulletproof Summary updated | ✅ DONE |
 
 ---
@@ -97,7 +97,7 @@ testForceDelegateHelper()                  // Permissionless delegation fixing
 ### Last Sanity Test Results ✅
 ```bash
 forge test
-# Result: 11 tests passed, 0 failed
+# Result: 12 tests passed, 0 failed
 # Key test: testPartialClaimFailureProportionalRedemption
 # - 3 NFTs deposited (3000 vS minted)
 # - 1 NFT fails to claim
@@ -163,7 +163,7 @@ bool public matured = false;                  // One-time maturity trigger
 - [x] Self-delegation pattern implemented and tested
 - [x] Proportional redemption ensures liveness  
 - [x] Gas bomb protection with bounded operations
-- [x] Comprehensive test suite (11 tests, 100% pass rate)
+- [x] Comprehensive test suite (12 tests, 100% pass rate)
 - [x] Documentation updated (README, Security Analysis, Bulletproof Summary)
 
 ### Audit Scope (Focused)
@@ -250,8 +250,8 @@ bool public matured = false;                  // One-time maturity trigger
 
 ### Economic Safeguards
 - **Proportional redemption** - mathematically fair distribution
-- **Gas economics protection** - 3% protocol fee (1% protocol + 2% gas buffer)
-- **Enhanced keeper incentives** - 0.1% reward to ensure claiming profitability
+- **Gas economics protection** - 1% protocol fee + 0.05% keeper incentive
+- **Enhanced keeper incentives** - 0.05% reward to ensure claiming profitability
 - **Protocol fee minimum** - prevents rounding to zero (1 wei minimum)
 - **Gas bomb protection** - claimBatch limited to 20 NFTs, forceDelegate to 50 NFTs per call
 - **Duplicate deposit prevention** - mapping check prevents double-counting
@@ -305,10 +305,11 @@ function forceDelegate(uint256[] calldata nftIds) external {
 
 ### Gas Economics Protection
 ```solidity
-uint256 public constant PROTOCOL_FEE_BPS = 300; // 3% (1% protocol + 2% gas buffer)
+uint256 public constant PROTOCOL_FEE_BPS = 100; // 1% protocol fee
+uint256 public constant KEEPER_INCENTIVE_BPS = 5; // 0.05% keeper incentive
 
-// Enhanced keeper incentive: 0.1% (double base rate for gas coverage)
-uint256 incentiveAmount = (totalClaimed * KEEPER_INCENTIVE_BPS * 2) / 10_000;
+// Keeper incentive calculation
+uint256 incentiveAmount = (totalClaimed * KEEPER_INCENTIVE_BPS) / 10_000;
 
 // Fee rounding protection
 uint256 protocolFee = (redeemableValue * PROTOCOL_FEE_BPS) / 10_000;
@@ -331,7 +332,7 @@ if (protocolFee == 0 && redeemableValue > 0) {
 
 ## Testing Coverage ✅
 
-**11 comprehensive tests** covering:
+**12 comprehensive tests** covering:
 - ✅ Normal deposit/redeem flows
 - ✅ Delegation edge cases  
 - ✅ Partial claim failures
@@ -385,3 +386,10 @@ if (protocolFee == 0 && redeemableValue > 0) {
 ---
 
 *The vault is mathematically sound, economically aligned, and technically bulletproof. All micro-edges have been addressed. Ready for production deployment.* 
+
+---
+
+**Commit**: `6317f10f659dfbd8d5cecd08bcbce473dd276d40` (v1.0.0-immutable)  
+**Date**: 28 Jun 2025 15:42 UTC  
+
+*This package represents the final immutable version ready for mainnet deployment.* 

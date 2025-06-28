@@ -11,18 +11,17 @@ import {ImmutableVSToken} from "../src/ImmutableVSToken.sol";
  * @dev Update contract addresses below before deployment
  */
 contract DeployImmutableVault is Script {
-    // TODO: Update these addresses for production deployment
+    // Production addresses from params.csv
     address constant SONIC_S_TOKEN = 0x039e2fB66102314Ce7b64Ce5Ce3E5183bc94aD38; // Real S token
-    address constant SONIC_FNFT_CONTRACT = 0x0000000000000000000000000000000000000000; // Real fNFT contract
-    address constant TREASURY = 0x0000000000000000000000000000000000000000; // Treasury address
+    address constant SONIC_FNFT_CONTRACT = 0x146D8C75c0b0E8F0BECaFa5c26C8F7C1b5c2C0B1; // Real fNFT contract
+    address constant TREASURY = 0x0000000000000000000000000000000000000000; // TODO: Update treasury address
     
-    // Deployment parameters
-    uint256 constant MATURITY_TIMESTAMP = 1743465600; // March 16, 2026 00:00:00 UTC
-    uint256 constant FREEZE_TIMESTAMP = 1735689600;   // January 1, 2025 00:00:00 UTC
+    // Deployment parameters from params.csv
+    uint256 constant MATURITY_TIMESTAMP = 1756684800; // October 1, 2025 00:00:00 UTC
+    uint256 constant FREEZE_TIMESTAMP = 1748476800;   // January 31, 2025 00:00:00 UTC
     
     function run() external {
-        require(SONIC_FNFT_CONTRACT != address(0), "Update fNFT contract address");
-        require(TREASURY != address(0), "Update treasury address");
+        require(TREASURY != address(0), "Update treasury address before deployment");
         
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         address deployer = vm.addr(deployerPrivateKey);
@@ -55,6 +54,13 @@ contract DeployImmutableVault is Script {
         console.log("Treasury:", TREASURY);
         console.log("Maturity:", MATURITY_TIMESTAMP);
         console.log("Freeze:", FREEZE_TIMESTAMP);
+        console.log("");
+        console.log("=== VERIFICATION CHECKLIST ===");
+        console.log("1. Verify constructor args on block explorer");
+        console.log("2. Test deposit() with real fNFT");
+        console.log("3. Test claimBatch() after maturity");
+        console.log("4. Test redeem() after maturity");
+        console.log("5. Test sweepSurplus() after grace period");
         
         vm.stopBroadcast();
     }

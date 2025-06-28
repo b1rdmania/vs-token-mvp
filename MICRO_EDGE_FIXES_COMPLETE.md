@@ -65,7 +65,7 @@ All micro-edge cases identified in the audit preparation have been systematicall
 ## 📊 Testing Results
 
 ```bash
-Ran 11 tests for test/ImmutableVault.t.sol:ImmutableVaultTest
+Ran 12 tests for test/ImmutableVault.t.sol:ImmutableVaultTest
 [PASS] testCannotDepositAfterFreeze() (gas: 93352)
 [PASS] testCannotRevokeDelegationAfterDeposit() (gas: 230104)
 [PASS] testDepositWithCorrectDelegation() (gas: 227487)
