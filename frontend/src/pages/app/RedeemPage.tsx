@@ -71,9 +71,9 @@ export const RedeemPage: React.FC = () => {
         transition={{ duration: 0.6 }}
       >
         <h1 className="page-title-modern">1:1 Redemption Opens 15 Apr 2026</h1>
-        <p className="page-subtitle-modern">
-          Direct vS → S swaps unlock as soon as every fNFT reaches 0% penalty. 
-          Until then, you can trade vS on Shadow DEX for instant liquidity.
+        <p style={{ fontSize: '1.1rem', color: '#64748b', marginBottom: '2rem', lineHeight: 1.6 }}>
+          <strong>1:1 redemption</strong> opens exactly 9 months after your NFT's vesting start date. 
+          Until then, you can trade vS on Beets for instant liquidity.
         </p>
       </motion.div>
 
@@ -162,12 +162,13 @@ export const RedeemPage: React.FC = () => {
           
           <div className="button-with-tooltip">
             <a 
-              href="https://dex.shadow.xyz/pool/vS-S" 
+              href="https://beets.fi"
               target="_blank" 
               rel="noopener noreferrer"
-              className="trade-button-secondary"
+              className="button-primary"
+              style={{ minWidth: '200px' }}
             >
-              Trade vS on Shadow ↗
+              Trade vS on Beets ↗
             </a>
             <p className="button-caption">Trade fee 0.25% • opens new tab ↗</p>
           </div>
@@ -187,7 +188,7 @@ export const RedeemPage: React.FC = () => {
             <div className="stepper-dot filled"></div>
             <div className="stepper-content">
               <h4>Now</h4>
-              <p>Trade vS on Shadow DEX</p>
+              <p>Trade vS on Beets</p>
             </div>
           </div>
           

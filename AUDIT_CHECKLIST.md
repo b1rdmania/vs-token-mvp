@@ -5,7 +5,7 @@
 **vS Vault enables immediate liquidity for Sonic vesting NFTs (fNFTs)**
 
 - **Deposit**: User deposits fNFT → Vault mints full-value vS tokens immediately  
-- **Trade**: User trades vS on Shadow DEX at market-determined rates
+- **Trade**: User trades vS on Beets at market-determined rates
 - **Wait**: Vault holds fNFTs until global maturity (9+ months), never claims early
 - **Redeem**: After maturity, users can redeem vS → S at 1:1 ratio on protocol website
 

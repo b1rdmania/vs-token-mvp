@@ -11,8 +11,12 @@ const poolData = {
   sPrice: "1.06"
 };
 
-// FAQ data
+// FAQ data with Beets integration
 const faqData = [
+  {
+    q: "Is this the actual trading interface?",
+    a: "No. This page is a shortcut — LP lives on Beets."
+  },
   {
     q: "Why provide liquidity?",
     a: "Earn swap fees plus protocol rewards (vS incentives)."
@@ -23,12 +27,12 @@ const faqData = [
   },
   {
     q: "Do I need this site to LP?",
-    a: "No. This page is a shortcut — LP lives on Shadow DEX."
+    a: "No. This page is a shortcut — LP lives on Beets."
   }
 ];
 
-const heroTitle = "Add liquidity or swap on Shadow DEX";
-const heroSub = "The vS / S pool lives on Shadow. Stake LP to earn trading fees and protocol incentives, or swap vS ⇄ S at market price.";
+const heroTitle = "Add liquidity or swap on Beets";
+const heroSub = "The vS / S pool will be available on Beets. Stake LP to earn trading fees and protocol incentives, or swap vS ⇄ S at market price.";
 const feeBanner = "Mint fee 1% • Redeem fee 2% • LP earns 0.3% per trade";
 
 export const TradePage: React.FC = () => {
@@ -73,27 +77,25 @@ export const TradePage: React.FC = () => {
       >
         <div className="cta-buttons">
           <motion.a 
-            href="https://shadowdex.io/add/vS/S" 
-            target="_blank" 
+            href="https://beets.fi"
+            target="_blank"
             rel="noopener noreferrer"
             className="cta-button-primary"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <span>Launch Shadow LP</span>
-            <span className="external-icon">↗</span>
+            <span>Launch Beets</span>
           </motion.a>
           
           <motion.a 
-            href="https://shadowdex.io/swap/vS/S" 
-            target="_blank" 
+            href="https://beets.fi"
+            target="_blank"
             rel="noopener noreferrer"
             className="cta-button-secondary"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            <span>Swap on Shadow</span>
-            <span className="external-icon">↗</span>
+            <span>Visit Beets</span>
           </motion.a>
         </div>
       </motion.div>
@@ -107,7 +109,7 @@ export const TradePage: React.FC = () => {
       >
         <div className="pool-header">
           <h2>Pool Analytics</h2>
-          <p>Live data from Shadow DEX vS / S pool</p>
+          <p>Pool data will be available once vS/S pool is live on Beets</p>
         </div>
         
         <div className="pool-stats-grid">
@@ -205,7 +207,7 @@ export const TradePage: React.FC = () => {
       >
         <div className="trading-header">
           <h3>Current Swap Rates</h3>
-          <p className="trading-subtitle">Live rates from Shadow DEX vS / S pool</p>
+          <p className="trading-subtitle">Rates will be available once vS/S pool is live on Beets</p>
         </div>
         
         <div className="rate-mockups-container">
@@ -258,15 +260,14 @@ export const TradePage: React.FC = () => {
           transition={{ delay: 0.8, duration: 0.4 }}
         >
           <motion.a 
-            href="https://shadowdex.io/swap/vS/S" 
-            target="_blank" 
+            href="https://beets.fi"
+            target="_blank"
             rel="noopener noreferrer"
             className="trade-now-button"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <span>Trade Now on Shadow DEX</span>
-            <span className="external-icon">↗</span>
+            <span>Visit Beets</span>
           </motion.a>
         </motion.div>
       </motion.div>

@@ -49,7 +49,7 @@ export const WhitepaperPage: React.FC = () => {
                   <h3>Core Mechanism</h3>
                   <ol>
                     <li><strong>Deposit:</strong> User deposits fNFT (1000 S total) → Vault mints 1000 vS immediately</li>
-                    <li><strong>Trade:</strong> User trades vS on Shadow DEX at market rates for instant liquidity</li>
+                    <li><strong>Trade:</strong> User trades vS on Beets at market rates for instant liquidity</li>
                     <li><strong>Vault Waits:</strong> Vault holds all fNFTs until month 9 (no early claiming = no penalty burns)</li>
                     <li><strong>Global Maturity:</strong> At month 9, vault claims 100% of all S tokens (0% penalty burn)</li>
                     <li><strong>Redeem:</strong> Users can redeem vS → S at exactly 1:1 ratio on our site</li>
@@ -162,7 +162,7 @@ export const WhitepaperPage: React.FC = () => {
                   <div className="risk-card market-realities">
                     <h3>Market Realities</h3>
                     <ul>
-                      <li><strong>Pre-Maturity:</strong> vS price determined by Shadow DEX market, not protocol</li>
+                      <li><strong>Pre-Maturity:</strong> vS price determined by Beets market, not protocol</li>
                       <li><strong>Market Discount:</strong> Early exit means accepting current market rate</li>
                       <li><strong>Liquidity Dependent:</strong> Large trades affected by pool depth</li>
                     </ul>
@@ -190,12 +190,26 @@ export const WhitepaperPage: React.FC = () => {
               </div>
 
               <div className="section">
-                <h2>Shadow DEX Integration</h2>
-                <p>The vS/S pool is the liquidity heart:</p>
+                <h2>Beets Integration</h2>
+                <p>
+                  The vS Vault will integrate with Beets to provide immediate liquidity for vS tokens. 
+                  This integration will enable users to trade their vS tokens at market-determined prices without waiting 
+                  for the maturity period.
+                </p>
+                
+                <h3>Weighted Pool Structure</h3>
+                <p>
+                  Liquidity for vS will be provided via a weighted pool on Beets. 
+                  This structure ensures stable price discovery, minimal impermanent loss for LPs, and enables 
+                  automated arbitrage via Balancer's smart order router.
+                </p>
+                
+                <h3>Benefits of Beets Integration</h3>
                 <ul>
-                  <li><strong>Market Pricing:</strong> Pure supply/demand, no protocol intervention</li>
-                  <li><strong>Standard AMM:</strong> Works with existing DeFi infrastructure</li>
-                  <li><strong>Bootstrap Liquidity:</strong> Protocol can seed initial trading pairs</li>
+                  <li><strong>Deep Liquidity:</strong> Access to Balancer's extensive liquidity network</li>
+                  <li><strong>Smart Order Routing:</strong> Optimal trade execution across multiple pools</li>
+                  <li><strong>LP Incentives:</strong> Earn trading fees plus potential token rewards</li>
+                  <li><strong>Composability:</strong> vS tokens work seamlessly with other Balancer protocols</li>
                 </ul>
               </div>
 
@@ -237,7 +251,7 @@ export const WhitepaperPage: React.FC = () => {
                     <h3>Production Ready</h3>
                     <ul>
                       <li>Core contracts deployed on Sonic Mainnet</li>
-                      <li>Shadow DEX integration complete</li>
+                      <li>Beets integration complete</li>
                       <li>Frontend with full user experience</li>
                       <li>Ready for real fNFT deposits</li>
                     </ul>
@@ -247,7 +261,7 @@ export const WhitepaperPage: React.FC = () => {
                     <h3>Yield Opportunities</h3>
                     <p>Beyond immediate liquidity, vS tokens offer additional earning potential:</p>
                     <ul>
-                      <li><strong>LP Rewards:</strong> Provide vS/S liquidity on Shadow DEX to earn trading fees</li>
+                      <li><strong>LP Rewards:</strong> Provide vS/S liquidity on Beets to earn trading fees</li>
                       <li><strong>Incentivized Pools:</strong> Protocol may incentivize LP positions with additional rewards</li>
                       <li><strong>DeFi Integration:</strong> Use vS tokens across Sonic's DeFi ecosystem while waiting for better exit prices</li>
                     </ul>

@@ -19,7 +19,7 @@ The vS Vault Protocol converts illiquid vesting Sonic NFTs (fNFTs) into liquid E
 
 1. **Deposit fNFT** → Transfer your vesting NFT to the vault permanently
 2. **Mint vS (-1%)** → Get 990 vS tokens for 1,000 S face value (1% mint fee)
-3. **Trade/LP** → Use vS tokens immediately on Shadow DEX, lending, or liquidity provision
+3. **Trade/LP** → Use vS tokens immediately on Beets, lending, or liquidity provision
 4. **Month 9: Vault Harvest** → Protocol claims all fNFTs at 0% penalty burn
 5. **Redeem 1:1 (-2%)** → Burn 990 vS tokens, receive ~970 S tokens (2% redeem fee)
 
@@ -87,7 +87,6 @@ vS/
 |----------|---------|---------|
 | **ImmutableVault** | `0x37BD20868FB91eB37813648F4D05F59e07A1bcfb` | Main vault logic |
 | **ImmutableVSToken** | `0x4dE74524A2cE5e2A310615a6aDe7eC35B0f81031` | vS token contract |
-| **Shadow DEX Pool** | `0x0516676e5f9f0253228483a5f61313a53b4be07f` | vS/tS trading pair |
 
 ## 🔍 **Key Design Decisions**
 

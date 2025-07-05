@@ -39,7 +39,7 @@ Modern, elegant design system for the vS Vault application with consistent visua
 - **Dual Trading Interface**: Side-by-side sell/buy cards with swap animation
 - **Real-time Calculations**: Dynamic value updates with highlighted results
 - **Pool Analytics**: Grid of animated stat cards with icons
-- **Shadow DEX Integration**: Prominent call-to-action with external link styling
+- **Beets Integration**: Prominent call-to-action with external link styling
 
 ### 🔄 **Redeem Page**
 - **Timeline Component**: Visual redemption timeline with completed/upcoming states
