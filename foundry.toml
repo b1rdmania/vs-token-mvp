@@ -5,10 +5,28 @@ libs = ["lib"]
 solc_version = "0.8.20"
 optimizer = true
 optimizer_runs = 200
-via_ir = false
+via_ir = true
+ffi = true  # Enable FFI for auto-verification in scripts
 
 [rpc_endpoints]
-sonic = "https://rpc.soniclabs.com"
+# Sonic Networks
+sonic_testnet = "https://rpc.blaze.soniclabs.com"
+sonic_mainnet = "https://rpc.soniclabs.com"
+
+# Common testnets for development
+sepolia = "https://sepolia.infura.io/v3/e78ee7de61cc472aa36de5c2e4b8f2f6"
+polygon_mumbai = "https://rpc-mumbai.maticvigil.com"
+
+[etherscan]
+# Sonic Testnet (Chain ID: 57054)
+sonic_testnet = { key = "${ETHERSCAN_API_KEY}", chain = 57054, url = "https://api.etherscan.io/v2/api?chainid=57054" }
+
+# Sonic Mainnet (Chain ID: 146) 
+sonic_mainnet = { key = "${ETHERSCAN_API_KEY}", chain = 146, url = "https://api.etherscan.io/v2/api?chainid=146" }
+
+# Other networks for future use
+sepolia = { key = "${ETHERSCAN_API_KEY}", chain = 11155111, url= "https://api.etherscan.io/v2/api?chainid=11155111" }
+polygon = { key = "${POLYGONSCAN_API_KEY}", chain = 137 }
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
 # Foundry configuration for vS Vault Protocol

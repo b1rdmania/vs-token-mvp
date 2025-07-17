@@ -25,28 +25,30 @@ interface IUpgradeableVSToken {
 }
 
 /**
- * @title UpgradeableVault - Upgradeable Vesting NFT Liquidity Protocol
+ * @title UpgradeableVault - Simplified Upgradeable Vesting NFT Liquidity Protocol
  * @author vS Vault Team
- * @notice Converts illiquid vesting NFTs into liquid ERC-20 tokens (vS) with upgrade capabilities
+ * @notice Converts illiquid vesting NFTs into liquid ERC-20 tokens (vS) with trusted multisig governance
  * 
- * @dev CORE DESIGN PRINCIPLES:
- * 1. UPGRADEABLE: Admin-controlled upgrades with timelock protection
- * 2. PAUSABLE: Emergency pause functionality for security incidents
- * 3. ROLE-BASED ACCESS: Multi-signature and governance-controlled operations
- * 4. WAIT-AND-HARVEST: Vault never claims early (avoiding penalty burns), waits until maturity
- * 5. SELF-DELEGATION: Automatically delegates NFTs to vault on deposit to prevent delegation attacks
- * 6. PROPORTIONAL REDEMPTION: Users get pro-rata share of harvested tokens, no hostage scenarios
+ * @dev DESIGN PRINCIPLES:
+ * 1. TRUSTED MULTISIG
+ * 2. FAST RESPONSE: 12-hour delays for normal operations, 2-hour emergency response
+ * 3. SIMPLE ROLES: Just ADMIN_ROLE for normal operations, EMERGENCY_ROLE for incidents
+ * 4. ESSENTIAL SAFETY: Emergency pause, upgrade delays, automatic unpause
+ * 5. WAIT-AND-HARVEST: Vault never claims early, waits until maturity
+ * 6. SELF-DELEGATION: Automatically delegates NFTs to prevent delegation attacks
  * 7. GAS-BOMB PROOF: Bounded batch processing prevents DoS attacks
  * 
- * @dev SECURITY FEATURES:
- * - UUPS proxy pattern for controlled upgrades
- * - Role-based access control with multiple admin types
- * - Emergency pause mechanism with automatic unpause
- * - Timelock delays for critical operations
- * - Storage layout versioning to prevent collisions
- * - Reentrancy protection on all external functions
- * - Try-catch wrappers isolate external call failures
- * - Bounded batch sizes prevent gas exhaustion attacks
+ * @dev GOVERNANCE MODEL:
+ * - Multisig controlled with 12-hour upgrade delays (users can exit before changes)
+ * - Emergency pause for immediate incident response (2-hour emergency upgrades when paused)
+ * - Single upgrade path optimized for trusted governance
+ * 
+ * @dev TRUST GUARANTEES (IMMUTABLE FOREVER):
+ * - Treasury address cannot be changed (no rug pull risk)
+ * - Fee rates are fixed (1% mint, 2% redeem) 
+ * - Maturity timestamps are locked (no season manipulation)
+ * - Only designated vault can mint tokens (minter role immutable)
+ * - Core economic parameters cannot be modified by any party
  */
 contract UpgradeableVault is 
     UUPSUpgradeable, 
@@ -55,21 +57,21 @@ contract UpgradeableVault is
     PausableUpgradeable,
     IERC721Receiver 
 {
-    // ============ ACCESS CONTROL ROLES ============
+    // ============ SIMPLIFIED ACCESS CONTROL ROLES ============
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
-    bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
-    bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
-    bytes32 public constant OPERATOR_ROLE = keccak256("OPERATOR_ROLE");
     bytes32 public constant EMERGENCY_ROLE = keccak256("EMERGENCY_ROLE");
+
+    /// @notice The vS token contract (set once in constructor)
+    /// @dev Set once in constructor, eliminates circular dependency
+    IUpgradeableVSToken public immutable vS;
+    address public immutable sonicNFT;
+    address public immutable underlyingToken;
+    address public immutable protocolTreasury;
+    uint256 public immutable maturityTimestamp;
+    uint256 public immutable vaultFreezeTimestamp;
 
     // ============ STORAGE LAYOUT V1 ============
     struct VaultStorageV1 {
-        IUpgradeableVSToken vS;
-        address sonicNFT;
-        address underlyingToken;
-        address protocolTreasury;
-        uint256 maturityTimestamp;
-        uint256 vaultFreezeTimestamp;
         
         // Vault state
         uint256[] heldNFTs;
@@ -79,8 +81,10 @@ contract UpgradeableVault is
         uint256 processedCount;
         bool matured;
         
-        // Upgrade management
+        // Simplified upgrade management
         mapping(address => uint256) upgradeProposals;
+        mapping(address => string) upgradeReasons;
+        mapping(address => bool) isEmergencyUpgrade; // Track emergency vs normal upgrades
         uint256 lastUpgradeTime;
         
         // Emergency controls
@@ -90,19 +94,20 @@ contract UpgradeableVault is
 
     VaultStorageV1 private _storage;
 
-    // ============ CONSTANTS ============
+    // ============ SIMPLIFIED CONSTANTS FOR TRUSTED MULTISIG ============
     uint256 public constant MINT_FEE_BPS = 100;        // 1% mint fee
     uint256 public constant REDEEM_FEE_BPS = 200;      // 2% redeem fee
-    uint256 public constant KEEPER_INCENTIVE_BPS = 0;  // 0% keeper incentive (self-keeper mode)
+    uint256 public constant KEEPER_INCENTIVE_BPS = 0;  // 0% keeper incentive
     uint256 public constant GRACE_PERIOD = 180 days;   // Grace period for surplus sweep
     uint256 public constant MAX_BATCH_SIZE = 20;       // Max NFTs per harvest batch
-    uint256 public constant MIN_NFT_FACE = 100e18;     // 100 S minimum (prevents dust grief)
-    uint256 public constant MAX_NFTS = 10000;          // SECURITY: Max NFTs to prevent scale issues
+    uint256 public constant MIN_NFT_FACE = 100e18;     // 100 S minimum
+    uint256 public constant MAX_NFTS = 10000;          // Max NFTs to prevent scale issues
     
-    // Upgrade controls
-    uint256 public constant UPGRADE_DELAY = 48 hours;  // Minimum delay for upgrades
-    uint256 public constant MAX_PAUSE_DURATION = 7 days; // Maximum pause duration
-    uint256 public constant MIN_UPGRADE_INTERVAL = 24 hours; // Minimum time between upgrades
+    // Simplified upgrade controls for trusted multisig
+    uint256 public constant UPGRADE_DELAY = 12 hours;  // Fast but safe for trusted parties
+    uint256 public constant EMERGENCY_UPGRADE_DELAY = 2 hours;  // Very fast emergency response
+    uint256 public constant MAX_PAUSE_DURATION = 7 days; // Keep automatic unpause
+    uint256 public constant MIN_UPGRADE_INTERVAL = 6 hours; // Flexible timing for multisig
 
     // ============ EVENTS ============
     event NFTDeposited(address indexed user, uint256 indexed nftId, uint256 userAmount, uint256 feeAmount);
@@ -111,9 +116,9 @@ contract UpgradeableVault is
     event SurplusSwept(address indexed sweeper, uint256 amount);
     event DelegationForced(uint256 indexed nftId);
     
-    // Upgrade events
-    event UpgradeProposed(address indexed newImplementation, uint256 executeAfter);
-    event UpgradeExecuted(address indexed newImplementation, address indexed executor);
+    // Simplified upgrade events
+    event UpgradeProposed(address indexed newImplementation, uint256 executeAfter, string reason, bool isEmergency);
+    event UpgradeExecuted(address indexed newImplementation, address indexed executor, string reason);
     event UpgradeCancelled(address indexed newImplementation);
     
     // Emergency events
@@ -121,37 +126,50 @@ contract UpgradeableVault is
     event EmergencyUnpaused(address indexed unpauser);
 
     // ============ STORAGE GAPS ============
-    // Reserve 50 storage slots for future versions
+    // Reserve 50 storage slots for future versions (more variables moved to immutable)
     uint256[50] private __gap;
 
     /**
-     * @notice Initialize the upgradeable vault
-     * @dev This replaces the constructor for upgradeable contracts
-     * @param _vsToken Address of the vS token contract
+     * @notice Constructor sets immutable addresses and timestamps
+     * @param _vS The vS token contract address
      * @param _sonicNFT Address of the Sonic fNFT contract
      * @param _underlyingToken Address of the underlying S token
      * @param _protocolTreasury Address to receive protocol fees
      * @param _maturityTimestamp When fNFTs can be claimed at 0% penalty
      * @param _vaultFreezeTimestamp No deposits accepted after this
-     * @param _admin Initial admin address (should be multisig)
      */
-    function initialize(
-        address _vsToken,
+    constructor(
+        address _vS,
         address _sonicNFT,
         address _underlyingToken,
         address _protocolTreasury,
         uint256 _maturityTimestamp,
-        uint256 _vaultFreezeTimestamp,
-        address _admin
-    ) public initializer {
-        require(_vsToken != address(0), "Invalid vS token");
+        uint256 _vaultFreezeTimestamp
+    ) {
+        require(_vS != address(0), "vS token cannot be zero address");
         require(_sonicNFT != address(0), "Invalid NFT contract");
         require(_underlyingToken != address(0), "Invalid underlying token");
         require(_protocolTreasury != address(0), "Invalid treasury");
+        require(_maturityTimestamp > 0, "Invalid maturity timestamp");
+        require(_vaultFreezeTimestamp > 0, "Invalid freeze timestamp");
+        require(_vaultFreezeTimestamp < _maturityTimestamp, "Freeze must be before maturity");
+        
+        vS = IUpgradeableVSToken(_vS);
+        sonicNFT = _sonicNFT;
+        underlyingToken = _underlyingToken;
+        protocolTreasury = _protocolTreasury;
+        maturityTimestamp = _maturityTimestamp;
+        vaultFreezeTimestamp = _vaultFreezeTimestamp;
+    }
+
+    /**
+     * @notice Initialize the upgradeable vault
+     * @dev This replaces the constructor for upgradeable contracts
+     * @dev All addresses and timestamps are set in constructor as immutable
+     * @param _admin Initial admin address (should be multisig)
+     */
+    function initialize(address _admin) public initializer {
         require(_admin != address(0), "Invalid admin");
-        require(_maturityTimestamp > block.timestamp, "Maturity must be future");
-        require(_vaultFreezeTimestamp > block.timestamp, "Freeze must be future");
-        require(_vaultFreezeTimestamp < _maturityTimestamp, "Freeze before maturity");
 
         // Initialize OpenZeppelin upgradeable contracts
         __UUPSUpgradeable_init();
@@ -162,18 +180,9 @@ contract UpgradeableVault is
         // Set up roles
         _grantRole(DEFAULT_ADMIN_ROLE, _admin);
         _grantRole(ADMIN_ROLE, _admin);
-        _grantRole(UPGRADER_ROLE, _admin);
-        _grantRole(PAUSER_ROLE, _admin);
-        _grantRole(OPERATOR_ROLE, _admin);
         _grantRole(EMERGENCY_ROLE, _admin);
 
-        // Initialize storage
-        _storage.vS = IUpgradeableVSToken(_vsToken);
-        _storage.sonicNFT = _sonicNFT;
-        _storage.underlyingToken = _underlyingToken;
-        _storage.protocolTreasury = _protocolTreasury;
-        _storage.maturityTimestamp = _maturityTimestamp;
-        _storage.vaultFreezeTimestamp = _vaultFreezeTimestamp;
+        // Initialize storage (immutable values set in constructor)
         _storage.nextClaim = 0;
         _storage.processedCount = 0;
         _storage.matured = false;
@@ -181,65 +190,144 @@ contract UpgradeableVault is
     }
 
     /**
-     * @notice Authorize contract upgrades
-     * @dev Only UPGRADER_ROLE can authorize upgrades with timelock
+     * @notice Authorize contract upgrades (simplified single path)
+     * @dev Handles both normal and emergency upgrades through unified proposal system
      * @param newImplementation Address of the new implementation
      */
-    function _authorizeUpgrade(address newImplementation) internal override onlyRole(UPGRADER_ROLE) {
-        require(
-            _storage.upgradeProposals[newImplementation] != 0 &&
-            block.timestamp >= _storage.upgradeProposals[newImplementation],
-            "Upgrade not ready or not proposed"
-        );
+    function _authorizeUpgrade(address newImplementation) internal override {
+        require(_storage.upgradeProposals[newImplementation] != 0, "No upgrade proposal found");
+        require(block.timestamp >= _storage.upgradeProposals[newImplementation], "Upgrade delay not met");
+        
+        // Check if this is an emergency upgrade that was proposed
+        bool proposalIsEmergency = _storage.isEmergencyUpgrade[newImplementation];
+        
+        if (proposalIsEmergency) {
+            // Emergency upgrades can only be executed when paused and by EMERGENCY_ROLE
+            require(paused(), "Emergency upgrades only when paused");
+            require(hasRole(EMERGENCY_ROLE, msg.sender), "Not emergency authorized");
+        } else {
+            // Normal upgrades can only be executed when not paused and by ADMIN_ROLE
+            require(!paused(), "Normal upgrades only when not paused");
+            require(hasRole(ADMIN_ROLE, msg.sender), "Not admin authorized");
+        }
+        
+        // Check minimum interval
         require(
             block.timestamp >= _storage.lastUpgradeTime + MIN_UPGRADE_INTERVAL,
             "Too soon since last upgrade"
         );
         
         _storage.lastUpgradeTime = block.timestamp;
-        delete _storage.upgradeProposals[newImplementation];
         
-        emit UpgradeExecuted(newImplementation, msg.sender);
+        // Emit upgrade executed event
+        string memory reason = _storage.upgradeReasons[newImplementation];
+        emit UpgradeExecuted(newImplementation, msg.sender, reason);
+        
+        // Cleanup upgrade data
+        delete _storage.upgradeProposals[newImplementation];
+        delete _storage.upgradeReasons[newImplementation];
+        delete _storage.isEmergencyUpgrade[newImplementation];
     }
 
     /**
      * @notice Propose a contract upgrade
-     * @dev Upgrades must be proposed and wait for timelock period
+     * @dev Normal upgrades with 12-hour timelock for trusted multisig
      * @param newImplementation Address of the new implementation
+     * @param reason Description of the upgrade
      */
-    function proposeUpgrade(address newImplementation) external onlyRole(UPGRADER_ROLE) {
+    function proposeUpgrade(
+        address newImplementation,
+        string calldata reason
+    ) external onlyRole(ADMIN_ROLE) {
         require(newImplementation != address(0), "Invalid implementation");
         require(_storage.upgradeProposals[newImplementation] == 0, "Already proposed");
+        require(bytes(reason).length > 0, "Must provide reason");
         
         uint256 executeAfter = block.timestamp + UPGRADE_DELAY;
         _storage.upgradeProposals[newImplementation] = executeAfter;
+        _storage.upgradeReasons[newImplementation] = reason;
         
-        emit UpgradeProposed(newImplementation, executeAfter);
+        emit UpgradeProposed(newImplementation, executeAfter, reason, false);
     }
 
     /**
      * @notice Cancel a proposed upgrade
-     * @dev Only UPGRADER_ROLE can cancel proposed upgrades
+     * @dev Can be called by ADMIN_ROLE or EMERGENCY_ROLE
      * @param newImplementation Address of the proposed implementation
      */
-    function cancelUpgrade(address newImplementation) external onlyRole(UPGRADER_ROLE) {
+    function cancelUpgrade(address newImplementation) external {
+        require(
+            hasRole(ADMIN_ROLE, msg.sender) || hasRole(EMERGENCY_ROLE, msg.sender),
+            "Not authorized to cancel"
+        );
         require(_storage.upgradeProposals[newImplementation] != 0, "No proposal found");
         
         delete _storage.upgradeProposals[newImplementation];
+        delete _storage.upgradeReasons[newImplementation];
+        
         emit UpgradeCancelled(newImplementation);
     }
 
     /**
+     * @notice Propose an emergency contract upgrade
+     * @dev Emergency upgrades with 2-hour timelock, only when contract is paused
+     * @param newImplementation Address of the new implementation
+     * @param exploitDescription Description of the exploit being fixed
+     */
+    function proposeEmergencyUpgrade(
+        address newImplementation,
+        string calldata exploitDescription
+    ) external onlyRole(EMERGENCY_ROLE) whenPaused {
+        require(newImplementation != address(0), "Invalid implementation");
+        require(bytes(exploitDescription).length > 0, "Must describe exploit");
+        require(_storage.upgradeProposals[newImplementation] == 0, "Already proposed");
+        
+        uint256 executeAfter = block.timestamp + EMERGENCY_UPGRADE_DELAY;
+        _storage.upgradeProposals[newImplementation] = executeAfter;
+        _storage.upgradeReasons[newImplementation] = exploitDescription;
+        _storage.isEmergencyUpgrade[newImplementation] = true; // Mark as emergency
+        
+        emit UpgradeProposed(newImplementation, executeAfter, exploitDescription, true);
+    }
+
+    /**
+     * @notice Cancel a proposed emergency upgrade
+     * @dev Only EMERGENCY_ROLE can cancel emergency upgrades
+     * @param newImplementation Address of the proposed implementation
+     */
+    function cancelEmergencyUpgrade(address newImplementation) external onlyRole(EMERGENCY_ROLE) {
+        require(_storage.upgradeProposals[newImplementation] != 0, "No proposal found");
+        
+        delete _storage.upgradeProposals[newImplementation];
+        delete _storage.upgradeReasons[newImplementation];
+        delete _storage.isEmergencyUpgrade[newImplementation];
+        
+        emit UpgradeCancelled(newImplementation);
+    }
+
+    /**
+     * @notice Get upgrade details
+     * @param implementation Address of the proposed implementation
+     * @return executeAfter Timestamp when upgrade can be executed
+     * @return reason Description of the upgrade
+     */
+    function getUpgradeDetails(address implementation) 
+        external 
+        view 
+        returns (uint256 executeAfter, string memory reason) 
+    {
+        return (
+            _storage.upgradeProposals[implementation],
+            _storage.upgradeReasons[implementation]
+        );
+    }
+
+    /**
      * @notice Emergency pause the contract
-     * @dev Can be called by PAUSER_ROLE or EMERGENCY_ROLE
+     * @dev Can be called by EMERGENCY_ROLE
      * @param reason Reason for the pause
      */
-    function emergencyPause(string calldata reason) external {
-        require(
-            hasRole(PAUSER_ROLE, msg.sender) || hasRole(EMERGENCY_ROLE, msg.sender),
-            "Not authorized to pause"
-        );
-        
+    function emergencyPause(string calldata reason) external onlyRole(EMERGENCY_ROLE) {
         _storage.pausedAt = block.timestamp;
         _storage.pauseReason = reason;
         _pause();
@@ -249,11 +337,11 @@ contract UpgradeableVault is
 
     /**
      * @notice Unpause the contract
-     * @dev Can be called by PAUSER_ROLE or automatically after MAX_PAUSE_DURATION
+     * @dev Can be called by EMERGENCY_ROLE or automatically after MAX_PAUSE_DURATION
      */
     function unpause() external {
         require(
-            hasRole(PAUSER_ROLE, msg.sender) || 
+            hasRole(EMERGENCY_ROLE, msg.sender) || 
             block.timestamp >= _storage.pausedAt + MAX_PAUSE_DURATION,
             "Not authorized to unpause or too early"
         );
@@ -271,18 +359,18 @@ contract UpgradeableVault is
      * @param nftId ID of the fNFT to deposit (must be owned by msg.sender)
      */
     function deposit(uint256 nftId) external nonReentrant whenNotPaused {
-        require(block.timestamp <= _storage.vaultFreezeTimestamp, "Vault frozen - use new season vault");
+        require(block.timestamp <= vaultFreezeTimestamp, "Vault frozen - use new season vault");
         require(_storage.depositedNFTs[nftId] == address(0), "NFT already deposited");
-        require(IERC721(_storage.sonicNFT).ownerOf(nftId) == msg.sender, "Not NFT owner");
+        require(IERC721(sonicNFT).ownerOf(nftId) == msg.sender, "Not NFT owner");
         require(_storage.heldNFTs.length < MAX_NFTS, "Vault at capacity");
         
         // Pull the NFT first
-        IERC721(_storage.sonicNFT).safeTransferFrom(msg.sender, address(this), nftId);
+        IERC721(sonicNFT).safeTransferFrom(msg.sender, address(this), nftId);
         
         // Immediately set ourselves as delegate
         _ensureDelegated(nftId);
         
-        uint256 totalValue = IDecayfNFT(_storage.sonicNFT).getTotalAmount(nftId);
+        uint256 totalValue = IDecayfNFT(sonicNFT).getTotalAmount(nftId);
         require(totalValue > 0, "NFT has no value");
         require(totalValue >= MIN_NFT_FACE, "NFT too small");
 
@@ -295,8 +383,8 @@ contract UpgradeableVault is
         uint256 userAmount = totalValue - feeAmount;
         
         // Mint vS tokens
-        _storage.vS.mint(_storage.protocolTreasury, feeAmount);
-        _storage.vS.mint(msg.sender, userAmount);
+        vS.mint(protocolTreasury, feeAmount);
+        vS.mint(msg.sender, userAmount);
 
         emit NFTDeposited(msg.sender, nftId, userAmount, feeAmount);
     }
@@ -309,7 +397,7 @@ contract UpgradeableVault is
      * @param k Number of NFTs to process (bounded for gas safety, max 20)
      */
     function harvestBatch(uint256 k) external nonReentrant whenNotPaused {
-        require(block.timestamp >= _storage.maturityTimestamp, "Too early - wait for maturity");
+        require(block.timestamp >= maturityTimestamp, "Too early - wait for maturity");
         require(k > 0 && k <= MAX_BATCH_SIZE, "Invalid batch size");
         require(!_storage.matured, "All NFTs already processed");
         
@@ -322,7 +410,7 @@ contract UpgradeableVault is
             
             // Only attempt if not already successfully processed
             if (!_storage.processed[nftId]) {
-                try IDecayfNFT(_storage.sonicNFT).claimVestedTokens(nftId) returns (uint256 claimed) {
+                try IDecayfNFT(sonicNFT).claimVestedTokens(nftId) returns (uint256 claimed) {
                     if (claimed > 0) {
                         _storage.processed[nftId] = true;
                         _storage.processedCount++;
@@ -360,14 +448,14 @@ contract UpgradeableVault is
      */
     function redeem(uint256 amount) external nonReentrant whenNotPaused {
         require(amount > 0, "Cannot redeem 0");
-        require(_storage.vS.balanceOf(msg.sender) >= amount, "Insufficient vS balance");
-        require(block.timestamp >= _storage.maturityTimestamp, "Too early - wait for maturity");
+        require(vS.balanceOf(msg.sender) >= amount, "Insufficient vS balance");
+        require(block.timestamp >= maturityTimestamp, "Too early - wait for maturity");
         
-        uint256 vsTotalSupply = _storage.vS.totalSupply();
+        uint256 vsTotalSupply = vS.totalSupply();
         require(vsTotalSupply > 0, "No vS tokens in circulation");
         
         // Calculate redemption from available balance (proportional)
-        uint256 availableBalance = IERC20(_storage.underlyingToken).balanceOf(address(this));
+        uint256 availableBalance = IERC20(underlyingToken).balanceOf(address(this));
         require(availableBalance > 0, "No tokens available for redemption");
         
         uint256 redeemableValue = (amount * availableBalance) / vsTotalSupply;
@@ -383,13 +471,13 @@ contract UpgradeableVault is
         uint256 userAmount = redeemableValue - feeAmount;
         
         // Burn vS tokens
-        _storage.vS.burn(msg.sender, amount);
+        vS.burn(msg.sender, amount);
         
         // Transfer fee to treasury and remaining to user
         if (feeAmount > 0) {
-            require(IERC20(_storage.underlyingToken).transfer(_storage.protocolTreasury, feeAmount), "Treasury transfer failed");
+            require(IERC20(underlyingToken).transfer(protocolTreasury, feeAmount), "Treasury transfer failed");
         }
-        require(IERC20(_storage.underlyingToken).transfer(msg.sender, userAmount), "User transfer failed");
+        require(IERC20(underlyingToken).transfer(msg.sender, userAmount), "User transfer failed");
 
         emit Redeemed(msg.sender, amount, userAmount, feeAmount);
     }
@@ -399,12 +487,12 @@ contract UpgradeableVault is
      * @dev No owner required - anyone can call after maturity + 180 days
      */
     function sweepSurplus() external nonReentrant whenNotPaused {
-        require(block.timestamp >= _storage.maturityTimestamp + GRACE_PERIOD, "Grace period not over");
+        require(block.timestamp >= maturityTimestamp + GRACE_PERIOD, "Grace period not over");
         
-        uint256 surplus = IERC20(_storage.underlyingToken).balanceOf(address(this));
+        uint256 surplus = IERC20(underlyingToken).balanceOf(address(this));
         require(surplus > 0, "No surplus to sweep");
         
-        require(IERC20(_storage.underlyingToken).transfer(_storage.protocolTreasury, surplus), "Surplus transfer failed");
+        require(IERC20(underlyingToken).transfer(protocolTreasury, surplus), "Surplus transfer failed");
         
         emit SurplusSwept(msg.sender, surplus);
     }
@@ -417,7 +505,7 @@ contract UpgradeableVault is
     function forceDelegate(uint256[] calldata nftIds) external whenNotPaused {
         require(nftIds.length <= 50, "Batch too large");
         for (uint256 i = 0; i < nftIds.length; i++) {
-            try IERC721(_storage.sonicNFT).ownerOf(nftIds[i]) returns (address owner) {
+            try IERC721(sonicNFT).ownerOf(nftIds[i]) returns (address owner) {
                 if (owner == address(this)) {
                     _ensureDelegated(nftIds[i]);
                 }
@@ -432,8 +520,8 @@ contract UpgradeableVault is
      * @param nftId ID of the NFT to ensure delegation for
      */
     function _ensureDelegated(uint256 nftId) internal {
-        if (IDecayfNFT(_storage.sonicNFT).claimDelegates(nftId) != address(this)) {
-            try IDecayfNFT(_storage.sonicNFT).setDelegate(nftId, address(this)) {
+        if (IDecayfNFT(sonicNFT).claimDelegates(nftId) != address(this)) {
+            try IDecayfNFT(sonicNFT).setDelegate(nftId, address(this)) {
                 emit DelegationForced(nftId);
             } catch {
                 // Ignore delegation failures
@@ -448,15 +536,15 @@ contract UpgradeableVault is
     }
 
     function getBackingRatio() external view returns (uint256 ratio) {
-        uint256 totalSupply = _storage.vS.totalSupply();
+        uint256 totalSupply = vS.totalSupply();
         if (totalSupply == 0) return 1e18;
         
-        uint256 vaultBalance = IERC20(_storage.underlyingToken).balanceOf(address(this));
+        uint256 vaultBalance = IERC20(underlyingToken).balanceOf(address(this));
         return (vaultBalance * 1e18) / totalSupply;
     }
 
     function totalAssets() external view returns (uint256) {
-        return IERC20(_storage.underlyingToken).balanceOf(address(this));
+        return IERC20(underlyingToken).balanceOf(address(this));
     }
 
     function getHeldNFTCount() external view returns (uint256) {
@@ -477,7 +565,7 @@ contract UpgradeableVault is
     }
 
     function isVaultFrozen() external view returns (bool) {
-        return block.timestamp > _storage.vaultFreezeTimestamp;
+        return block.timestamp > vaultFreezeTimestamp;
     }
 
     function isProcessed(uint256 nftId) external view returns (bool) {
@@ -488,35 +576,16 @@ contract UpgradeableVault is
         return _storage.upgradeProposals[implementation];
     }
 
+    function getUpgradeReason(address implementation) external view returns (string memory) {
+        return _storage.upgradeReasons[implementation];
+    }
+
     function getPauseInfo() external view returns (bool isPaused, uint256 pausedAt, string memory reason) {
         return (paused(), _storage.pausedAt, _storage.pauseReason);
     }
 
-    // ============ STORAGE GETTERS ============
-    
-    function vS() external view returns (address) {
-        return address(_storage.vS);
-    }
-
-    function sonicNFT() external view returns (address) {
-        return _storage.sonicNFT;
-    }
-
-    function underlyingToken() external view returns (address) {
-        return _storage.underlyingToken;
-    }
-
-    function protocolTreasury() external view returns (address) {
-        return _storage.protocolTreasury;
-    }
-
-    function maturityTimestamp() external view returns (uint256) {
-        return _storage.maturityTimestamp;
-    }
-
-    function vaultFreezeTimestamp() external view returns (uint256) {
-        return _storage.vaultFreezeTimestamp;
-    }
+    // ============ IMMUTABLE GETTERS ============
+    // Note: These are now immutable variables, getters provided for interface compatibility
 
     function depositedNFTs(uint256 nftId) external view returns (address) {
         return _storage.depositedNFTs[nftId];
@@ -532,7 +601,7 @@ contract UpgradeableVault is
         uint256, /* tokenId */
         bytes calldata /* data */
     ) external nonReentrant returns (bytes4) {
-        require(msg.sender == _storage.sonicNFT, "Only accepts target NFTs");
+        require(msg.sender == sonicNFT, "Only accepts target NFTs");
         return IERC721Receiver.onERC721Received.selector;
     }
 } 

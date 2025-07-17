@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 import {Script, console} from "forge-std/Script.sol";
-import {ImmutableVault} from "../src/ImmutableVault.sol";
+import {UpgradeableVault} from "../src/upgradeable/UpgradeableVault.sol";
 
 /**
  * @title HarvestAll - Automated Harvest Script for vS Vault
@@ -16,7 +16,7 @@ contract HarvestAll is Script {
         address vaultAddress = vm.envOr("VAULT_ADDRESS", address(0));
         require(vaultAddress != address(0), "VAULT_ADDRESS not set");
         
-        ImmutableVault vault = ImmutableVault(vaultAddress);
+        UpgradeableVault vault = UpgradeableVault(vaultAddress);
         
         // Check if vault has reached maturity
         require(block.timestamp >= vault.maturityTimestamp(), "Vault not mature yet");
@@ -104,7 +104,7 @@ contract HarvestAll is Script {
         address vaultAddress = vm.envOr("VAULT_ADDRESS", address(0));
         require(vaultAddress != address(0), "VAULT_ADDRESS not set");
         
-        ImmutableVault vault = ImmutableVault(vaultAddress);
+        UpgradeableVault vault = UpgradeableVault(vaultAddress);
         uint256 totalNFTs = vault.getHeldNFTCount();
         uint256 batchSize = vault.MAX_BATCH_SIZE();
         uint256 batchCount = (totalNFTs + batchSize - 1) / batchSize;

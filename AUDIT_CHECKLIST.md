@@ -11,10 +11,11 @@
 
 ## Key Security Features
 
-### **1. Immutable Design**
-- No admin functions, owner, or upgrade paths
-- All parameters hardcoded in constructor, never changeable  
-- Zero rug risk - contracts are pure infrastructure
+### **1. Upgradeable Design with Strong Safeguards**
+- **Multisig Governance**: All changes require multisig approval
+- **Public Timelock**: 12h delay for upgrades, 2h for emergency actions
+- **Immutable Critical Parameters**: Treasury address, fee structure, maturity dates locked
+- **Transparent Upgrades**: All changes are public and delayed for user protection
 
 ### **2. Wait-and-Claim Strategy**
 ```solidity
@@ -64,7 +65,7 @@ function deposit(uint256 nftId) external {
 - **Redemption**: Available after maturity at 1:1 ratio
 - **Grace Period**: 180 days to redeem, then sweep unclaimed tokens
 
-**No fees in current implementation** - Pure utility protocol
+**Fee Structure**: 1% mint fee, 2% redeem fee
 
 ## Test Coverage
 
@@ -73,19 +74,22 @@ function deposit(uint256 nftId) external {
 - Wait-and-claim maturity logic
 - Proportional redemption mathematics
 - Gas bomb protection via batch limits
-- Immutable parameter validation
+- Upgrade mechanism validation
+- Timelock and governance controls
 
 ## Contracts for Review
 
-### **ImmutableVault.sol** (~200 lines)
+### **UpgradeableVault.sol** (~600 lines)
 - Core vault with deposit/redeem/claim functions
-- Immutable parameters, zero admin control
+- UUPS upgradeable with timelock protection
 - Reentrancy protection on external functions
+- Emergency pause functionality
 
-### **ImmutableVSToken.sol** (~60 lines)  
-- Standard ERC-20 token
-- Only vault can mint/burn
-- No special features or complexity
+### **UpgradeableVSToken.sol** (~350 lines)  
+- Standard ERC-20 token with upgradeable logic
+- Only vault can mint/burn (immutable minter)
+- Emergency pause and upgrade controls
+- Role-based access control
 
 ## Key Audit Focus Areas
 
@@ -93,16 +97,18 @@ function deposit(uint256 nftId) external {
 2. **Maturity Gate**: Confirm vault never claims before global maturity timestamp
 3. **Proportional Math**: Check redemption calculations handle edge cases correctly
 4. **Reentrancy**: Validate all external functions properly protected
-5. **Immutability**: Confirm zero admin functions or upgrade paths exist
+5. **Upgrade Security**: Verify timelock, governance, and upgrade mechanism security
+6. **Role Management**: Confirm proper access control and role hierarchy
 
 ## Attack Vector Analysis
 
 - ✅ **Delegation Attacks**: Eliminated via self-delegation pattern
-- ✅ **Admin Attacks**: Impossible (no admin functions exist)
+- ✅ **Admin Attacks**: Mitigated via multisig governance and timelock
 - ✅ **System Lockup**: Prevented via proportional redemption
 - ✅ **Gas Bombs**: Mitigated via batch size limits
 - ✅ **Economic Attacks**: Market-driven pricing, no oracle dependencies
+- ✅ **Upgrade Attacks**: Protected via timelock and governance controls
 
 ---
 
-**The protocol achieves maximum security through radical simplification. Ready for production audit.**
+**The protocol achieves strong security through upgradeable design with comprehensive safeguards. Ready for production audit.**

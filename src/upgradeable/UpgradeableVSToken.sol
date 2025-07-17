@@ -7,34 +7,14 @@ import {ERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/
 import {PausableUpgradeable} from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
 /**
- * @title UpgradeableVSToken - Upgradeable Vault-Minted Liquidity Token
- * @author vS Vault Team
- * @notice ERC-20 token representing claims on vesting NFT value, tradeable before maturity
- * 
- * @dev DESIGN PRINCIPLES:
- * 1. UPGRADEABLE: Admin-controlled upgrades with role-based access control
- * 2. ROLE-BASED MINTING: Only authorized vault contracts can mint/burn tokens
- * 3. PAUSABLE: Emergency pause functionality for security incidents
- * 4. STANDARD ERC-20: Full compatibility with DEXs, lending protocols, and DeFi infrastructure
- * 5. CONTROLLED ADMIN: Multi-signature and governance-controlled operations
- * 
- * @dev ECONOMIC FUNCTION:
- * - Represents proportional claims on vault's underlying token balance
- * - Minted when users deposit vesting NFTs into vault (99% of face value)
- * - Burned when users redeem for underlying tokens (proportional to vault balance)
- * - Trades freely on secondary markets at market-determined prices
- * 
- * @dev SECURITY FEATURES:
- * - Role-based access control prevents unauthorized token creation
- * - Emergency pause mechanism for security incidents
- * - Upgrade controls with timelock protection
- * - Storage layout versioning to prevent collisions
- * 
- * @dev USAGE:
- * - Users receive vS tokens when depositing fNFTs to vault
- * - vS tokens can be traded, used as collateral, or provided as liquidity
- * - At maturity, vS tokens can be redeemed 1:1 for underlying S tokens
- * - Market pricing reflects time value and liquidity premium
+ * @title UpgradeableVSToken
+ * @notice Upgradeable ERC-20 token representing claims on vesting NFT value
+ * @dev TRUST GUARANTEES (IMMUTABLE FOREVER):
+ * - Only designated vault can mint/burn tokens (minter address immutable)
+ * - Upgrade delays are fixed (12h normal, 2h emergency when paused)
+ * - Maximum pause duration is capped (7 days automatic unpause)
+ * - Core minting control cannot be transferred or modified
+ * - Economic model protected by immutable vault parameters
  */
 contract UpgradeableVSToken is 
     UUPSUpgradeable, 
@@ -42,27 +22,20 @@ contract UpgradeableVSToken is
     ERC20Upgradeable,
     PausableUpgradeable
 {
-    // ============ ACCESS CONTROL ROLES ============
+    // Access Control Roles
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
-    bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
-    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
-    bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
-    bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
+    bytes32 public constant EMERGENCY_ROLE = keccak256("EMERGENCY_ROLE");
 
-    // ============ STORAGE LAYOUT V1 ============
+    address public immutable minter;
+
+    // Storage Layout V1
     struct TokenStorageV1 {
-        // Authorized minters (vault contracts)
-        mapping(address => bool) authorizedMinters;
-        
-        // Upgrade management
         mapping(address => uint256) upgradeProposals;
+        mapping(address => string) upgradeReasons;
+        mapping(address => bool) isEmergencyUpgrade;
         uint256 lastUpgradeTime;
-        
-        // Emergency controls
         uint256 pausedAt;
         string pauseReason;
-        
-        // Token metadata
         string tokenName;
         string tokenSymbol;
         uint8 tokenDecimals;
@@ -70,61 +43,53 @@ contract UpgradeableVSToken is
 
     TokenStorageV1 private _storage;
 
-    // ============ CONSTANTS ============
-    uint256 public constant UPGRADE_DELAY = 48 hours;  // Minimum delay for upgrades
-    uint256 public constant MAX_PAUSE_DURATION = 7 days; // Maximum pause duration
-    uint256 public constant MIN_UPGRADE_INTERVAL = 24 hours; // Minimum time between upgrades
+    // Constants
+    uint256 public constant UPGRADE_DELAY = 12 hours;
+    uint256 public constant EMERGENCY_UPGRADE_DELAY = 2 hours;
+    uint256 public constant MAX_PAUSE_DURATION = 7 days;
+    uint256 public constant MIN_UPGRADE_INTERVAL = 6 hours;
 
-    // ============ EVENTS ============
-    event MinterAdded(address indexed minter, address indexed admin);
-    event MinterRemoved(address indexed minter, address indexed admin);
-    
-    // Upgrade events
-    event UpgradeProposed(address indexed newImplementation, uint256 executeAfter);
-    event UpgradeExecuted(address indexed newImplementation, address indexed executor);
+    // Events
+    event UpgradeProposed(address indexed newImplementation, uint256 executeAfter, string reason, bool isEmergency);
+    event UpgradeExecuted(address indexed newImplementation, address indexed executor, string reason);
     event UpgradeCancelled(address indexed newImplementation);
-    
-    // Emergency events
     event EmergencyPaused(address indexed pauser, string reason);
     event EmergencyUnpaused(address indexed unpauser);
 
-    // ============ STORAGE GAPS ============
-    // Reserve 50 storage slots for future versions
-    uint256[50] private __gap;
+    // Storage gap for future upgrades
+    uint256[49] private __gap;
 
     /**
-     * @notice Initialize the upgradeable vS token
-     * @dev This replaces the constructor for upgradeable contracts
-     * @param _name Token name (e.g., "vS Token")
-     * @param _symbol Token symbol (e.g., "vS")
-     * @param _admin Initial admin address (should be multisig)
-     * @param _initialMinter Initial minter address (vault contract)
+     * @notice Constructor sets immutable minter address
+     * @param _minter The address that can mint/burn tokens
+     */
+    constructor(address _minter) {
+        require(_minter != address(0), "Minter cannot be zero address");
+        minter = _minter;
+    }
+
+    /**
+     * @notice Initialize the upgradeable token
+     * @param _name Token name
+     * @param _symbol Token symbol
+     * @param _admin Initial admin address
      */
     function initialize(
         string memory _name,
         string memory _symbol,
-        address _admin,
-        address _initialMinter
+        address _admin
     ) public initializer {
         require(_admin != address(0), "Invalid admin");
-        require(_initialMinter != address(0), "Invalid minter");
 
-        // Initialize OpenZeppelin upgradeable contracts
         __UUPSUpgradeable_init();
         __AccessControl_init();
         __ERC20_init(_name, _symbol);
         __Pausable_init();
 
-        // Set up roles
         _grantRole(DEFAULT_ADMIN_ROLE, _admin);
         _grantRole(ADMIN_ROLE, _admin);
-        _grantRole(UPGRADER_ROLE, _admin);
-        _grantRole(PAUSER_ROLE, _admin);
-        _grantRole(MINTER_ROLE, _initialMinter);
-        _grantRole(BURNER_ROLE, _initialMinter);
+        _grantRole(EMERGENCY_ROLE, _admin);
 
-        // Initialize storage
-        _storage.authorizedMinters[_initialMinter] = true;
         _storage.lastUpgradeTime = block.timestamp;
         _storage.tokenName = _name;
         _storage.tokenSymbol = _symbol;
@@ -133,59 +98,135 @@ contract UpgradeableVSToken is
 
     /**
      * @notice Authorize contract upgrades
-     * @dev Only UPGRADER_ROLE can authorize upgrades with timelock
+     * @dev Validates proposal timing and authorization for normal/emergency upgrades
      * @param newImplementation Address of the new implementation
      */
-    function _authorizeUpgrade(address newImplementation) internal override onlyRole(UPGRADER_ROLE) {
-        require(
-            _storage.upgradeProposals[newImplementation] != 0 &&
-            block.timestamp >= _storage.upgradeProposals[newImplementation],
-            "Upgrade not ready or not proposed"
-        );
+    function _authorizeUpgrade(address newImplementation) internal override {
+        require(_storage.upgradeProposals[newImplementation] != 0, "No upgrade proposal found");
+        require(block.timestamp >= _storage.upgradeProposals[newImplementation], "Upgrade delay not met");
+        
+        bool proposalIsEmergency = _storage.isEmergencyUpgrade[newImplementation];
+        
+        if (proposalIsEmergency) {
+            require(paused(), "Emergency upgrades only when paused");
+            require(hasRole(EMERGENCY_ROLE, msg.sender), "Not emergency authorized");
+        } else {
+            require(!paused(), "Normal upgrades only when not paused");
+            require(hasRole(ADMIN_ROLE, msg.sender), "Not admin authorized");
+        }
+        
         require(
             block.timestamp >= _storage.lastUpgradeTime + MIN_UPGRADE_INTERVAL,
             "Too soon since last upgrade"
         );
         
         _storage.lastUpgradeTime = block.timestamp;
-        delete _storage.upgradeProposals[newImplementation];
         
-        emit UpgradeExecuted(newImplementation, msg.sender);
+        string memory reason = _storage.upgradeReasons[newImplementation];
+        emit UpgradeExecuted(newImplementation, msg.sender, reason);
+        
+        delete _storage.upgradeProposals[newImplementation];
+        delete _storage.upgradeReasons[newImplementation];
+        delete _storage.isEmergencyUpgrade[newImplementation];
     }
 
     /**
-     * @notice Propose a contract upgrade
-     * @dev Upgrades must be proposed and wait for timelock period
+     * @notice Propose a contract upgrade with 12-hour timelock
      * @param newImplementation Address of the new implementation
+     * @param reason Description of the upgrade
      */
-    function proposeUpgrade(address newImplementation) external onlyRole(UPGRADER_ROLE) {
+    function proposeUpgrade(
+        address newImplementation,
+        string calldata reason
+    ) external onlyRole(ADMIN_ROLE) {
         require(newImplementation != address(0), "Invalid implementation");
         require(_storage.upgradeProposals[newImplementation] == 0, "Already proposed");
         
         uint256 executeAfter = block.timestamp + UPGRADE_DELAY;
         _storage.upgradeProposals[newImplementation] = executeAfter;
+        _storage.upgradeReasons[newImplementation] = reason;
         
-        emit UpgradeProposed(newImplementation, executeAfter);
+        emit UpgradeProposed(newImplementation, executeAfter, reason, false);
     }
 
     /**
      * @notice Cancel a proposed upgrade
-     * @dev Only UPGRADER_ROLE can cancel proposed upgrades
      * @param newImplementation Address of the proposed implementation
      */
-    function cancelUpgrade(address newImplementation) external onlyRole(UPGRADER_ROLE) {
+    function cancelUpgrade(address newImplementation) external {
+        require(
+            hasRole(ADMIN_ROLE, msg.sender) || hasRole(EMERGENCY_ROLE, msg.sender),
+            "Not authorized to cancel"
+        );
         require(_storage.upgradeProposals[newImplementation] != 0, "No proposal found");
         
         delete _storage.upgradeProposals[newImplementation];
+        delete _storage.upgradeReasons[newImplementation];
+        delete _storage.isEmergencyUpgrade[newImplementation];
+        
         emit UpgradeCancelled(newImplementation);
     }
 
     /**
+     * @notice Propose an emergency upgrade with 2-hour timelock
+     * @param newImplementation Address of the new implementation
+     * @param exploitDescription Description of the exploit being fixed
+     */
+    function proposeEmergencyUpgrade(
+        address newImplementation,
+        string calldata exploitDescription
+    ) external onlyRole(EMERGENCY_ROLE) whenPaused {
+        require(newImplementation != address(0), "Invalid implementation");
+        require(bytes(exploitDescription).length > 0, "Must describe exploit");
+        require(_storage.upgradeProposals[newImplementation] == 0, "Already proposed");
+        
+        uint256 executeAfter = block.timestamp + EMERGENCY_UPGRADE_DELAY;
+        _storage.upgradeProposals[newImplementation] = executeAfter;
+        _storage.upgradeReasons[newImplementation] = exploitDescription;
+        _storage.isEmergencyUpgrade[newImplementation] = true;
+        
+        emit UpgradeProposed(newImplementation, executeAfter, exploitDescription, true);
+    }
+
+    /**
+     * @notice Cancel a proposed emergency upgrade
+     * @param newImplementation Address of the proposed implementation
+     */
+    function cancelEmergencyUpgrade(address newImplementation) external onlyRole(EMERGENCY_ROLE) {
+        require(_storage.upgradeProposals[newImplementation] != 0, "No emergency proposal found");
+        require(_storage.isEmergencyUpgrade[newImplementation], "Not an emergency upgrade");
+        
+        delete _storage.upgradeProposals[newImplementation];
+        delete _storage.upgradeReasons[newImplementation];
+        delete _storage.isEmergencyUpgrade[newImplementation];
+        
+        emit UpgradeCancelled(newImplementation);
+    }
+
+    /**
+     * @notice Get upgrade proposal details
+     * @param implementation Address of the proposed implementation
+     * @return executeAfter Timestamp when upgrade can be executed
+     * @return reason Description of the upgrade
+     * @return isEmergency True if it's an emergency upgrade, false otherwise
+     */
+    function getUpgradeDetails(address implementation) 
+        external 
+        view 
+        returns (uint256 executeAfter, string memory reason, bool isEmergency) 
+    {
+        return (
+            _storage.upgradeProposals[implementation],
+            _storage.upgradeReasons[implementation],
+            _storage.isEmergencyUpgrade[implementation]
+        );
+    }
+
+    /**
      * @notice Emergency pause the contract
-     * @dev Can be called by PAUSER_ROLE
      * @param reason Reason for the pause
      */
-    function emergencyPause(string calldata reason) external onlyRole(PAUSER_ROLE) {
+    function emergencyPause(string calldata reason) external onlyRole(EMERGENCY_ROLE) {
         _storage.pausedAt = block.timestamp;
         _storage.pauseReason = reason;
         _pause();
@@ -195,11 +236,10 @@ contract UpgradeableVSToken is
 
     /**
      * @notice Unpause the contract
-     * @dev Can be called by PAUSER_ROLE or automatically after MAX_PAUSE_DURATION
      */
     function unpause() external {
         require(
-            hasRole(PAUSER_ROLE, msg.sender) || 
+            hasRole(EMERGENCY_ROLE, msg.sender) || 
             block.timestamp >= _storage.pausedAt + MAX_PAUSE_DURATION,
             "Not authorized to unpause or too early"
         );
@@ -210,44 +250,15 @@ contract UpgradeableVSToken is
         emit EmergencyUnpaused(msg.sender);
     }
 
-    /**
-     * @notice Add a new authorized minter
-     * @dev Only ADMIN_ROLE can add minters
-     * @param minter Address to authorize as minter
-     */
-    function addMinter(address minter) external onlyRole(ADMIN_ROLE) {
-        require(minter != address(0), "Invalid minter");
-        require(!_storage.authorizedMinters[minter], "Already authorized");
-        
-        _storage.authorizedMinters[minter] = true;
-        _grantRole(MINTER_ROLE, minter);
-        _grantRole(BURNER_ROLE, minter);
-        
-        emit MinterAdded(minter, msg.sender);
-    }
+
 
     /**
-     * @notice Remove an authorized minter
-     * @dev Only ADMIN_ROLE can remove minters
-     * @param minter Address to remove from minters
-     */
-    function removeMinter(address minter) external onlyRole(ADMIN_ROLE) {
-        require(_storage.authorizedMinters[minter], "Not authorized");
-        
-        _storage.authorizedMinters[minter] = false;
-        _revokeRole(MINTER_ROLE, minter);
-        _revokeRole(BURNER_ROLE, minter);
-        
-        emit MinterRemoved(minter, msg.sender);
-    }
-
-    /**
-     * @notice Mint tokens to an address
-     * @dev Only callable by authorized minters (vault contracts)
+     * @notice Mint tokens to an address (minter only)
      * @param to Address to mint tokens to
-     * @param amount Amount of tokens to mint (18 decimal precision)
+     * @param amount Amount of tokens to mint
      */
-    function mint(address to, uint256 amount) external onlyRole(MINTER_ROLE) whenNotPaused {
+    function mint(address to, uint256 amount) external whenNotPaused {
+        require(msg.sender == minter, "Only minter can mint");
         require(to != address(0), "Cannot mint to zero address");
         require(amount > 0, "Cannot mint zero amount");
         
@@ -255,12 +266,12 @@ contract UpgradeableVSToken is
     }
 
     /**
-     * @notice Burn tokens from an address
-     * @dev Only callable by authorized burners (vault contracts)
+     * @notice Burn tokens from an address (minter only)
      * @param from Address to burn tokens from
-     * @param amount Amount of tokens to burn (18 decimal precision)
+     * @param amount Amount of tokens to burn
      */
-    function burn(address from, uint256 amount) external onlyRole(BURNER_ROLE) whenNotPaused {
+    function burn(address from, uint256 amount) external whenNotPaused {
+        require(msg.sender == minter, "Only minter can burn");
         require(from != address(0), "Cannot burn from zero address");
         require(amount > 0, "Cannot burn zero amount");
         require(balanceOf(from) >= amount, "Insufficient balance to burn");
@@ -289,24 +300,30 @@ contract UpgradeableVSToken is
         return super.approve(spender, amount);
     }
 
-    // ============ VIEW FUNCTIONS ============
-
     /**
-     * @notice Check if an address is an authorized minter
-     * @param minter Address to check
-     * @return True if authorized, false otherwise
+     * @notice Get minter address
+     * @return Address of the minter contract
      */
-    function isAuthorizedMinter(address minter) external view returns (bool) {
-        return _storage.authorizedMinters[minter];
+    function getMinter() external view returns (address) {
+        return minter;
     }
 
     /**
      * @notice Get upgrade proposal timestamp
      * @param implementation Address of the proposed implementation
-     * @return Timestamp when upgrade can be executed (0 if not proposed)
+     * @return Timestamp when upgrade can be executed
      */
     function getUpgradeProposal(address implementation) external view returns (uint256) {
         return _storage.upgradeProposals[implementation];
+    }
+
+    /**
+     * @notice Get upgrade reason
+     * @param implementation Address of the proposed implementation
+     * @return Reason for the upgrade
+     */
+    function getUpgradeReason(address implementation) external view returns (string memory) {
+        return _storage.upgradeReasons[implementation];
     }
 
     /**
@@ -323,14 +340,14 @@ contract UpgradeableVSToken is
      * @notice Get token metadata
      * @return name Token name
      * @return symbol Token symbol
-     * @return decimals Token decimals
+     * @return decimals_ Token decimals
      */
-    function getTokenInfo() external view returns (string memory name, string memory symbol, uint8 decimals) {
+    function getTokenInfo() external view returns (string memory name, string memory symbol, uint8 decimals_) {
         return (_storage.tokenName, _storage.tokenSymbol, _storage.tokenDecimals);
     }
 
     /**
-     * @notice Override decimals to return stored value
+     * @notice Get token decimals
      */
     function decimals() public view override returns (uint8) {
         return _storage.tokenDecimals;
