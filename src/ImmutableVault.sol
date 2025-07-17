@@ -19,20 +19,20 @@ interface IDecayfNFT is IERC721 {
  * @title ImmutableVault - Vesting NFT Liquidity Protocol
  * @author vS Vault Team
  * @notice Converts illiquid vesting NFTs into liquid ERC-20 tokens (vS) that can be traded immediately
- * 
+ *
  * @dev CORE DESIGN PRINCIPLES:
  * 1. IMMUTABLE: Zero admin functions, no upgrades, no parameter changes after deployment
  * 2. WAIT-AND-HARVEST: Vault never claims early (avoiding penalty burns), waits until maturity
  * 3. SELF-DELEGATION: Automatically delegates NFTs to vault on deposit to prevent delegation attacks
  * 4. PROPORTIONAL REDEMPTION: Users get pro-rata share of harvested tokens, no hostage scenarios
  * 5. GAS-BOMB PROOF: Bounded batch processing prevents DoS attacks
- * 
+ *
  * @dev ECONOMIC MODEL:
  * - Users deposit vesting NFTs, get 99% of face value as vS tokens (1% mint fee)
  * - vS tokens trade freely on secondary markets at market-determined discounts
  * - At maturity (month 9), vault harvests all NFTs at 0% penalty burn
  * - Users redeem vS tokens for underlying S tokens at 1:1 ratio (minus 2% redeem fee)
- * 
+ *
  * @dev SECURITY FEATURES:
  * - Reentrancy protection on all external functions
  * - Try-catch wrappers isolate external call failures
@@ -47,23 +47,23 @@ contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
     address public immutable underlyingToken;
     address public immutable protocolTreasury;
     uint256 public immutable maturityTimestamp;
-    uint256 public immutable vaultFreezeTimestamp;  // No deposits after this
-    
+    uint256 public immutable vaultFreezeTimestamp; // No deposits after this
+
     // ============ CONSTANTS ============
-    uint256 public constant MINT_FEE_BPS = 100;        // 1% mint fee
-    uint256 public constant REDEEM_FEE_BPS = 200;      // 2% redeem fee
-    uint256 public constant KEEPER_INCENTIVE_BPS = 0;  // 0% keeper incentive (self-keeper mode)
-    uint256 public constant GRACE_PERIOD = 180 days;   // Grace period for surplus sweep
-    uint256 public constant MAX_BATCH_SIZE = 20;       // Max NFTs per harvest batch
-    uint256 public constant MIN_NFT_FACE = 100e18;     // 100 S minimum (prevents dust grief)
-    uint256 public constant MAX_NFTS = 10000;          // SECURITY: Max NFTs to prevent scale issues
-    
+    uint256 public constant MINT_FEE_BPS = 100; // 1% mint fee
+    uint256 public constant REDEEM_FEE_BPS = 200; // 2% redeem fee
+    uint256 public constant KEEPER_INCENTIVE_BPS = 0; // 0% keeper incentive (self-keeper mode)
+    uint256 public constant GRACE_PERIOD = 180 days; // Grace period for surplus sweep
+    uint256 public constant MAX_BATCH_SIZE = 20; // Max NFTs per harvest batch
+    uint256 public constant MIN_NFT_FACE = 100e18; // 100 S minimum (prevents dust grief)
+    uint256 public constant MAX_NFTS = 10000; // SECURITY: Max NFTs to prevent scale issues
+
     // ============ MINIMAL STATE ============
     uint256[] public heldNFTs;
     mapping(uint256 => address) public depositedNFTs;
-    mapping(uint256 => bool) public processed;    // Track which NFTs successfully claimed
-    uint256 public nextClaim = 0;                 // Rolling pointer for harvest batches
-    uint256 public processedCount = 0;            // SECURITY FIX: Track processed count to avoid loops
+    mapping(uint256 => bool) public processed; // Track which NFTs successfully claimed
+    uint256 public nextClaim = 0; // Rolling pointer for harvest batches
+    uint256 public processedCount = 0; // SECURITY FIX: Track processed count to avoid loops
     bool public matured = false;
 
     // ============ EVENTS ============
@@ -85,7 +85,7 @@ contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
      */
     constructor(
         address _vsToken,
-        address _sonicNFT, 
+        address _sonicNFT,
         address _underlyingToken,
         address _protocolTreasury,
         uint256 _maturityTimestamp,
@@ -98,13 +98,14 @@ contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
         require(_maturityTimestamp > block.timestamp, "Maturity must be future");
         require(_vaultFreezeTimestamp > block.timestamp, "Freeze must be future");
         require(_vaultFreezeTimestamp < _maturityTimestamp, "Freeze before maturity");
-        
+
         // Additional sanity checks for reasonable timeframes (skip in test environments)
-        if (block.timestamp > 1000000) { // Skip for test environments with low timestamps
+        if (block.timestamp > 1000000) {
+            // Skip for test environments with low timestamps
             require(_maturityTimestamp <= block.timestamp + 365 days * 2, "Maturity too far in future");
             require(_vaultFreezeTimestamp >= block.timestamp + 1 days, "Freeze too soon");
         }
-        
+
         vS = ImmutableVSToken(_vsToken);
         sonicNFT = _sonicNFT;
         underlyingToken = _underlyingToken;
@@ -124,15 +125,15 @@ contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
         require(depositedNFTs[nftId] == address(0), "NFT already deposited");
         require(IERC721(sonicNFT).ownerOf(nftId) == msg.sender, "Not NFT owner");
         require(heldNFTs.length < MAX_NFTS, "Vault at capacity"); // SECURITY: Prevent scale issues
-        
+
         // Pull the NFT first
         IERC721(sonicNFT).safeTransferFrom(msg.sender, address(this), nftId);
-        
+
         // Immediately set ourselves as delegate (now we own it, so we can)
         _ensureDelegated(nftId);
-        
+
         uint256 totalValue = IDecayfNFT(sonicNFT).getTotalAmount(nftId);
-        require(totalValue > 0, "NFT has no value");           // SECURITY: Prevent zero-value NFTs
+        require(totalValue > 0, "NFT has no value"); // SECURITY: Prevent zero-value NFTs
         require(totalValue >= MIN_NFT_FACE, "NFT too small");
 
         // Store NFT info
@@ -142,7 +143,7 @@ contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
         // Split 1% fee to treasury, rest to user
         uint256 feeAmount = (totalValue * MINT_FEE_BPS) / 10_000;
         uint256 userAmount = totalValue - feeAmount;
-        
+
         // Mint vS tokens
         vS.mint(protocolTreasury, feeAmount);
         vS.mint(msg.sender, userAmount);
@@ -161,47 +162,47 @@ contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
         require(block.timestamp >= maturityTimestamp, "Too early - wait for maturity");
         require(k > 0 && k <= MAX_BATCH_SIZE, "Invalid batch size");
         require(!matured, "All NFTs already processed");
-        
+
         uint256 processedNow = 0;
         uint256 startIndex = nextClaim;
-        
+
         // Process k NFTs starting from pointer
         while (processedNow < k && processedNow < heldNFTs.length) {
             uint256 nftId = heldNFTs[nextClaim];
-            
+
             // Only attempt if not already successfully processed
             if (!processed[nftId]) {
                 try IDecayfNFT(sonicNFT).claimVestedTokens(nftId) returns (uint256 claimed) {
                     if (claimed > 0) {
-                        processed[nftId] = true;  // Mark as successfully claimed
-                        processedCount++;         // SECURITY FIX: Increment counter
+                        processed[nftId] = true; // Mark as successfully claimed
+                        processedCount++; // SECURITY FIX: Increment counter
                     }
                 } catch {
                     // Leave processed[nftId] = false, will retry later
                 }
             }
-            
+
             nextClaim++;
             processedNow++;
-            
+
             // Wrap around if we reach the end but still have unprocessed NFTs
             if (nextClaim >= heldNFTs.length) {
                 nextClaim = 0;
-                
+
                 // If we've wrapped around to where we started, we've checked all NFTs
                 if (nextClaim == startIndex || processedNow >= heldNFTs.length) {
                     break;
                 }
             }
         }
-        
+
         // Check if all NFTs are now processed (SECURITY FIX: Use counter instead of loop)
         if (processedCount >= heldNFTs.length) {
-            matured = true;  // Only mature when 100% harvested
+            matured = true; // Only mature when 100% harvested
         }
 
         // No keeper incentive in self-keeper mode (KEEPER_INCENTIVE_BPS = 0)
-        emit VestedTokensClaimed(msg.sender, 0, 0);  // totalClaimed tracked per NFT now
+        emit VestedTokensClaimed(msg.sender, 0, 0); // totalClaimed tracked per NFT now
     }
 
     /**
@@ -213,29 +214,29 @@ contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
         require(amount > 0, "Cannot redeem 0");
         require(vS.balanceOf(msg.sender) >= amount, "Insufficient vS balance");
         require(block.timestamp >= maturityTimestamp, "Too early - wait for maturity");
-        
+
         uint256 vsTotalSupply = vS.totalSupply();
         require(vsTotalSupply > 0, "No vS tokens in circulation");
-        
+
         // Calculate redemption from available balance (proportional)
         uint256 availableBalance = IERC20(underlyingToken).balanceOf(address(this));
         require(availableBalance > 0, "No tokens available for redemption");
-        
+
         uint256 redeemableValue = (amount * availableBalance) / vsTotalSupply;
-        
+
         // Calculate 2% redemption fee
         uint256 feeAmount = (redeemableValue * REDEEM_FEE_BPS) / 10_000;
-        
+
         // Rounding guard: ensure minimum fee for non-zero redemptions
         if (feeAmount == 0 && redeemableValue > 0) {
             feeAmount = 1; // 1 wei minimum fee
         }
-        
+
         uint256 userAmount = redeemableValue - feeAmount;
-        
+
         // Burn vS tokens
         vS.burn(msg.sender, amount);
-        
+
         // Transfer fee to treasury and remaining to user
         if (feeAmount > 0) {
             require(IERC20(underlyingToken).transfer(protocolTreasury, feeAmount), "Treasury transfer failed");
@@ -251,13 +252,13 @@ contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
      */
     function sweepSurplus() external nonReentrant {
         require(block.timestamp >= maturityTimestamp + GRACE_PERIOD, "Grace period not over");
-        
+
         uint256 surplus = IERC20(underlyingToken).balanceOf(address(this));
         require(surplus > 0, "No surplus to sweep");
-        
+
         // Transfer surplus to treasury (or could burn if treasury is burn address)
         require(IERC20(underlyingToken).transfer(protocolTreasury, surplus), "Surplus transfer failed");
-        
+
         emit SurplusSwept(msg.sender, surplus);
     }
 
@@ -298,7 +299,7 @@ contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
     }
 
     // ============ VIEW FUNCTIONS ============
-    
+
     /**
      * @notice Check if vault has matured (all NFTs harvested)
      */
@@ -313,7 +314,7 @@ contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
     function getBackingRatio() external view returns (uint256 ratio) {
         uint256 totalSupply = vS.totalSupply();
         if (totalSupply == 0) return 1e18; // 100% if no tokens issued
-        
+
         uint256 vaultBalance = IERC20(underlyingToken).balanceOf(address(this));
         return (vaultBalance * 1e18) / totalSupply;
     }
@@ -384,4 +385,4 @@ contract ImmutableVault is IERC721Receiver, ReentrancyGuard {
         require(msg.sender == sonicNFT, "Only accepts target NFTs");
         return IERC721Receiver.onERC721Received.selector;
     }
-} 
+}

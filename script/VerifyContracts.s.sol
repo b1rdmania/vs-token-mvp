@@ -9,7 +9,6 @@ import {Script, console} from "forge-std/Script.sol";
  * @dev Usage: forge script script/VerifyContracts.s.sol --chain-id <CHAIN_ID>
  */
 contract VerifyContracts is Script {
-    
     struct VerificationConfig {
         string network;
         uint256 chainId;
@@ -17,43 +16,43 @@ contract VerifyContracts is Script {
         string explorerUrl;
         string apiKeyEnvVar;
     }
-    
+
     function run() external {
         // Get addresses from environment or use defaults
         address implementation = _getRequiredAddress("IMPLEMENTATION_ADDRESS");
         address proxy = _getRequiredAddress("PROXY_ADDRESS");
-        
+
         VerificationConfig memory config = _getVerificationConfig();
-        
+
         console.log("=== CONTRACT VERIFICATION ===");
         console.log("Network:", config.network);
         console.log("Chain ID:", config.chainId);
         console.log("Implementation:", implementation);
         console.log("Proxy:", proxy);
         console.log("");
-        
+
         string memory apiKey = _getApiKey(config.apiKeyEnvVar);
         if (bytes(apiKey).length == 0) {
             console.log("ERROR: API key not found. Set", config.apiKeyEnvVar);
             return;
         }
-        
+
         // Verify implementation
         console.log("Verifying Implementation Contract...");
         _verifyContract(implementation, "src/upgradeable/UpgradeableVSToken.sol:UpgradeableVSToken", config, apiKey);
-        
+
         // Verify proxy (with constructor args)
         console.log("Verifying Proxy Contract...");
         _verifyProxyContract(proxy, implementation, config, apiKey);
-        
+
         console.log("");
         console.log("SUCCESS: Verification commands executed!");
         console.log("Check status at:", config.explorerUrl);
     }
-    
+
     function _getVerificationConfig() internal view returns (VerificationConfig memory) {
         uint256 chainId = block.chainid;
-        
+
         if (chainId == 57054) {
             return VerificationConfig({
                 network: "Sonic Testnet",
@@ -64,7 +63,7 @@ contract VerifyContracts is Script {
             });
         } else if (chainId == 146) {
             return VerificationConfig({
-                network: "Sonic Mainnet", 
+                network: "Sonic Mainnet",
                 chainId: chainId,
                 verifierUrl: "https://api.etherscan.io/v2/api?chainid=146",
                 explorerUrl: "https://sonicscan.org",
@@ -82,8 +81,13 @@ contract VerifyContracts is Script {
             revert(string(abi.encodePacked("Unsupported chain ID: ", vm.toString(chainId))));
         }
     }
-    
-    function _verifyContract(address contractAddr, string memory contractPath, VerificationConfig memory config, string memory apiKey) internal {
+
+    function _verifyContract(
+        address contractAddr,
+        string memory contractPath,
+        VerificationConfig memory config,
+        string memory apiKey
+    ) internal {
         string[] memory cmd = new string[](11);
         cmd[0] = "forge";
         cmd[1] = "verify-contract";
@@ -96,14 +100,14 @@ contract VerifyContracts is Script {
         cmd[8] = "--chain-id";
         cmd[9] = vm.toString(config.chainId);
         cmd[10] = "--watch";
-        
+
         console.log("Command:");
         console.log("forge verify-contract", vm.toString(contractAddr), contractPath);
         console.log("--verifier-url", config.verifierUrl);
         console.log("--etherscan-api-key [HIDDEN]");
         console.log("--chain-id", vm.toString(config.chainId));
         console.log("--watch");
-        
+
         try vm.ffi(cmd) {
             console.log("SUCCESS: Verification submitted for", vm.toString(contractAddr));
         } catch Error(string memory reason) {
@@ -112,7 +116,7 @@ contract VerifyContracts is Script {
             console.log("ERROR: Verification failed with unknown error");
         }
     }
-    
+
     function _getRequiredAddress(string memory envVar) internal view returns (address) {
         try vm.envAddress(envVar) returns (address addr) {
             require(addr != address(0), string(abi.encodePacked(envVar, " cannot be zero address")));
@@ -121,16 +125,21 @@ contract VerifyContracts is Script {
             revert(string(abi.encodePacked("Required environment variable not set: ", envVar)));
         }
     }
-    
-    function _verifyProxyContract(address proxy, address implementation, VerificationConfig memory config, string memory apiKey) internal {
+
+    function _verifyProxyContract(
+        address proxy,
+        address implementation,
+        VerificationConfig memory config,
+        string memory apiKey
+    ) internal {
         // Get constructor args from broadcast data
         string memory constructorArgs = _getProxyConstructorArgs(proxy);
-        
+
         if (bytes(constructorArgs).length == 0) {
             console.log("ERROR: Could not find constructor args for proxy");
             return;
         }
-        
+
         string[] memory cmd = new string[](13);
         cmd[0] = "forge";
         cmd[1] = "verify-contract";
@@ -145,11 +154,11 @@ contract VerifyContracts is Script {
         cmd[10] = "--constructor-args";
         cmd[11] = constructorArgs;
         cmd[12] = "--watch";
-        
+
         console.log("Command:");
         console.log("forge verify-contract", vm.toString(proxy), "ERC1967Proxy");
         console.log("--constructor-args", constructorArgs);
-        
+
         try vm.ffi(cmd) {
             console.log("SUCCESS: Proxy verification submitted for", vm.toString(proxy));
         } catch Error(string memory reason) {
@@ -158,7 +167,7 @@ contract VerifyContracts is Script {
             console.log("ERROR: Proxy verification failed with unknown error");
         }
     }
-    
+
     function _getProxyConstructorArgs(address proxy) internal view returns (string memory) {
         // For now, try to read from environment variable
         // In the future, this could parse broadcast files automatically
@@ -177,4 +186,4 @@ contract VerifyContracts is Script {
             return "";
         }
     }
-} 
+}
