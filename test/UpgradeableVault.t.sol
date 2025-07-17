@@ -199,8 +199,8 @@ contract UpgradeableVaultTest is Test {
         
         assertEq(vsToken.balanceOf(user1), expectedUserAmount);
         assertEq(vsToken.balanceOf(treasury), expectedFeeAmount);
-        assertEq(vault.getHeldNFTCount(), 1);
-        assertEq(vault.depositedNFTs(1), user1);
+        assertEq(vault.getHeldNftCount(), 1);
+        assertEq(vault.depositedNfts(1), user1);
     }
     
     function testDepositWithWrongDelegation() public {
@@ -570,7 +570,7 @@ contract UpgradeableVaultTest is Test {
         }
         
         // Should still work (well under capacity)
-        assertEq(vault.getHeldNFTCount(), 10);
+        assertEq(vault.getHeldNftCount(), 10);
     }
     
     function testSweepSurplus() public {
@@ -593,12 +593,12 @@ contract UpgradeableVaultTest is Test {
     
     function testImmutableParameters() public view {
         // Verify all parameters are correctly set
-        assertEq(address(vault.vS()), address(vsToken));
-        assertEq(vault.sonicNFT(), address(mockNFT));
-        assertEq(vault.underlyingToken(), address(mockToken));
-        assertEq(vault.protocolTreasury(), treasury);
-        assertEq(vault.maturityTimestamp(), MATURITY_TIMESTAMP);
-        assertEq(vault.vaultFreezeTimestamp(), FREEZE_TIMESTAMP);
+        assertEq(address(vault.VS_TOKEN()), address(vsToken));
+        assertEq(vault.SONIC_NFT(), address(mockNFT));
+        assertEq(vault.UNDERLYING_TOKEN(), address(mockToken));
+        assertEq(vault.PROTOCOL_TREASURY(), treasury);
+        assertEq(vault.MATURITY_TIMESTAMP(), MATURITY_TIMESTAMP);
+        assertEq(vault.VAULT_FREEZE_TIMESTAMP(), FREEZE_TIMESTAMP);
     }
     
     function testCannotDepositAfterFreeze() public {
@@ -643,8 +643,8 @@ contract UpgradeableVaultTest is Test {
         vault.deposit(1);
         
         // Store original state
-        uint256 originalHeldCount = vault.getHeldNFTCount();
-        address originalDepositor = vault.depositedNFTs(1);
+        uint256 originalHeldCount = vault.getHeldNftCount();
+        address originalDepositor = vault.depositedNfts(1);
         
         // Deploy new implementation
         address newImplementation = address(new MockUpgradeableVault(address(vsToken), address(mockNFT), address(mockToken), treasury, MATURITY_TIMESTAMP, FREEZE_TIMESTAMP));
@@ -659,8 +659,8 @@ contract UpgradeableVaultTest is Test {
         vault.upgradeTo(newImplementation);
         
         // Verify storage preserved after upgrade
-        assertEq(vault.getHeldNFTCount(), originalHeldCount);
-        assertEq(vault.depositedNFTs(1), originalDepositor);
+        assertEq(vault.getHeldNftCount(), originalHeldCount);
+        assertEq(vault.depositedNfts(1), originalDepositor);
         
         // Verify new functionality works
         assertTrue(MockUpgradeableVault(address(vault)).isUpgraded());
@@ -674,7 +674,7 @@ contract UpgradeableVaultTest is Test {
         vault.deposit(1);
         
         // Verify reentrancy guard prevents double processing
-        assertEq(vault.getHeldNFTCount(), 1);
+        assertEq(vault.getHeldNftCount(), 1);
         
         // Test reentrancy protection on redeem
         mockNFT.setClaimable(1, 1000e18);
@@ -723,7 +723,7 @@ contract UpgradeableVaultTest is Test {
         
         // 7. Verify upgrade successful and data preserved
         assertTrue(MockUpgradeableVault(address(vault)).isUpgraded());
-        assertEq(vault.getHeldNFTCount(), 1);
+        assertEq(vault.getHeldNftCount(), 1);
         
         // 8. Unpause and verify normal operations resume
         vm.prank(admin);
@@ -733,7 +733,7 @@ contract UpgradeableVaultTest is Test {
         vm.prank(user1);
         vault.deposit(2);
         
-        assertEq(vault.getHeldNFTCount(), 2);
+        assertEq(vault.getHeldNftCount(), 2);
     }
 
     function testMultiUserComplexInteractions() public {
@@ -828,7 +828,7 @@ contract UpgradeableVaultTest is Test {
             vault.deposit(i);
         }
         
-        assertEq(vault.getHeldNFTCount(), 100);
+        assertEq(vault.getHeldNftCount(), 100);
         
         // Should still be able to harvest in batches
         for (uint256 i = 1; i <= 100; i++) {

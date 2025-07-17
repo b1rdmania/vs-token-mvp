@@ -74,15 +74,15 @@ contract DeployUpgradeableVault is Script {
         UpgradeableVault vault = UpgradeableVault(address(vaultProxy));
         
         console.log("3. Verifying vault deployment...");
-        require(address(vault.vS()) == params.tokenAddress, "Token address mismatch");
-        require(vault.sonicNFT() == params.sonicNFT, "Sonic NFT mismatch");
-        require(vault.underlyingToken() == params.underlyingToken, "Underlying token mismatch");
-        require(vault.protocolTreasury() == params.protocolTreasury, "Treasury mismatch");
+        require(address(vault.VS_TOKEN()) == params.tokenAddress, "Token address mismatch");
+        require(vault.SONIC_NFT() == params.sonicNFT, "Sonic NFT mismatch");
+        require(vault.UNDERLYING_TOKEN() == params.underlyingToken, "Underlying token mismatch");
+        require(vault.PROTOCOL_TREASURY() == params.protocolTreasury, "Treasury mismatch");
         require(vault.hasRole(vault.DEFAULT_ADMIN_ROLE(), params.admin), "Admin role not set");
         require(vault.hasRole(vault.ADMIN_ROLE(), params.admin), "Admin role not set");
         require(vault.hasRole(vault.EMERGENCY_ROLE(), params.admin), "Emergency role not set");
-        require(vault.maturityTimestamp() == params.maturityTimestamp, "Maturity mismatch");
-        require(vault.vaultFreezeTimestamp() == params.vaultFreezeTimestamp, "Freeze mismatch");
+        require(vault.MATURITY_TIMESTAMP() == params.maturityTimestamp, "Maturity mismatch");
+        require(vault.VAULT_FREEZE_TIMESTAMP() == params.vaultFreezeTimestamp, "Freeze mismatch");
         
         // Step 5: Print deployment summary
         _printDeploymentSummary(
@@ -184,9 +184,9 @@ contract DeployUpgradeableVault is Script {
         
         console.log("=== TESTING COMMANDS ===");
         console.log("# Test basic vault functionality");
-        console.log("cast call %s \"sonicNFT()\"", vaultProxy);
-        console.log("cast call %s \"vS()\"", vaultProxy);
-        console.log("cast call %s \"maturityTimestamp()\"", vaultProxy);
+        console.log("cast call %s \"SONIC_NFT()\"", vaultProxy);
+        console.log("cast call %s \"VS_TOKEN()\"", vaultProxy);
+        console.log("cast call %s \"MATURITY_TIMESTAMP()\"", vaultProxy);
         console.log("");
         
         console.log("# Test token minter configuration");
