@@ -20,7 +20,7 @@ contract HarvestAll is Script {
         
         // Check if vault has reached maturity
         require(block.timestamp >= vault.maturityTimestamp(), "Vault not mature yet");
-        require(!vault.matured(), "Vault already fully harvested");
+        require(!vault.hasMatured(), "Vault already fully harvested");
         
         console.log("Starting harvest process for vault:", vaultAddress);
         console.log("Block timestamp:", block.timestamp);
@@ -37,7 +37,7 @@ contract HarvestAll is Script {
         vm.startBroadcast();
         
         // Keep harvesting until all NFTs are processed
-        while (!vault.matured() && batchCount < maxBatches) {
+        while (!vault.hasMatured() && batchCount < maxBatches) {
             (uint256 startIndex, uint256 remaining) = vault.getNextBatch();
             
             if (remaining == 0) {
@@ -58,7 +58,7 @@ contract HarvestAll is Script {
                 console.log("Progress: %d/%d NFTs processed", processedNow, total);
                 
                 // Small delay between batches to avoid rate limiting
-                if (!vault.matured() && batchCount < maxBatches) {
+                if (!vault.hasMatured() && batchCount < maxBatches) {
                     // In a real deployment, you might want to add a delay here
                     // vm.sleep(1); // Not available in Foundry, but useful for real automation
                 }
@@ -71,7 +71,7 @@ contract HarvestAll is Script {
         vm.stopBroadcast();
         
         // Final status
-        if (vault.matured()) {
+        if (vault.hasMatured()) {
             console.log("SUCCESS: All NFTs harvested successfully!");
             console.log("Total batches processed:", batchCount);
             
