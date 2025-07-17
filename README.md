@@ -34,10 +34,11 @@ The vS Vault Protocol converts illiquid vesting Sonic NFTs (fNFTs) into liquid E
 
 ## 🛡️ **Security Features**
 
-### **Immutable Design**
-- ✅ **Zero admin functions** - No owner, no upgrades, no parameter changes
-- ✅ **Hardcoded parameters** - All fees and timestamps locked at deployment
-- ✅ **No proxy patterns** - Direct implementation eliminates upgrade risks
+### **Upgradeable Design with Strong Safeguards**
+- ✅ **Multisig Governance** - All changes require multisig approval
+- ✅ **Public Timelock** - 12h delay for upgrades, 2h for emergency actions
+- ✅ **Immutable Critical Parameters** - Treasury address, fee structure, maturity dates locked
+- ✅ **Transparent Upgrades** - All changes are public and delayed for user protection
 
 ### **Attack Prevention**
 - ✅ **Self-delegation pattern** - Prevents delegation manipulation attacks
@@ -62,10 +63,11 @@ The vS Vault Protocol converts illiquid vesting Sonic NFTs (fNFTs) into liquid E
 ```
 vS/
 ├── src/                          # Smart contracts
-│   ├── ImmutableVault.sol        # Main vault logic (deposit/harvest/redeem)
-│   ├── ImmutableVSToken.sol      # ERC-20 token (vault-minted liquidity)
-│   ├── interfaces/               # Minimal contract interfaces
-│   └── base/                     # Custom ERC-20 + reentrancy guard
+│   ├── upgradeable/              # Upgradeable contract implementations
+│   │   ├── UpgradeableVault.sol  # Main vault logic (deposit/harvest/redeem)
+│   │   └── UpgradeableVSToken.sol # ERC-20 token (vault-minted liquidity)
+│   ├── interfaces/               # Contract interfaces
+│   └── base/                     # Base contracts
 ├── test/                         # Comprehensive test suite
 ├── script/                       # Deployment and management scripts
 ├── frontend/                     # React app for user interface
@@ -85,8 +87,8 @@ vS/
 
 | Contract | Address | Purpose |
 |----------|---------|---------|
-| **ImmutableVault** | `0x37BD20868FB91eB37813648F4D05F59e07A1bcfb` | Main vault logic |
-| **ImmutableVSToken** | `0x4dE74524A2cE5e2A310615a6aDe7eC35B0f81031` | vS token contract |
+| **UpgradeableVault** | `[TO BE DEPLOYED]` | Main vault logic |
+| **UpgradeableVSToken** | `[TO BE DEPLOYED]` | vS token contract |
 
 ## 🔍 **Key Design Decisions**
 
@@ -95,10 +97,11 @@ vS/
 - **Eliminates timing risk:** No complex streaming or partial claims
 - **Simplifies economics:** Clear 1:1 redemption guarantee
 
-### **Why Immutable?**
-- **Eliminates rug risk:** No admin keys, no upgrades, no parameter changes
-- **Builds trust:** Code is law, no human intervention possible
-- **Reduces complexity:** No governance, no multisig, no upgrade paths
+### **Why Upgradeable with Safeguards?**
+- **Security-first approach:** Bug fixes and improvements possible via multisig governance
+- **User protection:** All changes require multisig approval and public timelock
+- **Trust through transparency:** Immutable critical parameters + upgradeable logic
+- **Balanced flexibility:** Operational improvements without compromising core trust
 
 ### **Why Market Pricing?**
 - **Honest price discovery:** Market sets discount based on time value
@@ -113,7 +116,7 @@ vS/
 
 ## 🤝 **Contributing**
 
-This protocol is designed to be immutable after deployment. However, during development:
+This protocol uses upgradeable contracts with strong governance controls. During development:
 
 1. Fork the repository
 2. Create a feature branch
