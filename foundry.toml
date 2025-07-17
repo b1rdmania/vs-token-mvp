@@ -14,7 +14,7 @@ sonic_testnet = "https://rpc.blaze.soniclabs.com"
 sonic_mainnet = "https://rpc.soniclabs.com"
 
 # Common testnets for development
-sepolia = "https://sepolia.infura.io/v3/e78ee7de61cc472aa36de5c2e4b8f2f6"
+sepolia = "https://sepolia.infura.io/v3/<infura-key>"
 polygon_mumbai = "https://rpc-mumbai.maticvigil.com"
 
 [etherscan]
