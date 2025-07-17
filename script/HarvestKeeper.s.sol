@@ -42,7 +42,7 @@ contract HarvestKeeper is Script {
         (uint256 processed, uint256 total) = vault.getHarvestProgress();
         console.log("Initial progress: %d/%d NFTs processed", processed, total);
         
-        if (vault.matured()) {
+        if (vault.hasMatured()) {
             console.log("Vault already fully matured!");
             _printFinalStatus();
             vm.stopBroadcast();
@@ -53,7 +53,7 @@ contract HarvestKeeper is Script {
         uint256 retries = 0;
         uint256 lastProcessed = processed;
         
-        while (!vault.matured() && retries < MAX_RETRIES) {
+        while (!vault.hasMatured() && retries < MAX_RETRIES) {
             console.log("--- Harvest Cycle %d ---", retries + 1);
             
             // Try to harvest a batch
@@ -77,13 +77,13 @@ contract HarvestKeeper is Script {
             retries++;
             
             // Small delay to avoid spamming
-            if (!vault.matured()) {
+            if (!vault.hasMatured()) {
                 console.log("Waiting 5 seconds before next attempt...");
                 // Note: In real script, you'd add actual delay between transactions
             }
         }
         
-        if (vault.matured()) {
+        if (vault.hasMatured()) {
             console.log("HARVEST COMPLETE! Vault fully matured.");
             _printFinalStatus();
         } else {
@@ -140,7 +140,7 @@ contract HarvestKeeper is Script {
         (uint256 processed, uint256 total) = vault.getHarvestProgress();
         console.log("Harvest progress: %d/%d", processed, total);
         
-        console.log("Vault matured:", vault.matured());
+        console.log("Vault matured:", vault.hasMatured());
         console.log("Backing ratio:", vault.getBackingRatio());
         console.log("Total assets:", vault.totalAssets());
         
