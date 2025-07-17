@@ -16,12 +16,7 @@ import {PausableUpgradeable} from "@openzeppelin/contracts-upgradeable/security/
  * - Core minting control cannot be transferred or modified
  * - Economic model protected by immutable vault parameters
  */
-contract UpgradeableVSToken is 
-    UUPSUpgradeable, 
-    AccessControlUpgradeable, 
-    ERC20Upgradeable,
-    PausableUpgradeable
-{
+contract UpgradeableVSToken is UUPSUpgradeable, AccessControlUpgradeable, ERC20Upgradeable, PausableUpgradeable {
     // Access Control Roles
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
     bytes32 public constant EMERGENCY_ROLE = keccak256("EMERGENCY_ROLE");
@@ -74,11 +69,7 @@ contract UpgradeableVSToken is
      * @param _symbol Token symbol
      * @param _admin Initial admin address
      */
-    function initialize(
-        string memory _name,
-        string memory _symbol,
-        address _admin
-    ) public initializer {
+    function initialize(string memory _name, string memory _symbol, address _admin) public initializer {
         require(_admin != address(0), "Invalid admin");
 
         __UUPSUpgradeable_init();
@@ -104,9 +95,9 @@ contract UpgradeableVSToken is
     function _authorizeUpgrade(address newImplementation) internal override {
         require(_storage.upgradeProposals[newImplementation] != 0, "No upgrade proposal found");
         require(block.timestamp >= _storage.upgradeProposals[newImplementation], "Upgrade delay not met");
-        
+
         bool proposalIsEmergency = _storage.isEmergencyUpgrade[newImplementation];
-        
+
         if (proposalIsEmergency) {
             require(paused(), "Emergency upgrades only when paused");
             require(hasRole(EMERGENCY_ROLE, msg.sender), "Not emergency authorized");
@@ -114,17 +105,14 @@ contract UpgradeableVSToken is
             require(!paused(), "Normal upgrades only when not paused");
             require(hasRole(ADMIN_ROLE, msg.sender), "Not admin authorized");
         }
-        
-        require(
-            block.timestamp >= _storage.lastUpgradeTime + MIN_UPGRADE_INTERVAL,
-            "Too soon since last upgrade"
-        );
-        
+
+        require(block.timestamp >= _storage.lastUpgradeTime + MIN_UPGRADE_INTERVAL, "Too soon since last upgrade");
+
         _storage.lastUpgradeTime = block.timestamp;
-        
+
         string memory reason = _storage.upgradeReasons[newImplementation];
         emit UpgradeExecuted(newImplementation, msg.sender, reason);
-        
+
         delete _storage.upgradeProposals[newImplementation];
         delete _storage.upgradeReasons[newImplementation];
         delete _storage.isEmergencyUpgrade[newImplementation];
@@ -135,17 +123,14 @@ contract UpgradeableVSToken is
      * @param newImplementation Address of the new implementation
      * @param reason Description of the upgrade
      */
-    function proposeUpgrade(
-        address newImplementation,
-        string calldata reason
-    ) external onlyRole(ADMIN_ROLE) {
+    function proposeUpgrade(address newImplementation, string calldata reason) external onlyRole(ADMIN_ROLE) {
         require(newImplementation != address(0), "Invalid implementation");
         require(_storage.upgradeProposals[newImplementation] == 0, "Already proposed");
-        
+
         uint256 executeAfter = block.timestamp + UPGRADE_DELAY;
         _storage.upgradeProposals[newImplementation] = executeAfter;
         _storage.upgradeReasons[newImplementation] = reason;
-        
+
         emit UpgradeProposed(newImplementation, executeAfter, reason, false);
     }
 
@@ -154,16 +139,13 @@ contract UpgradeableVSToken is
      * @param newImplementation Address of the proposed implementation
      */
     function cancelUpgrade(address newImplementation) external {
-        require(
-            hasRole(ADMIN_ROLE, msg.sender) || hasRole(EMERGENCY_ROLE, msg.sender),
-            "Not authorized to cancel"
-        );
+        require(hasRole(ADMIN_ROLE, msg.sender) || hasRole(EMERGENCY_ROLE, msg.sender), "Not authorized to cancel");
         require(_storage.upgradeProposals[newImplementation] != 0, "No proposal found");
-        
+
         delete _storage.upgradeProposals[newImplementation];
         delete _storage.upgradeReasons[newImplementation];
         delete _storage.isEmergencyUpgrade[newImplementation];
-        
+
         emit UpgradeCancelled(newImplementation);
     }
 
@@ -172,19 +154,20 @@ contract UpgradeableVSToken is
      * @param newImplementation Address of the new implementation
      * @param exploitDescription Description of the exploit being fixed
      */
-    function proposeEmergencyUpgrade(
-        address newImplementation,
-        string calldata exploitDescription
-    ) external onlyRole(EMERGENCY_ROLE) whenPaused {
+    function proposeEmergencyUpgrade(address newImplementation, string calldata exploitDescription)
+        external
+        onlyRole(EMERGENCY_ROLE)
+        whenPaused
+    {
         require(newImplementation != address(0), "Invalid implementation");
         require(bytes(exploitDescription).length > 0, "Must describe exploit");
         require(_storage.upgradeProposals[newImplementation] == 0, "Already proposed");
-        
+
         uint256 executeAfter = block.timestamp + EMERGENCY_UPGRADE_DELAY;
         _storage.upgradeProposals[newImplementation] = executeAfter;
         _storage.upgradeReasons[newImplementation] = exploitDescription;
         _storage.isEmergencyUpgrade[newImplementation] = true;
-        
+
         emit UpgradeProposed(newImplementation, executeAfter, exploitDescription, true);
     }
 
@@ -195,11 +178,11 @@ contract UpgradeableVSToken is
     function cancelEmergencyUpgrade(address newImplementation) external onlyRole(EMERGENCY_ROLE) {
         require(_storage.upgradeProposals[newImplementation] != 0, "No emergency proposal found");
         require(_storage.isEmergencyUpgrade[newImplementation], "Not an emergency upgrade");
-        
+
         delete _storage.upgradeProposals[newImplementation];
         delete _storage.upgradeReasons[newImplementation];
         delete _storage.isEmergencyUpgrade[newImplementation];
-        
+
         emit UpgradeCancelled(newImplementation);
     }
 
@@ -210,10 +193,10 @@ contract UpgradeableVSToken is
      * @return reason Description of the upgrade
      * @return isEmergency True if it's an emergency upgrade, false otherwise
      */
-    function getUpgradeDetails(address implementation) 
-        external 
-        view 
-        returns (uint256 executeAfter, string memory reason, bool isEmergency) 
+    function getUpgradeDetails(address implementation)
+        external
+        view
+        returns (uint256 executeAfter, string memory reason, bool isEmergency)
     {
         return (
             _storage.upgradeProposals[implementation],
@@ -230,7 +213,7 @@ contract UpgradeableVSToken is
         _storage.pausedAt = block.timestamp;
         _storage.pauseReason = reason;
         _pause();
-        
+
         emit EmergencyPaused(msg.sender, reason);
     }
 
@@ -239,18 +222,15 @@ contract UpgradeableVSToken is
      */
     function unpause() external {
         require(
-            hasRole(EMERGENCY_ROLE, msg.sender) || 
-            block.timestamp >= _storage.pausedAt + MAX_PAUSE_DURATION,
+            hasRole(EMERGENCY_ROLE, msg.sender) || block.timestamp >= _storage.pausedAt + MAX_PAUSE_DURATION,
             "Not authorized to unpause or too early"
         );
-        
+
         _storage.pauseReason = "";
         _unpause();
-        
+
         emit EmergencyUnpaused(msg.sender);
     }
-
-
 
     /**
      * @notice Mint tokens to an address (minter only)
@@ -261,7 +241,7 @@ contract UpgradeableVSToken is
         require(msg.sender == MINTER, "Only minter can mint");
         require(to != address(0), "Cannot mint to zero address");
         require(amount > 0, "Cannot mint zero amount");
-        
+
         _mint(to, amount);
     }
 
@@ -275,7 +255,7 @@ contract UpgradeableVSToken is
         require(from != address(0), "Cannot burn from zero address");
         require(amount > 0, "Cannot burn zero amount");
         require(balanceOf(from) >= amount, "Insufficient balance to burn");
-        
+
         _burn(from, amount);
     }
 
@@ -352,4 +332,4 @@ contract UpgradeableVSToken is
     function decimals() public view override returns (uint8) {
         return _storage.tokenDecimals;
     }
-} 
+}

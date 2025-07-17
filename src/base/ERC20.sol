@@ -6,7 +6,7 @@ import "../interfaces/IERC20.sol";
 contract ERC20 is IERC20 {
     mapping(address => uint256) private _balances;
     mapping(address => mapping(address => uint256)) private _allowances;
-    
+
     uint256 private _totalSupply;
     string private _name;
     string private _symbol;
@@ -18,11 +18,25 @@ contract ERC20 is IERC20 {
         _decimals = decimals_;
     }
 
-    function name() public view returns (string memory) { return _name; }
-    function symbol() public view returns (string memory) { return _symbol; }
-    function decimals() public view returns (uint8) { return _decimals; }
-    function totalSupply() public view override returns (uint256) { return _totalSupply; }
-    function balanceOf(address account) public view override returns (uint256) { return _balances[account]; }
+    function name() public view returns (string memory) {
+        return _name;
+    }
+
+    function symbol() public view returns (string memory) {
+        return _symbol;
+    }
+
+    function decimals() public view returns (uint8) {
+        return _decimals;
+    }
+
+    function totalSupply() public view override returns (uint256) {
+        return _totalSupply;
+    }
+
+    function balanceOf(address account) public view override returns (uint256) {
+        return _balances[account];
+    }
 
     function transfer(address to, uint256 amount) public override returns (bool) {
         address owner = msg.sender;
@@ -50,7 +64,9 @@ contract ERC20 is IERC20 {
     function _mint(address to, uint256 amount) internal {
         require(to != address(0), "ERC20: mint to the zero address");
         _totalSupply += amount;
-        unchecked { _balances[to] += amount; }
+        unchecked {
+            _balances[to] += amount;
+        }
         emit Transfer(address(0), to, amount);
     }
 
@@ -88,7 +104,9 @@ contract ERC20 is IERC20 {
         uint256 currentAllowance = allowance(owner, spender);
         if (currentAllowance != type(uint256).max) {
             require(currentAllowance >= amount, "ERC20: insufficient allowance");
-            unchecked { _approve(owner, spender, currentAllowance - amount); }
+            unchecked {
+                _approve(owner, spender, currentAllowance - amount);
+            }
         }
     }
 }

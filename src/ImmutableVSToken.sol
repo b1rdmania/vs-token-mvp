@@ -7,25 +7,25 @@ import {ERC20} from "./base/ERC20.sol";
  * @title ImmutableVSToken - Vault-Minted Liquidity Token
  * @author vS Vault Team
  * @notice ERC-20 token representing claims on vesting NFT value, tradeable before maturity
- * 
+ *
  * @dev DESIGN PRINCIPLES:
  * 1. IMMUTABLE: No admin functions, no owner, no upgrades possible after deployment
  * 2. SINGLE MINTER: Only the vault contract can mint/burn tokens (set in constructor)
  * 3. STANDARD ERC-20: Full compatibility with DEXs, lending protocols, and DeFi infrastructure
  * 4. ZERO ADMIN RISK: Cannot be paused, upgraded, or modified by any party
- * 
+ *
  * @dev ECONOMIC FUNCTION:
  * - Represents proportional claims on vault's underlying token balance
  * - Minted when users deposit vesting NFTs into vault (99% of face value)
  * - Burned when users redeem for underlying tokens (proportional to vault balance)
  * - Trades freely on secondary markets at market-determined prices
- * 
+ *
  * @dev SECURITY FEATURES:
  * - Immutable minter address prevents unauthorized token creation
  * - No admin functions eliminate rug pull vectors
  * - Standard ERC-20 implementation reduces smart contract risk
  * - Single-purpose design minimizes attack surface
- * 
+ *
  * @dev USAGE:
  * - Users receive vS tokens when depositing fNFTs to vault
  * - vS tokens can be traded, used as collateral, or provided as liquidity
@@ -44,11 +44,7 @@ contract ImmutableVSToken is ERC20 {
      * @param _name Token name (e.g., "vS Token")
      * @param _symbol Token symbol (e.g., "vS")
      */
-    constructor(
-        address _minter,
-        string memory _name,
-        string memory _symbol
-    ) ERC20(_name, _symbol, 18) {
+    constructor(address _minter, string memory _name, string memory _symbol) ERC20(_name, _symbol, 18) {
         require(_minter != address(0), "Minter cannot be zero address");
         minter = _minter;
     }
@@ -76,4 +72,4 @@ contract ImmutableVSToken is ERC20 {
         require(msg.sender == minter, "Only minter can burn");
         _burn(from, amount);
     }
-} 
+}
