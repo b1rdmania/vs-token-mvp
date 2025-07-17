@@ -79,9 +79,6 @@ vS/
 | File | Purpose |
 |------|---------|
 | **README.md** | Main protocol overview and getting started guide |
-| **SECURITY_ANALYSIS.md** | Comprehensive security audit and attack vector analysis |
-| **AUDIT_CHECKLIST.md** | Production readiness checklist for external auditors |
-| **DESIGN_SYSTEM.md** | UI/UX design system and component documentation |
 
 ## 📊 **Contract Addresses (Sonic Mainnet)**
 
@@ -107,21 +104,6 @@ vS/
 - **Honest price discovery:** Market sets discount based on time value
 - **No artificial pegs:** Protocol doesn't promise impossible economics
 - **Sustainable model:** No protocol subsidies required
-
-## 📚 **Additional Resources**
-
-- **[Security Analysis](./SECURITY_ANALYSIS.md)** - Comprehensive security audit and attack vector analysis
-- **[Audit Checklist](./AUDIT_CHECKLIST.md)** - Production readiness checklist for external auditors
-- **[Design System](./DESIGN_SYSTEM.md)** - UI/UX design system and component documentation
-
-## 🤝 **Contributing**
-
-This protocol uses upgradeable contracts with strong governance controls. During development:
-
-1. Fork the repository
-2. Create a feature branch
-3. Add comprehensive tests
-4. Submit a pull request
 
 ## ⚖️ **License**
 
