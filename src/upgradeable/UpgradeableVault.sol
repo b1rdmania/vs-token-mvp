@@ -63,19 +63,19 @@ contract UpgradeableVault is
 
     /// @notice The vS token contract (set once in constructor)
     /// @dev Set once in constructor, eliminates circular dependency
-    IUpgradeableVSToken public immutable vS;
-    address public immutable sonicNFT;
-    address public immutable underlyingToken;
-    address public immutable protocolTreasury;
-    uint256 public immutable maturityTimestamp;
-    uint256 public immutable vaultFreezeTimestamp;
+    IUpgradeableVSToken public immutable VS_TOKEN;
+    address public immutable SONIC_NFT;
+    address public immutable UNDERLYING_TOKEN;
+    address public immutable PROTOCOL_TREASURY;
+    uint256 public immutable MATURITY_TIMESTAMP;
+    uint256 public immutable VAULT_FREEZE_TIMESTAMP;
 
     // ============ STORAGE LAYOUT V1 ============
     struct VaultStorageV1 {
         
         // Vault state
-        uint256[] heldNFTs;
-        mapping(uint256 => address) depositedNFTs;
+        uint256[] heldNfts;
+        mapping(uint256 => address) depositedNfts;
         mapping(uint256 => bool) processed;
         uint256 nextClaim;
         uint256 processedCount;
@@ -132,7 +132,7 @@ contract UpgradeableVault is
     /**
      * @notice Constructor sets immutable addresses and timestamps
      * @param _vS The vS token contract address
-     * @param _sonicNFT Address of the Sonic fNFT contract
+     * @param _sonicNft Address of the Sonic fNFT contract
      * @param _underlyingToken Address of the underlying S token
      * @param _protocolTreasury Address to receive protocol fees
      * @param _maturityTimestamp When fNFTs can be claimed at 0% penalty
@@ -140,26 +140,26 @@ contract UpgradeableVault is
      */
     constructor(
         address _vS,
-        address _sonicNFT,
+        address _sonicNft,
         address _underlyingToken,
         address _protocolTreasury,
         uint256 _maturityTimestamp,
         uint256 _vaultFreezeTimestamp
     ) {
         require(_vS != address(0), "vS token cannot be zero address");
-        require(_sonicNFT != address(0), "Invalid NFT contract");
+        require(_sonicNft != address(0), "Invalid NFT contract");
         require(_underlyingToken != address(0), "Invalid underlying token");
         require(_protocolTreasury != address(0), "Invalid treasury");
         require(_maturityTimestamp > 0, "Invalid maturity timestamp");
         require(_vaultFreezeTimestamp > 0, "Invalid freeze timestamp");
         require(_vaultFreezeTimestamp < _maturityTimestamp, "Freeze must be before maturity");
         
-        vS = IUpgradeableVSToken(_vS);
-        sonicNFT = _sonicNFT;
-        underlyingToken = _underlyingToken;
-        protocolTreasury = _protocolTreasury;
-        maturityTimestamp = _maturityTimestamp;
-        vaultFreezeTimestamp = _vaultFreezeTimestamp;
+        VS_TOKEN = IUpgradeableVSToken(_vS);
+        SONIC_NFT = _sonicNft;
+        UNDERLYING_TOKEN = _underlyingToken;
+        PROTOCOL_TREASURY = _protocolTreasury;
+        MATURITY_TIMESTAMP = _maturityTimestamp;
+        VAULT_FREEZE_TIMESTAMP = _vaultFreezeTimestamp;
     }
 
     /**
@@ -359,32 +359,32 @@ contract UpgradeableVault is
      * @param nftId ID of the fNFT to deposit (must be owned by msg.sender)
      */
     function deposit(uint256 nftId) external nonReentrant whenNotPaused {
-        require(block.timestamp <= vaultFreezeTimestamp, "Vault frozen - use new season vault");
-        require(_storage.depositedNFTs[nftId] == address(0), "NFT already deposited");
-        require(IERC721(sonicNFT).ownerOf(nftId) == msg.sender, "Not NFT owner");
-        require(_storage.heldNFTs.length < MAX_NFTS, "Vault at capacity");
+        require(block.timestamp <= VAULT_FREEZE_TIMESTAMP, "Vault frozen - use new season vault");
+        require(_storage.depositedNfts[nftId] == address(0), "NFT already deposited");
+        require(IERC721(SONIC_NFT).ownerOf(nftId) == msg.sender, "Not NFT owner");
+        require(_storage.heldNfts.length < MAX_NFTS, "Vault at capacity");
         
         // Pull the NFT first
-        IERC721(sonicNFT).safeTransferFrom(msg.sender, address(this), nftId);
+        IERC721(SONIC_NFT).safeTransferFrom(msg.sender, address(this), nftId);
         
         // Immediately set ourselves as delegate
         _ensureDelegated(nftId);
         
-        uint256 totalValue = IDecayfNFT(sonicNFT).getTotalAmount(nftId);
+        uint256 totalValue = IDecayfNFT(SONIC_NFT).getTotalAmount(nftId);
         require(totalValue > 0, "NFT has no value");
         require(totalValue >= MIN_NFT_FACE, "NFT too small");
 
         // Store NFT info
-        _storage.depositedNFTs[nftId] = msg.sender;
-        _storage.heldNFTs.push(nftId);
+        _storage.depositedNfts[nftId] = msg.sender;
+        _storage.heldNfts.push(nftId);
 
         // Split 1% fee to treasury, rest to user
         uint256 feeAmount = (totalValue * MINT_FEE_BPS) / 10_000;
         uint256 userAmount = totalValue - feeAmount;
         
         // Mint vS tokens
-        vS.mint(protocolTreasury, feeAmount);
-        vS.mint(msg.sender, userAmount);
+        VS_TOKEN.mint(PROTOCOL_TREASURY, feeAmount);
+        VS_TOKEN.mint(msg.sender, userAmount);
 
         emit NFTDeposited(msg.sender, nftId, userAmount, feeAmount);
     }
@@ -397,7 +397,7 @@ contract UpgradeableVault is
      * @param k Number of NFTs to process (bounded for gas safety, max 20)
      */
     function harvestBatch(uint256 k) external nonReentrant whenNotPaused {
-        require(block.timestamp >= maturityTimestamp, "Too early - wait for maturity");
+        require(block.timestamp >= MATURITY_TIMESTAMP, "Too early - wait for maturity");
         require(k > 0 && k <= MAX_BATCH_SIZE, "Invalid batch size");
         require(!_storage.matured, "All NFTs already processed");
         
@@ -405,12 +405,12 @@ contract UpgradeableVault is
         uint256 startIndex = _storage.nextClaim;
         
         // Process k NFTs starting from pointer
-        while (processedNow < k && processedNow < _storage.heldNFTs.length) {
-            uint256 nftId = _storage.heldNFTs[_storage.nextClaim];
+        while (processedNow < k && processedNow < _storage.heldNfts.length) {
+            uint256 nftId = _storage.heldNfts[_storage.nextClaim];
             
             // Only attempt if not already successfully processed
             if (!_storage.processed[nftId]) {
-                try IDecayfNFT(sonicNFT).claimVestedTokens(nftId) returns (uint256 claimed) {
+                try IDecayfNFT(SONIC_NFT).claimVestedTokens(nftId) returns (uint256 claimed) {
                     if (claimed > 0) {
                         _storage.processed[nftId] = true;
                         _storage.processedCount++;
@@ -424,17 +424,17 @@ contract UpgradeableVault is
             processedNow++;
             
             // Wrap around if we reach the end but still have unprocessed NFTs
-            if (_storage.nextClaim >= _storage.heldNFTs.length) {
+            if (_storage.nextClaim >= _storage.heldNfts.length) {
                 _storage.nextClaim = 0;
                 
-                if (_storage.nextClaim == startIndex || processedNow >= _storage.heldNFTs.length) {
+                if (_storage.nextClaim == startIndex || processedNow >= _storage.heldNfts.length) {
                     break;
                 }
             }
         }
         
         // Check if all NFTs are now processed
-        if (_storage.processedCount >= _storage.heldNFTs.length) {
+        if (_storage.processedCount >= _storage.heldNfts.length) {
             _storage.matured = true;
         }
 
@@ -448,14 +448,14 @@ contract UpgradeableVault is
      */
     function redeem(uint256 amount) external nonReentrant whenNotPaused {
         require(amount > 0, "Cannot redeem 0");
-        require(vS.balanceOf(msg.sender) >= amount, "Insufficient vS balance");
-        require(block.timestamp >= maturityTimestamp, "Too early - wait for maturity");
+        require(VS_TOKEN.balanceOf(msg.sender) >= amount, "Insufficient vS balance");
+        require(block.timestamp >= MATURITY_TIMESTAMP, "Too early - wait for maturity");
         
-        uint256 vsTotalSupply = vS.totalSupply();
+        uint256 vsTotalSupply = VS_TOKEN.totalSupply();
         require(vsTotalSupply > 0, "No vS tokens in circulation");
         
         // Calculate redemption from available balance (proportional)
-        uint256 availableBalance = IERC20(underlyingToken).balanceOf(address(this));
+        uint256 availableBalance = IERC20(UNDERLYING_TOKEN).balanceOf(address(this));
         require(availableBalance > 0, "No tokens available for redemption");
         
         uint256 redeemableValue = (amount * availableBalance) / vsTotalSupply;
@@ -471,13 +471,13 @@ contract UpgradeableVault is
         uint256 userAmount = redeemableValue - feeAmount;
         
         // Burn vS tokens
-        vS.burn(msg.sender, amount);
+        VS_TOKEN.burn(msg.sender, amount);
         
         // Transfer fee to treasury and remaining to user
         if (feeAmount > 0) {
-            require(IERC20(underlyingToken).transfer(protocolTreasury, feeAmount), "Treasury transfer failed");
+            require(IERC20(UNDERLYING_TOKEN).transfer(PROTOCOL_TREASURY, feeAmount), "Treasury transfer failed");
         }
-        require(IERC20(underlyingToken).transfer(msg.sender, userAmount), "User transfer failed");
+        require(IERC20(UNDERLYING_TOKEN).transfer(msg.sender, userAmount), "User transfer failed");
 
         emit Redeemed(msg.sender, amount, userAmount, feeAmount);
     }
@@ -487,12 +487,12 @@ contract UpgradeableVault is
      * @dev No owner required - anyone can call after maturity + 180 days
      */
     function sweepSurplus() external nonReentrant whenNotPaused {
-        require(block.timestamp >= maturityTimestamp + GRACE_PERIOD, "Grace period not over");
+        require(block.timestamp >= MATURITY_TIMESTAMP + GRACE_PERIOD, "Grace period not over");
         
-        uint256 surplus = IERC20(underlyingToken).balanceOf(address(this));
+        uint256 surplus = IERC20(UNDERLYING_TOKEN).balanceOf(address(this));
         require(surplus > 0, "No surplus to sweep");
         
-        require(IERC20(underlyingToken).transfer(protocolTreasury, surplus), "Surplus transfer failed");
+        require(IERC20(UNDERLYING_TOKEN).transfer(PROTOCOL_TREASURY, surplus), "Surplus transfer failed");
         
         emit SurplusSwept(msg.sender, surplus);
     }
@@ -505,7 +505,7 @@ contract UpgradeableVault is
     function forceDelegate(uint256[] calldata nftIds) external whenNotPaused {
         require(nftIds.length <= 50, "Batch too large");
         for (uint256 i = 0; i < nftIds.length; i++) {
-            try IERC721(sonicNFT).ownerOf(nftIds[i]) returns (address owner) {
+            try IERC721(SONIC_NFT).ownerOf(nftIds[i]) returns (address owner) {
                 if (owner == address(this)) {
                     _ensureDelegated(nftIds[i]);
                 }
@@ -520,8 +520,8 @@ contract UpgradeableVault is
      * @param nftId ID of the NFT to ensure delegation for
      */
     function _ensureDelegated(uint256 nftId) internal {
-        if (IDecayfNFT(sonicNFT).claimDelegates(nftId) != address(this)) {
-            try IDecayfNFT(sonicNFT).setDelegate(nftId, address(this)) {
+        if (IDecayfNFT(SONIC_NFT).claimDelegates(nftId) != address(this)) {
+            try IDecayfNFT(SONIC_NFT).setDelegate(nftId, address(this)) {
                 emit DelegationForced(nftId);
             } catch {
                 // Ignore delegation failures
@@ -536,36 +536,36 @@ contract UpgradeableVault is
     }
 
     function getBackingRatio() external view returns (uint256 ratio) {
-        uint256 totalSupply = vS.totalSupply();
+        uint256 totalSupply = VS_TOKEN.totalSupply();
         if (totalSupply == 0) return 1e18;
         
-        uint256 vaultBalance = IERC20(underlyingToken).balanceOf(address(this));
+        uint256 vaultBalance = IERC20(UNDERLYING_TOKEN).balanceOf(address(this));
         return (vaultBalance * 1e18) / totalSupply;
     }
 
     function totalAssets() external view returns (uint256) {
-        return IERC20(underlyingToken).balanceOf(address(this));
+        return IERC20(UNDERLYING_TOKEN).balanceOf(address(this));
     }
 
-    function getHeldNFTCount() external view returns (uint256) {
-        return _storage.heldNFTs.length;
+    function getHeldNftCount() external view returns (uint256) {
+        return _storage.heldNfts.length;
     }
 
-    function getHeldNFT(uint256 index) external view returns (uint256) {
-        require(index < _storage.heldNFTs.length, "Index out of bounds");
-        return _storage.heldNFTs[index];
+    function getHeldNft(uint256 index) external view returns (uint256) {
+        require(index < _storage.heldNfts.length, "Index out of bounds");
+        return _storage.heldNfts[index];
     }
 
-    function getHarvestProgress() external view returns (uint256 processedNFTs, uint256 total) {
-        return (_storage.processedCount, _storage.heldNFTs.length);
+    function getHarvestProgress() external view returns (uint256 processedNfts, uint256 total) {
+        return (_storage.processedCount, _storage.heldNfts.length);
     }
 
     function getNextBatch() external view returns (uint256 startIndex, uint256 remaining) {
-        return (_storage.nextClaim, _storage.heldNFTs.length > _storage.nextClaim ? _storage.heldNFTs.length - _storage.nextClaim : 0);
+        return (_storage.nextClaim, _storage.heldNfts.length > _storage.nextClaim ? _storage.heldNfts.length - _storage.nextClaim : 0);
     }
 
     function isVaultFrozen() external view returns (bool) {
-        return block.timestamp > vaultFreezeTimestamp;
+        return block.timestamp > VAULT_FREEZE_TIMESTAMP;
     }
 
     function isProcessed(uint256 nftId) external view returns (bool) {
@@ -587,8 +587,8 @@ contract UpgradeableVault is
     // ============ IMMUTABLE GETTERS ============
     // Note: These are now immutable variables, getters provided for interface compatibility
 
-    function depositedNFTs(uint256 nftId) external view returns (address) {
-        return _storage.depositedNFTs[nftId];
+    function depositedNfts(uint256 nftId) external view returns (address) {
+        return _storage.depositedNfts[nftId];
     }
 
     /**
@@ -601,7 +601,7 @@ contract UpgradeableVault is
         uint256, /* tokenId */
         bytes calldata /* data */
     ) external nonReentrant returns (bytes4) {
-        require(msg.sender == sonicNFT, "Only accepts target NFTs");
+        require(msg.sender == SONIC_NFT, "Only accepts target NFTs");
         return IERC721Receiver.onERC721Received.selector;
     }
 } 

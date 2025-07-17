@@ -33,10 +33,10 @@ contract HarvestKeeper is Script {
         console.log("=== vS Vault Harvest Keeper ===");
         console.log("Vault address:", address(vault));
         console.log("Block timestamp:", block.timestamp);
-        console.log("Maturity timestamp:", vault.maturityTimestamp());
+        console.log("Maturity timestamp:", vault.MATURITY_TIMESTAMP());
         
         // Check if we can harvest yet
-        require(block.timestamp >= vault.maturityTimestamp(), "Too early - wait for maturity");
+        require(block.timestamp >= vault.MATURITY_TIMESTAMP(), "Too early - wait for maturity");
         
         // Get initial status
         (uint256 processed, uint256 total) = vault.getHarvestProgress();
@@ -102,7 +102,7 @@ contract HarvestKeeper is Script {
         
         console.log("=== Force Delegation Recovery ===");
         
-        uint256 totalNFTs = vault.getHeldNFTCount();
+        uint256 totalNFTs = vault.getHeldNftCount();
         console.log("Total NFTs in vault: %d", totalNFTs);
         
         // Process in batches of 50 (max allowed)
@@ -112,7 +112,7 @@ contract HarvestKeeper is Script {
             
             uint256[] memory nftIds = new uint256[](batchSize);
             for (uint256 j = 0; j < batchSize; j++) {
-                nftIds[j] = vault.getHeldNFT(i + j);
+                nftIds[j] = vault.getHeldNft(i + j);
             }
             
             console.log("Force delegating batch %d-%d...", i, batchEnd - 1);
@@ -134,7 +134,7 @@ contract HarvestKeeper is Script {
         console.log("Vault address:", address(vault));
         console.log("Current block:", block.number);
         console.log("Current timestamp:", block.timestamp);
-        console.log("Maturity timestamp:", vault.maturityTimestamp());
+        console.log("Maturity timestamp:", vault.MATURITY_TIMESTAMP());
         console.log("Vault frozen:", vault.isVaultFrozen());
         
         (uint256 processed, uint256 total) = vault.getHarvestProgress();
@@ -148,7 +148,7 @@ contract HarvestKeeper is Script {
         console.log("--- Sample NFT Status ---");
         uint256 sampleSize = total > 10 ? 10 : total;
         for (uint256 i = 0; i < sampleSize; i++) {
-            uint256 nftId = vault.getHeldNFT(i);
+            uint256 nftId = vault.getHeldNft(i);
             bool isProcessed = vault.isProcessed(nftId);
             console.log("NFT #%d: %s", nftId, isProcessed ? "Processed" : "Pending");
         }
@@ -157,13 +157,13 @@ contract HarvestKeeper is Script {
     // ============ INTERNAL HELPERS ============
     
     function _forceDelegateFailedNFTs() internal {
-        uint256 totalNFTs = vault.getHeldNFTCount();
+        uint256 totalNFTs = vault.getHeldNftCount();
         uint256[] memory failedNFTs = new uint256[](totalNFTs);
         uint256 failedCount = 0;
         
         // Identify failed NFTs
         for (uint256 i = 0; i < totalNFTs; i++) {
-            uint256 nftId = vault.getHeldNFT(i);
+            uint256 nftId = vault.getHeldNft(i);
             if (!vault.isProcessed(nftId)) {
                 failedNFTs[failedCount] = nftId;
                 failedCount++;

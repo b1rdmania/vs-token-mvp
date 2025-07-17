@@ -26,7 +26,7 @@ contract UpgradeableVSToken is
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
     bytes32 public constant EMERGENCY_ROLE = keccak256("EMERGENCY_ROLE");
 
-    address public immutable minter;
+    address public immutable MINTER;
 
     // Storage Layout V1
     struct TokenStorageV1 {
@@ -65,7 +65,7 @@ contract UpgradeableVSToken is
      */
     constructor(address _minter) {
         require(_minter != address(0), "Minter cannot be zero address");
-        minter = _minter;
+        MINTER = _minter;
     }
 
     /**
@@ -258,7 +258,7 @@ contract UpgradeableVSToken is
      * @param amount Amount of tokens to mint
      */
     function mint(address to, uint256 amount) external whenNotPaused {
-        require(msg.sender == minter, "Only minter can mint");
+        require(msg.sender == MINTER, "Only minter can mint");
         require(to != address(0), "Cannot mint to zero address");
         require(amount > 0, "Cannot mint zero amount");
         
@@ -271,7 +271,7 @@ contract UpgradeableVSToken is
      * @param amount Amount of tokens to burn
      */
     function burn(address from, uint256 amount) external whenNotPaused {
-        require(msg.sender == minter, "Only minter can burn");
+        require(msg.sender == MINTER, "Only minter can burn");
         require(from != address(0), "Cannot burn from zero address");
         require(amount > 0, "Cannot burn zero amount");
         require(balanceOf(from) >= amount, "Insufficient balance to burn");
@@ -305,7 +305,7 @@ contract UpgradeableVSToken is
      * @return Address of the minter contract
      */
     function getMinter() external view returns (address) {
-        return minter;
+        return MINTER;
     }
 
     /**

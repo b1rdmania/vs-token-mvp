@@ -19,12 +19,12 @@ contract HarvestAll is Script {
         UpgradeableVault vault = UpgradeableVault(vaultAddress);
         
         // Check if vault has reached maturity
-        require(block.timestamp >= vault.maturityTimestamp(), "Vault not mature yet");
+        require(block.timestamp >= vault.MATURITY_TIMESTAMP(), "Vault not mature yet");
         require(!vault.hasMatured(), "Vault already fully harvested");
         
         console.log("Starting harvest process for vault:", vaultAddress);
         console.log("Block timestamp:", block.timestamp);
-        console.log("Maturity timestamp:", vault.maturityTimestamp());
+        console.log("Maturity timestamp:", vault.MATURITY_TIMESTAMP());
         
         // Get initial state
         (uint256 processedBefore, uint256 total) = vault.getHarvestProgress();
@@ -88,7 +88,7 @@ contract HarvestAll is Script {
             // Log which NFTs are still unprocessed
             console.log("Checking individual NFT status...");
             for (uint256 i = 0; i < totalFinal; i++) {
-                uint256 nftId = vault.getHeldNFT(i);
+                uint256 nftId = vault.getHeldNft(i);
                 bool processed = vault.isProcessed(nftId);
                 if (!processed) {
                     console.log("NFT ID %d still unprocessed", nftId);
@@ -105,7 +105,7 @@ contract HarvestAll is Script {
         require(vaultAddress != address(0), "VAULT_ADDRESS not set");
         
         UpgradeableVault vault = UpgradeableVault(vaultAddress);
-        uint256 totalNFTs = vault.getHeldNFTCount();
+        uint256 totalNFTs = vault.getHeldNftCount();
         uint256 batchSize = vault.MAX_BATCH_SIZE();
         uint256 batchCount = (totalNFTs + batchSize - 1) / batchSize;
         
