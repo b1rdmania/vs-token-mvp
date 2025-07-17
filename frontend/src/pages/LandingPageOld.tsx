@@ -25,7 +25,7 @@ export const LandingPage: React.FC = () => {
                   Swap your locked Sonic airdrop for liquid vS in one click.
                 </p>
                 <p className="hero-fees">
-                  <strong>1% in, 2% out. No upgrades. No rugs.</strong>
+                  <strong>1% in, 2% out. Upgrades require multisig approval and a public timelock.</strong>
                 </p>
                 <Link to="/app" className="button-primary button-hero">
                   Connect Wallet
@@ -69,7 +69,7 @@ export const LandingPage: React.FC = () => {
           </div>
         </section>
 
-        {/* Key Benefits - 2x3 grid */}
+        {/* Key Benefits - 6 cards */}
         <section className="benefits-section">
           <div className="container">
             <h2>Key Benefits</h2>
@@ -92,7 +92,7 @@ export const LandingPage: React.FC = () => {
               </div>
               <div className="benefit-card">
                 <h3>✅ No rug risk</h3>
-                <p>Immutable code. No admin keys, no pause.</p>
+                <p>Upgrades require multisig approval and a public timelock. No single admin.</p>
               </div>
               <div className="benefit-card">
                 <h3>✅ 1:1 redemption</h3>
@@ -128,7 +128,7 @@ export const LandingPage: React.FC = () => {
               </details>
               <details>
                 <summary>Can fees ever change?</summary>
-                <p>No. They're hard-coded in an upgrade-blocked contract.</p>
+                <p>Any change requires multisig approval and a public timelock, so users always have time to react.</p>
               </details>
               <details>
                 <summary>Which wallet gets the fees?</summary>

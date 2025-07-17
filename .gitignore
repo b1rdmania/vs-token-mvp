@@ -20,3 +20,5 @@ Thumbs.db
 
 # Logs
 *.log 
+.md
+.npm-cache

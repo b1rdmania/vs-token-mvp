@@ -86,30 +86,31 @@ export const WhitepaperPage: React.FC = () => {
                 
                 <div className="tech-grid">
                   <div className="tech-card">
-                    <h3>ImmutableVault.sol</h3>
+                    <h3>UpgradeableVault.sol</h3>
                     <ul>
-                      <li><strong>Zero Admin Control:</strong> No owner, no pause, no upgrades</li>
-                      <li><strong>Immutable Parameters:</strong> Set once in constructor, never changed</li>
+                      <li><strong>Secure Upgradeability:</strong> All protocol changes require multisig approval and a public timelock (12h for upgrades, 2h for emergency actions)</li>
+                      <li><strong>Governance-Controlled Parameters:</strong> Fee rates and core logic can only change via a public, timelocked upgrade process</li>
                       <li><strong>Simple Flow:</strong> Deposit fNFT → Mint vS → Hold until maturity</li>
                       <li><strong>Wait-and-Claim:</strong> Never claims early, preserves full backing</li>
-                      <li><strong>Pure Infrastructure:</strong> Works forever without intervention</li>
+                      <li><strong>Transparent Infrastructure:</strong> All upgrades are public and delayed for user protection</li>
                     </ul>
                     <div className="contract-links">
-                      <a href="https://github.com/b1rdmania/vs-token-mvp/blob/main/src/ImmutableVault.sol" target="_blank" rel="noopener noreferrer" className="contract-link">
+                      <a href="https://github.com/b1rdmania/vs-token-mvp/blob/main/src/upgradeable/UpgradeableVault.sol" target="_blank" rel="noopener noreferrer" className="contract-link">
                         View Contract →
                       </a>
                     </div>
                   </div>
                   
                   <div className="tech-card">
-                    <h3>ImmutableVSToken.sol</h3>
+                    <h3>UpgradeableVSToken.sol</h3>
                     <ul>
                       <li><strong>Standard ERC-20:</strong> Full DeFi composability</li>
                       <li><strong>Vault-Only Minting:</strong> Only vault can mint (deposit) or burn (redemption)</li>
-                      <li><strong>No Special Features:</strong> Clean, predictable token mechanics</li>
+                      <li><strong>Upgradeable for Security:</strong> Bug fixes and improvements possible via multisig governance</li>
+                      <li><strong>No Transfer Taxes or Rebasing:</strong> Clean, predictable token mechanics</li>
                     </ul>
                     <div className="contract-links">
-                      <a href="https://github.com/b1rdmania/vs-token-mvp/blob/main/src/ImmutableVSToken.sol" target="_blank" rel="noopener noreferrer" className="contract-link">
+                      <a href="https://github.com/b1rdmania/vs-token-mvp/blob/main/src/upgradeable/UpgradeableVSToken.sol" target="_blank" rel="noopener noreferrer" className="contract-link">
                         View Contract →
                       </a>
                     </div>
@@ -122,11 +123,12 @@ export const WhitepaperPage: React.FC = () => {
                 
                 <div className="fee-breakdown">
                   <div className="fee-card">
-                    <h3>Protocol Fees (Immutable)</h3>
+                    <h3>Protocol Fees (Governance-Controlled)</h3>
                     <ul>
                       <li><strong>Mint Fee:</strong> 1% when depositing fNFT → vS</li>
                       <li><strong>Redeem Fee:</strong> 2% when redeeming vS → S</li>
                       <li><strong>Keeper Fee:</strong> 0% (self-keeper mode)</li>
+                      <li><strong>Changes:</strong> Any fee change requires multisig approval and a 12h public timelock</li>
                     </ul>
                   </div>
 
@@ -143,7 +145,7 @@ export const WhitepaperPage: React.FC = () => {
                       <li><strong>Protocol Sustainability:</strong> Fees fund ongoing development and infrastructure</li>
                       <li><strong>Market Competitive:</strong> 3% total cost vs 9-month opportunity cost</li>
                       <li><strong>Value Creation:</strong> Immediate liquidity worth the small fee</li>
-                      <li><strong>Immutable:</strong> Fee rates locked forever, no surprise changes</li>
+                      <li><strong>Transparent Changes:</strong> Fees can only change through a public, timelocked upgrade process controlled by the protocol's multisig</li>
                     </ul>
                   </div>
                 </div>
@@ -151,7 +153,7 @@ export const WhitepaperPage: React.FC = () => {
                 <div className="highlight-box">
                   <h3>Fee Transparency</h3>
                   <p><strong>Fees</strong>: 1% when you mint vS, 2% when you redeem. Net cost ≈ 3% for nine-month liquidity.</p>
-                  <p>All fees are clearly displayed in the UI before any transaction. No hidden costs, no surprise deductions.</p>
+                  <p>All fees are clearly displayed in the UI before any transaction. No hidden costs, no surprise deductions. Any changes require multisig approval and a public timelock.</p>
                 </div>
               </div>
 
@@ -173,8 +175,8 @@ export const WhitepaperPage: React.FC = () => {
                     <ul>
                       <li><strong>1:1 Redemption:</strong> At month 9+, redeem vS → S at 1:1 ratio (minus 2% fee)</li>
                       <li><strong>Full Backing:</strong> Every vS backed by 1 S token (zero penalty burns)</li>
-                      <li><strong>No Rug Risk:</strong> Immutable contracts, no admin control</li>
-                      <li><strong>Fixed Fees:</strong> 1% mint + 2% redeem rates locked forever</li>
+                      <li><strong>No Rug Risk:</strong> Upgrades and emergency actions require multisig consensus and a public timelock. No single party can make changes</li>
+                      <li><strong>Transparent Governance:</strong> All protocol changes are public, multisig-controlled, and delayed for user protection</li>
                     </ul>
                   </div>
 
@@ -225,7 +227,7 @@ export const WhitepaperPage: React.FC = () => {
                   <div className="benefit-card">
                     <h3>Maximum Security</h3>
                     <ul>
-                      <li><strong>Immutable Design:</strong> No admin keys or upgrade paths</li>
+                      <li><strong>Secure Upgradeability:</strong> All protocol changes require multisig approval and a public timelock, so users always have time to review and respond</li>
                       <li><strong>Simple Logic:</strong> Fewer attack vectors than complex protocols</li>
                       <li><strong>Transparent Economics:</strong> No hidden mechanisms or surprise behaviors</li>
                     </ul>
