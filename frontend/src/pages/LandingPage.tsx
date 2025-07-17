@@ -172,7 +172,7 @@ export const LandingPage: React.FC = () => {
                 { emoji: "⚖️", title: "Fair Discount", text: "Market sets the time price, not us." },
                 { emoji: "🔥", title: "Zero Penalty Burns", text: "Vault waits for 0% burn window." },
                 { emoji: "🧩", title: "DeFi Ready", text: "Pure ERC-20 plugs into any Sonic pool." },
-                { emoji: "🛡️", title: "No Rug Risk", text: "Immutable code, no admin keys." },
+                { emoji: "🛡️", title: "No Rug Risk", text: "Upgrades require multisig approval and a public timelock (12h delay for upgrades). No single admin." },
                 { emoji: "🎯", title: "1:1 Redemption", text: "Every vS is backed by S after harvest." }
               ].map((benefit, index) => (
                 <motion.div
@@ -258,7 +258,7 @@ export const LandingPage: React.FC = () => {
                   {/* 🤔 */}
                   Can the fees change?
                 </summary>
-                <p>1% in, 2% out, hard-coded & immutable.</p>
+                <p>1% mint fee, 2% redeem fee — any change requires multisig approval and a public timelock (12h delay for upgrades).</p>
               </details>
               <details>
                 <summary>

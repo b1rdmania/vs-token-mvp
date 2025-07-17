@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 import {Script, console} from "forge-std/Script.sol";
-import {ImmutableVault} from "../src/ImmutableVault.sol";
+import {UpgradeableVault} from "../src/upgradeable/UpgradeableVault.sol";
 
 /**
  * @title Harvest Keeper Script
@@ -17,10 +17,10 @@ contract HarvestKeeper is Script {
     // Environment variable
     address constant VAULT_ADDRESS = 0x1234567890123456789012345678901234567890; // Set via env
     
-    ImmutableVault vault;
+    UpgradeableVault vault;
     
     function setUp() public {
-        vault = ImmutableVault(VAULT_ADDRESS);
+        vault = UpgradeableVault(VAULT_ADDRESS);
     }
 
     /**
