@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import {Script, console} from "forge-std/Script.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
-import {UpgradeableVault} from "../src/upgradeable/UpgradeableVault.sol";
+import {Vault} from "../src/upgradeable/Vault.sol";
 
 /**
  * @title Deploy Upgradeable Vault with UUPS Proxy
@@ -16,7 +16,6 @@ contract DeployUpgradeableVault is Script {
     struct DeployParams {
         address tokenAddress; // Previously deployed token
         address sonicNFT; // Sonic fNFT contract
-        address underlyingToken; // S token contract
         address protocolTreasury; // Treasury address
         uint256 maturityTimestamp; // When fNFTs mature
         uint256 vaultFreezeTimestamp; // When vault stops accepting deposits
@@ -32,7 +31,6 @@ contract DeployUpgradeableVault is Script {
         console.log("Deployer:", params.deployer);
         console.log("Token Address:", params.tokenAddress);
         console.log("Sonic NFT:", params.sonicNFT);
-        console.log("Underlying Token:", params.underlyingToken);
         console.log("Protocol Treasury:", params.protocolTreasury);
         console.log("Admin (Multisig):", params.admin);
         console.log("Maturity Timestamp:", params.maturityTimestamp);
@@ -43,10 +41,9 @@ contract DeployUpgradeableVault is Script {
 
         // Step 1: Deploy the vault implementation contract
         console.log("1. Deploying UpgradeableVault implementation...");
-        UpgradeableVault vaultImplementation = new UpgradeableVault(
+        Vault vaultImplementation = new Vault(
             params.tokenAddress,
             params.sonicNFT,
-            params.underlyingToken,
             params.protocolTreasury,
             params.maturityTimestamp,
             params.vaultFreezeTimestamp
@@ -54,7 +51,7 @@ contract DeployUpgradeableVault is Script {
         console.log("Vault implementation deployed at:", address(vaultImplementation));
 
         // Step 2: Prepare vault initialization data
-        bytes memory vaultInitData = abi.encodeWithSelector(UpgradeableVault.initialize.selector, params.admin);
+        bytes memory vaultInitData = abi.encodeWithSelector(Vault.initialize.selector, params.admin);
 
         // Step 3: Deploy the vault proxy
         console.log("2. Deploying Vault ERC1967Proxy...");
@@ -64,12 +61,11 @@ contract DeployUpgradeableVault is Script {
         vm.stopBroadcast();
 
         // Step 4: Verify the vault deployment
-        UpgradeableVault vault = UpgradeableVault(address(vaultProxy));
+        Vault vault = Vault(payable(address(vaultProxy)));
 
         console.log("3. Verifying vault deployment...");
         require(address(vault.VS_TOKEN()) == params.tokenAddress, "Token address mismatch");
         require(vault.SONIC_NFT() == params.sonicNFT, "Sonic NFT mismatch");
-        require(vault.UNDERLYING_TOKEN() == params.underlyingToken, "Underlying token mismatch");
         require(vault.PROTOCOL_TREASURY() == params.protocolTreasury, "Treasury mismatch");
         require(vault.hasRole(vault.DEFAULT_ADMIN_ROLE(), params.admin), "Admin role not set");
         require(vault.hasRole(vault.ADMIN_ROLE(), params.admin), "Admin role not set");
@@ -90,7 +86,6 @@ contract DeployUpgradeableVault is Script {
         // Contract addresses
         params.tokenAddress = vm.envAddress("TOKEN_ADDRESS"); // Required: Previously deployed token
         params.sonicNFT = vm.envAddress("SONIC_NFT"); // Required: Sonic fNFT contract
-        params.underlyingToken = vm.envAddress("UNDERLYING_TOKEN"); // Required: S token contract
         params.protocolTreasury = vm.envAddress("PROTOCOL_TREASURY"); // Required: Treasury address
         params.admin = vm.envAddress("ADMIN_ADDRESS"); // Required: Multisig address
 
@@ -105,7 +100,6 @@ contract DeployUpgradeableVault is Script {
         // Validation
         require(params.tokenAddress != address(0), "TOKEN_ADDRESS required");
         require(params.sonicNFT != address(0), "SONIC_NFT required");
-        require(params.underlyingToken != address(0), "UNDERLYING_TOKEN required");
         require(params.protocolTreasury != address(0), "PROTOCOL_TREASURY required");
         require(params.admin != address(0), "ADMIN_ADDRESS required");
         require(params.maturityTimestamp > block.timestamp, "MATURITY_TIMESTAMP must be future");
@@ -144,7 +138,7 @@ contract DeployUpgradeableVault is Script {
         console.log(
             "  --constructor-args $(cast abi-encode \"constructor(address,address,address,address,uint256,uint256)\""
         );
-        console.log("    %s %s %s", params.tokenAddress, params.sonicNFT, params.underlyingToken);
+        console.log("    %s %s", params.tokenAddress, params.sonicNFT);
         console.log(
             "    %s %s %s)",
             params.protocolTreasury,
@@ -160,7 +154,7 @@ contract DeployUpgradeableVault is Script {
         console.log(
             "  --constructor-args $(cast abi-encode \"constructor(address,bytes)\" %s 0x%s)",
             vaultImplementation,
-            vm.toString(abi.encodeWithSelector(UpgradeableVault.initialize.selector, params.admin))
+            vm.toString(abi.encodeWithSelector(Vault.initialize.selector, params.admin))
         );
         console.log("");
 

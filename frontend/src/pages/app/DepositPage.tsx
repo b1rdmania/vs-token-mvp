@@ -3,30 +3,26 @@ import { useAccount } from 'wagmi';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { motion } from 'framer-motion';
 import './DepositPage.css';
+import { useSonicNFTContract, type SeasonData } from '../../hooks/useSonicNFTContract';
+import { useVaultContract } from '../../hooks/useVaultContract';
 
 interface Nft {
   id: number;
-  lockedAmount: number;
-  vestingEndDate: string;
+  lockedAmount: bigint;
+  vestingEndTime: bigint;
 }
 
-// Mock data for simplified model
-const mockNfts: Nft[] = [
-  {
-    id: 1234,
-    lockedAmount: 4800,
-    vestingEndDate: '15 Apr 2026',
-  },
-  {
-    id: 5678,
-    lockedAmount: 10000,
-    vestingEndDate: '15 Apr 2026',
-  },
-];
-
 const DepositModal = ({ nft, onClose }: { nft: Nft; onClose: () => void }) => {
-  const mintFee = Math.floor(nft.lockedAmount * 0.01); // 1% mint fee
-  const userReceives = nft.lockedAmount - mintFee; // Amount after fee
+  const { deposit, isDepositing, isDepositConfirming } = useVaultContract();
+  
+  // Convert from wei to human readable format (18 decimals)
+  const lockedAmount = Number(nft.lockedAmount) / 10**18;
+  const mintFee = lockedAmount * 0.01; // 1% mint fee
+  const userReceives = lockedAmount - mintFee; // Amount after fee
+  
+  const handleDeposit = () => {
+    deposit();
+  };
   
   return (
     <motion.div 
@@ -73,7 +69,7 @@ const DepositModal = ({ nft, onClose }: { nft: Nft; onClose: () => void }) => {
             transition={{ delay: 0.2 }}
           >
             <span>fNFT Value</span>
-            <strong className="value-highlight">{nft.lockedAmount.toLocaleString()} S</strong>
+            <strong className="value-highlight">{lockedAmount.toLocaleString()} S</strong>
           </motion.div>
           <motion.div 
             className="detail-row fee-row"
@@ -108,10 +104,12 @@ const DepositModal = ({ nft, onClose }: { nft: Nft; onClose: () => void }) => {
           <button className="button-secondary-modern" onClick={onClose}>Cancel</button>
           <motion.button 
             className="button-primary-modern"
+            onClick={handleDeposit}
+            disabled={isDepositing || isDepositConfirming}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            Confirm Deposit
+            {isDepositing || isDepositConfirming ? 'Processing...' : 'Confirm Deposit'}
           </motion.button>
         </div>
       </motion.div>
@@ -123,6 +121,15 @@ export const DepositPage: React.FC = () => {
   const { isConnected } = useAccount();
   const { openConnectModal } = useConnectModal();
   const [selectedNft, setSelectedNft] = useState<Nft | null>(null);
+  const { userNFTs, isLoadingUserNFTs, isApprovedForVault, approveVault, isApproving, season1Data } = useSonicNFTContract();
+  console.log('userNFTs', userNFTs, isLoadingUserNFTs, isApprovedForVault, approveVault, isApproving);
+
+  // Map userNFTs (NFTInfo) to Nft type for display
+  const mappedNFTs: Nft[] = (userNFTs || []).map((nft) => ({
+    id: nft.id,
+    lockedAmount: nft.balance, // Use balance as locked amount
+    vestingEndTime: (season1Data as SeasonData)?.maturationTime ? BigInt((season1Data as SeasonData).maturationTime) : 0n, // Use actual maturation time
+  }));
 
   const handleDepositClick = (nft: Nft) => {
     if (!isConnected) {
@@ -194,81 +201,175 @@ export const DepositPage: React.FC = () => {
         </div>
       </motion.div>
       
+      {/* Connection State */}
       {!isConnected && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
+          <motion.div 
+            className="connect-wallet-card"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+            style={{
+              background: '#fff',
+              borderRadius: '18px',
+              boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
+              padding: '2.5rem 2rem',
+              maxWidth: '350px',
+              width: '100%',
+              textAlign: 'center',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '1.2rem',
+            }}
+          >
+            <div className="empty-icon" style={{ fontSize: '2.5rem' }}>🔗</div>
+            <div>
+              <h2 style={{ margin: 0, fontWeight: 700, fontSize: '1.4rem', color: '#222' }}>Please connect your wallet</h2>
+              <p style={{ color: '#666', margin: '0.5rem 0 0 0', fontSize: '1rem' }}>Connect your wallet to deposit your fNFTs.</p>
+            </div>
+            <button
+              className="button-primary-modern"
+              style={{ marginTop: '1rem', padding: '0.8rem 1.5rem', fontSize: '1.1rem', borderRadius: '8px', fontWeight: 600 }}
+              onClick={() => openConnectModal && openConnectModal()}
+            >
+              Connect Wallet
+            </button>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Loading State */}
+      {isLoadingUserNFTs && (
         <motion.div 
-          className="demo-banner-modern"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.4 }}
+          className="loading-state"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
         >
-          <div className="demo-icon">🔗</div>
-          <div>
-            <strong>Demo Mode</strong>
-            <p>Connect your wallet to see your actual fNFTs</p>
+          <div className="loading-spinner">⏳</div>
+          <p>Loading your fNFTs...</p>
+        </motion.div>
+      )}
+
+      {/* No NFTs State */}
+      {isConnected && !isLoadingUserNFTs && (!mappedNFTs || mappedNFTs.length === 0) && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
+          <motion.div 
+            className="no-nft-card"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+            style={{
+              background: '#fff',
+              borderRadius: '18px',
+              boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
+              padding: '2.5rem 2rem',
+              maxWidth: '350px',
+              width: '100%',
+              textAlign: 'center',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '1.2rem',
+            }}
+          >
+            <div className="empty-icon" style={{ fontSize: '2.5rem' }}>📭</div>
+            <div>
+              <h2 style={{ margin: 0, fontWeight: 700, fontSize: '1.4rem', color: '#222' }}>No fNFTs found</h2>
+              <p style={{ color: '#666', margin: '0.5rem 0 0 0', fontSize: '1rem' }}>You have no fNFTs available to deposit.</p>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Approval Banner */}
+      {isConnected && !isApprovedForVault && userNFTs && userNFTs.length > 0 && (
+        <motion.div 
+          className="approval-banner"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <div className="approval-content">
+            <div className="approval-icon">🔐</div>
+            <div>
+              <strong>Approve Vault Access</strong>
+              <p>Allow the vault to transfer your fNFTs for deposit</p>
+            </div>
+            <button 
+              className="button-primary-modern"
+              onClick={approveVault}
+              disabled={isApproving}
+            >
+              {isApproving ? 'Approving...' : 'Approve'}
+            </button>
           </div>
         </motion.div>
       )}
 
       {/* NFT Grid */}
-      <motion.div 
-        className="nft-grid-modern"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        {mockNfts.map((nft, index) => {
-          const mintFee = Math.floor(nft.lockedAmount * 0.01);
-          const userReceives = nft.lockedAmount - mintFee;
-          
-          return (
-            <motion.div 
-              key={nft.id} 
-              className="nft-card-modern"
-              variants={cardVariants}
-              whileHover={{ y: -8, scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              <div className="nft-header">
-                <div className="nft-id">#{nft.id}</div>
-                <div className="nft-badge">fNFT</div>
-              </div>
-              
-              <div className="nft-value-display">
-                <div className="locked-amount">
-                  <span className="amount">{nft.lockedAmount.toLocaleString()}</span>
-                  <span className="token">S</span>
-                </div>
-                <div className="conversion-arrow">↓</div>
-                <div className="vs-amount">
-                  <span className="amount">{userReceives.toLocaleString()}</span>
-                  <span className="token vs-token">vS</span>
-                </div>
-              </div>
-
-              <div className="nft-details-modern">
-                <div className="detail-item">
-                  <span className="label">Vesting End</span>
-                  <span className="value">{nft.vestingEndDate}</span>
-                </div>
-                <div className="detail-item fee-detail">
-                  <span className="label">Protocol Fee</span>
-                  <span className="value fee">-{mintFee.toLocaleString()} S (1%)</span>
-                </div>
-              </div>
-
-              <motion.button 
-                className="deposit-button-modern"
-                onClick={() => handleDepositClick(nft)}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+      {isConnected && mappedNFTs && mappedNFTs.length > 0 && (
+        <motion.div 
+          className="nft-grid-modern"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          {mappedNFTs.map((nft, index) => {
+            // Convert from wei to human readable format (18 decimals)
+            const lockedAmount = Number(nft.lockedAmount) / 10**18;
+            const mintFee = lockedAmount * 0.01;
+            const userReceives = lockedAmount - mintFee;
+            
+            return (
+              <motion.div 
+                key={nft.id} 
+                className="nft-card-modern"
+                variants={cardVariants}
+                whileHover={{ y: -8, scale: 1.02 }}
+                transition={{ type: "spring", stiffness: 300 }}
               >
-                <span>Deposit & Mint vS</span>
-                <span className="button-arrow">→</span>
-              </motion.button>
-            </motion.div>
-          );
-        })}
-      </motion.div>
+                <div className="nft-header">
+                  <div className="nft-id">#{nft.id}</div>
+                  <div className="nft-badge">fNFT</div>
+                </div>
+                
+                <div className="nft-value-display">
+                  <div className="locked-amount">
+                    <span className="amount">{lockedAmount.toLocaleString()}</span>
+                    <span className="token">S</span>
+                  </div>
+                  <div className="conversion-arrow">↓</div>
+                  <div className="vs-amount">
+                    <span className="amount">{userReceives.toLocaleString()}</span>
+                    <span className="token vs-token">vS</span>
+                  </div>
+                </div>
+
+                <div className="nft-details-modern">
+                  <div className="detail-item">
+                    <span className="label">Vesting End</span>
+                    <span className="value">{nft.vestingEndTime ? new Date(Number(nft.vestingEndTime) * 1000).toLocaleDateString() : '-'}</span>
+                  </div>
+                  <div className="detail-item fee-detail">
+                    <span className="label">Protocol Fee</span>
+                    <span className="value fee">-{mintFee.toLocaleString()} S (1%)</span>
+                  </div>
+                </div>
+
+                <motion.button 
+                  className="deposit-button-modern"
+                  onClick={() => handleDepositClick(nft)}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <span>Deposit & Mint vS</span>
+                  <span className="button-arrow">→</span>
+                </motion.button>
+              </motion.div>
+            );
+          })}
+        </motion.div>
+      )}
 
       {selectedNft && <DepositModal nft={selectedNft} onClose={() => setSelectedNft(null)} />}
     </div>

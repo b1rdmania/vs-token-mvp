@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import {Script, console} from "forge-std/Script.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
-import {UpgradeableVSToken} from "../src/upgradeable/UpgradeableVSToken.sol";
+import {VsToken} from "../src/upgradeable/UpgradeableVSToken.sol";
 
 /**
  * @title Deploy Upgradeable vS Token with UUPS Proxy
@@ -42,12 +42,12 @@ contract DeployUpgradeableVSToken is Script {
 
         // Step 2: Deploy the token implementation contract
         console.log("1. Deploying UpgradeableVSToken implementation...");
-        UpgradeableVSToken tokenImplementation = new UpgradeableVSToken(futureVaultProxy);
+        VsToken tokenImplementation = new VsToken(futureVaultProxy);
         console.log("Token implementation deployed at:", address(tokenImplementation));
 
         // Step 3: Prepare token initialization data
         bytes memory tokenInitData = abi.encodeWithSelector(
-            UpgradeableVSToken.initialize.selector, params.tokenName, params.tokenSymbol, params.admin
+            VsToken.initialize.selector, params.tokenName, params.tokenSymbol, params.admin
         );
 
         // Step 4: Deploy the token proxy
@@ -58,7 +58,7 @@ contract DeployUpgradeableVSToken is Script {
         vm.stopBroadcast();
 
         // Step 5: Verify the token deployment
-        UpgradeableVSToken token = UpgradeableVSToken(address(tokenProxy));
+        VsToken token = VsToken(address(tokenProxy));
 
         console.log("3. Verifying token deployment...");
         require(keccak256(bytes(token.name())) == keccak256(bytes(params.tokenName)), "Name mismatch");
@@ -150,7 +150,7 @@ contract DeployUpgradeableVSToken is Script {
             tokenImplementation,
             vm.toString(
                 abi.encodeWithSelector(
-                    UpgradeableVSToken.initialize.selector, params.tokenName, params.tokenSymbol, params.admin
+                    VsToken.initialize.selector, params.tokenName, params.tokenSymbol, params.admin
                 )
             )
         );

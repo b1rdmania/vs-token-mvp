@@ -282,7 +282,7 @@ export const LandingPage: React.FC = () => {
                   {/* 🤔 */}
                   Where's the code?
                 </summary>
-                <p>Verified contracts & audits: view on SonicScan → <a href="https://sonicscan.org/address/0x37BD20868FB91eB37813648F4D05F59e07A1bcfb" target="_blank" rel="noopener noreferrer" style={{ color: '#6366f1', textDecoration: 'underline' }}>Vault</a>, <a href="https://sonicscan.org/address/0x4dE74524A2cE5e2A310615a6aDe7eC35B0f81031" target="_blank" rel="noopener noreferrer" style={{ color: '#6366f1', textDecoration: 'underline' }}>vS</a>.</p>
+                <p>Verified contracts & audits: view on SonicScan → <a href="https://sonicscan.org/address/0xE2BB365a107441C1734a7aC08930dbEbb421249d" target="_blank" rel="noopener noreferrer" style={{ color: '#6366f1', textDecoration: 'underline' }}>Vault</a>, <a href="https://sonicscan.org/address/0x2286bA4fcbb2eF06C4349fAF6B8970ece593f5DD" target="_blank" rel="noopener noreferrer" style={{ color: '#6366f1', textDecoration: 'underline' }}>vS</a>.</p>
               </details>
             </div>
           </div>
