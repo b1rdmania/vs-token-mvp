@@ -86,7 +86,7 @@ export const WhitepaperPage: React.FC = () => {
                 
                 <div className="tech-grid">
                   <div className="tech-card">
-                    <h3>UpgradeableVault.sol</h3>
+                    <h3>Vault.sol</h3>
                     <ul>
                       <li><strong>Secure Upgradeability:</strong> All protocol changes require multisig approval and a public timelock (12h for upgrades, 2h for emergency actions)</li>
                       <li><strong>Governance-Controlled Parameters:</strong> Fee rates and core logic can only change via a public, timelocked upgrade process</li>
@@ -95,14 +95,14 @@ export const WhitepaperPage: React.FC = () => {
                       <li><strong>Transparent Infrastructure:</strong> All upgrades are public and delayed for user protection</li>
                     </ul>
                     <div className="contract-links">
-                      <a href="https://github.com/b1rdmania/vs-token-mvp/blob/main/src/upgradeable/UpgradeableVault.sol" target="_blank" rel="noopener noreferrer" className="contract-link">
+                      <a href="https://sonicscan.org/address/0xE2BB365a107441C1734a7aC08930dbEbb421249d" target="_blank" rel="noopener noreferrer" className="contract-link">
                         View Contract →
                       </a>
                     </div>
                   </div>
                   
                   <div className="tech-card">
-                    <h3>UpgradeableVSToken.sol</h3>
+                    <h3>VSToken.sol</h3>
                     <ul>
                       <li><strong>Standard ERC-20:</strong> Full DeFi composability</li>
                       <li><strong>Vault-Only Minting:</strong> Only vault can mint (deposit) or burn (redemption)</li>
@@ -110,7 +110,7 @@ export const WhitepaperPage: React.FC = () => {
                       <li><strong>No Transfer Taxes or Rebasing:</strong> Clean, predictable token mechanics</li>
                     </ul>
                     <div className="contract-links">
-                      <a href="https://github.com/b1rdmania/vs-token-mvp/blob/main/src/upgradeable/UpgradeableVSToken.sol" target="_blank" rel="noopener noreferrer" className="contract-link">
+                      <a href="https://sonicscan.org/address/0x2286bA4fcbb2eF06C4349fAF6B8970ece593f5DD" target="_blank" rel="noopener noreferrer" className="contract-link">
                         View Contract →
                       </a>
                     </div>

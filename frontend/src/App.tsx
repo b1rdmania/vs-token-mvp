@@ -18,9 +18,10 @@ if (!projectId) {
 }
 
 const config = createConfig({
-  chains: [sonicTestnet, sonicMainnet], // Testnet first for development
+  chains: [ sonicMainnet],
+  // chains: [sonicTestnet, sonicMainnet],
   transports: {
-    [sonicTestnet.id]: http(),
+    // [sonicTestnet.id]: http(),
     [sonicMainnet.id]: http(),
   },
   ssr: true,
