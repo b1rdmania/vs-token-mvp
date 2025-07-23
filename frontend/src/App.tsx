@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { WagmiProvider, createConfig, http } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RainbowKitProvider, getDefaultWallets } from '@rainbow-me/rainbowkit';
-import { sonicMainnet } from './config/chains';
+import { sonicMainnet, sonicTestnet } from './config/chains';
 import { AppShell } from './components/layout/AppShell';
 import { LandingPage } from './pages/LandingPage';
 import { WhitepaperPage } from './pages/WhitepaperPage';
@@ -17,12 +17,11 @@ if (!projectId) {
   throw new Error("VITE_PROJECT_ID is not set. Please add it to your .env file or Vercel project settings.");
 }
 
-const { wallets } = getDefaultWallets();
-
 const config = createConfig({
-  wallets,
-  chains: [sonicMainnet],
+  chains: [ sonicMainnet],
+  // chains: [sonicTestnet, sonicMainnet],
   transports: {
+    // [sonicTestnet.id]: http(),
     [sonicMainnet.id]: http(),
   },
   ssr: true,

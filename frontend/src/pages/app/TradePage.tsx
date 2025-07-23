@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import './TradePage.css';
+import { useVSTokenContract } from '../../hooks/useVSTokenContract';
+import { useAccount } from 'wagmi';
 
 // Mock data
 const poolData = {
@@ -36,6 +38,8 @@ const heroSub = "The vS / S pool will be available on Beets. Stake LP to earn tr
 const feeBanner = "Mint fee 1% • Redeem fee 2% • LP earns 0.3% per trade";
 
 export const TradePage: React.FC = () => {
+  const { isConnected } = useAccount();
+  const { balance, isLoadingBalance } = useVSTokenContract();
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   
   const cardVariants = {
@@ -68,7 +72,27 @@ export const TradePage: React.FC = () => {
         </p>
       </motion.div>
 
-      {/* 2. CTA Row (two buttons) */}
+      {/* 2. Balance Display */}
+      {isConnected && (
+        <motion.div 
+          className="balance-section"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, duration: 0.4 }}
+        >
+          <div className="balance-card">
+            <div className="balance-icon">💰</div>
+            <div className="balance-content">
+              <div className="balance-label">Your vS Balance</div>
+              <div className="balance-value">
+                {isLoadingBalance ? 'Loading...' : balance ? `${(Number(balance) / 10**18).toLocaleString()} vS` : '0 vS'}
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* 3. CTA Row (two buttons) */}
       <motion.div 
         className="cta-section"
         initial={{ opacity: 0, scale: 0.95 }}

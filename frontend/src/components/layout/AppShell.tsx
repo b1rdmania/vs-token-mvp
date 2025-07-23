@@ -24,7 +24,6 @@ export const AppShell: React.FC = () => {
         <div className="header-container">
           <Link to="/" className="logo">
             vS Vault
-            <span className="testnet-badge">DEMO BETA</span>
           </Link>
           <nav className="desktop-nav">
             {navLinks.map((link) => (
