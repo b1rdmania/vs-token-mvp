@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.25;
 
 import "forge-std/Test.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import "../src/upgradeable/UpgradeableVSToken.sol";
 
 // Mock implementation for testing upgrades
-contract MockUpgradeableVSToken is UpgradeableVSToken {
-    constructor(address _minter) UpgradeableVSToken(_minter) {}
+contract MockUpgradeableVSToken is VsToken {
+    constructor(address _minter) VsToken(_minter) {}
 
     function isUpgraded() external pure returns (bool) {
         return true;
@@ -19,7 +19,7 @@ contract MockUpgradeableVSToken is UpgradeableVSToken {
 }
 
 contract UpgradeableVSTokenTest is Test {
-    UpgradeableVSToken public token;
+    VsToken public token;
     address public implementation;
 
     // Test addresses
@@ -31,14 +31,14 @@ contract UpgradeableVSTokenTest is Test {
 
     function setUp() public {
         // Deploy implementation
-        implementation = address(new UpgradeableVSToken(minter));
+        implementation = address(new VsToken(minter));
 
         // Deploy proxy
         bytes memory initData =
-            abi.encodeWithSelector(UpgradeableVSToken.initialize.selector, "Test vS Token", "vsTEST", admin, minter);
+            abi.encodeWithSelector(VsToken.initialize.selector, "Test vS Token", "vsTEST", admin, minter);
 
         address proxy = address(new ERC1967Proxy(implementation, initData));
-        token = UpgradeableVSToken(proxy);
+        token = VsToken(proxy);
     }
 
     // ============ BASIC FUNCTIONALITY TESTS ============

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.25;
 
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import {AccessControlUpgradeable} from "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
@@ -7,7 +7,7 @@ import {ERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/
 import {PausableUpgradeable} from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
 /**
- * @title UpgradeableVSToken
+ * @title VsToken
  * @notice Upgradeable ERC-20 token representing claims on vesting NFT value
  * @dev TRUST GUARANTEES (IMMUTABLE FOREVER):
  * - Only designated vault can mint/burn tokens (minter address immutable)
@@ -16,7 +16,7 @@ import {PausableUpgradeable} from "@openzeppelin/contracts-upgradeable/security/
  * - Core minting control cannot be transferred or modified
  * - Economic model protected by immutable vault parameters
  */
-contract UpgradeableVSToken is UUPSUpgradeable, AccessControlUpgradeable, ERC20Upgradeable, PausableUpgradeable {
+contract VsToken is UUPSUpgradeable, AccessControlUpgradeable, ERC20Upgradeable, PausableUpgradeable {
     // Access Control Roles
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
     bytes32 public constant EMERGENCY_ROLE = keccak256("EMERGENCY_ROLE");
@@ -51,12 +51,13 @@ contract UpgradeableVSToken is UUPSUpgradeable, AccessControlUpgradeable, ERC20U
     event EmergencyPaused(address indexed pauser, string reason);
     event EmergencyUnpaused(address indexed unpauser);
 
-    // Storage gap for future upgrades
+    /// @dev Storage gap for future upgrades (reserves 49 slots)
     uint256[49] private __gap;
 
     /**
      * @notice Constructor sets immutable minter address
-     * @param _minter The address that can mint/burn tokens
+     * @dev This constructor is called only once during proxy deployment
+     * @param _minter The address that can mint/burn tokens (typically the vault contract)
      */
     constructor(address _minter) {
         require(_minter != address(0), "Minter cannot be zero address");
