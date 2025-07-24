@@ -2,16 +2,15 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import './TradePage.css';
 import { useVSTokenContract } from '../../hooks/useVSTokenContract';
+import { useBeetsPoolLazy } from '../../hooks/useBeetsPool';
 import { useAccount } from 'wagmi';
 
-// Mock data
-const poolData = {
-  tvl: "1,250,000",
-  volume24h: "150,000",
-  apr: "12.5",
-  vsPrice: "0.94",
-  sPrice: "1.06"
-};
+// Simple Skeleton component
+const Skeleton = ({ width = 'w-16', height = 'h-6' }: { width?: string; height?: string }) => (
+  <div className={`${width} ${height} bg-gray-300 rounded-full animate-pulse`}>
+    &nbsp;
+  </div>
+);
 
 // FAQ data with Beets integration
 const faqData = [
@@ -40,6 +39,7 @@ const feeBanner = "Mint fee 1% • Redeem fee 2% • LP earns 0.3% per trade";
 export const TradePage: React.FC = () => {
   const { isConnected } = useAccount();
   const { balance, isLoadingBalance } = useVSTokenContract();
+  const { elementRef, data: poolData, loading: isLoadingPool, error: poolError, hasIntersected } = useBeetsPoolLazy();
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   
   const cardVariants = {
@@ -66,7 +66,7 @@ export const TradePage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <h1 className="page-title-modern">vS / S Pool</h1>
+        <h1 className="page-title-modern">{poolData?.name || 'vS / S Pool'}</h1>
         <p className="page-subtitle-modern">
           {heroSub}
         </p>
@@ -85,7 +85,7 @@ export const TradePage: React.FC = () => {
             <div className="balance-content">
               <div className="balance-label">Your vS Balance</div>
               <div className="balance-value">
-                {isLoadingBalance ? 'Loading...' : balance ? `${(Number(balance) / 10**18).toLocaleString()} vS` : '0 vS'}
+                {isLoadingBalance ? <Skeleton width="w-24" /> : balance ? `${(Number(balance) / 10**18).toLocaleString()} vS` : '0 vS'}
               </div>
             </div>
           </div>
@@ -101,7 +101,7 @@ export const TradePage: React.FC = () => {
       >
         <div className="cta-buttons">
           <motion.a 
-            href="https://beets.fi"
+            href="https://beets.fi/pools/sonic/v3/0x8C1121B2BFD23ef4e152097C07764D6ad50477B4"
             target="_blank"
             rel="noopener noreferrer"
             className="cta-button-primary"
@@ -112,7 +112,7 @@ export const TradePage: React.FC = () => {
           </motion.a>
           
           <motion.a 
-            href="https://beets.fi"
+            href="https://beets.fi/pools/sonic/v3/0x8C1121B2BFD23ef4e152097C07764D6ad50477B4"
             target="_blank"
             rel="noopener noreferrer"
             className="cta-button-secondary"
@@ -126,6 +126,7 @@ export const TradePage: React.FC = () => {
 
       {/* 3. Pool Analytics Grid */}
       <motion.div 
+        ref={elementRef}
         className="pool-section-modern"
         variants={containerVariants}
         initial="hidden"
@@ -133,7 +134,7 @@ export const TradePage: React.FC = () => {
       >
         <div className="pool-header">
           <h2>Pool Analytics</h2>
-          <p>Pool data will be available once vS/S pool is live on Beets</p>
+          {poolError && <p className="error-text">Error loading pool data: {poolError}</p>}
         </div>
         
         <div className="pool-stats-grid">
@@ -146,7 +147,9 @@ export const TradePage: React.FC = () => {
             <div className="stat-icon">💰</div>
             <div className="stat-content">
               <div className="stat-label">TVL</div>
-              <div className="stat-value">${poolData.tvl}</div>
+              <div className="stat-value">
+                {!hasIntersected || isLoadingPool ? <Skeleton width="w-16" /> : `$${poolData?.tvl || '0'}`}
+              </div>
             </div>
           </motion.div>
           
@@ -159,7 +162,9 @@ export const TradePage: React.FC = () => {
             <div className="stat-icon">📊</div>
             <div className="stat-content">
               <div className="stat-label">24h Volume</div>
-              <div className="stat-value">${poolData.volume24h}</div>
+              <div className="stat-value">
+                {!hasIntersected || isLoadingPool ? <Skeleton width="w-16" /> : `$${poolData?.volume24h || '0'}`}
+              </div>
             </div>
           </motion.div>
           
@@ -171,8 +176,10 @@ export const TradePage: React.FC = () => {
           >
             <div className="stat-icon">🚀</div>
             <div className="stat-content">
-              <div className="stat-label">Current APR</div>
-              <div className="stat-value">{poolData.apr}%</div>
+              <div className="stat-label">Swap Fee</div>
+              <div className="stat-value">
+                {!hasIntersected || isLoadingPool ? <Skeleton width="w-12" /> : (poolData?.swapFee ? `${(parseFloat(poolData.swapFee) * 100).toFixed(2)}%` : '0%')}
+              </div>
             </div>
           </motion.div>
         </div>
@@ -231,7 +238,7 @@ export const TradePage: React.FC = () => {
       >
         <div className="trading-header">
           <h3>Current Swap Rates</h3>
-          <p className="trading-subtitle">Rates will be available once vS/S pool is live on Beets</p>
+          <p className="trading-subtitle">Visit Beets to see live pricing for vS/S trades</p>
         </div>
         
         <div className="rate-mockups-container">
@@ -248,10 +255,10 @@ export const TradePage: React.FC = () => {
                 <span className="arrow">→</span>
                 <span className="token-to">S</span>
               </div>
-              <div className="rate-value">{poolData.vsPrice}</div>
+              <div className="rate-value">Live on Beets</div>
             </div>
             <div className="rate-example">
-              <span>Example: 1,000 vS → {(1000 * parseFloat(poolData.vsPrice)).toLocaleString()} S</span>
+              <span>Trade vS tokens for S tokens at market rate</span>
             </div>
           </motion.div>
 
@@ -268,10 +275,10 @@ export const TradePage: React.FC = () => {
                 <span className="arrow">→</span>
                 <span className="token-to">vS</span>
               </div>
-              <div className="rate-value">{poolData.sPrice}</div>
+              <div className="rate-value">Live on Beets</div>
             </div>
             <div className="rate-example">
-              <span>Example: 1,000 S → {(1000 * parseFloat(poolData.sPrice)).toLocaleString()} vS</span>
+              <span>Trade S tokens for vS tokens at market rate</span>
             </div>
           </motion.div>
         </div>
@@ -284,7 +291,7 @@ export const TradePage: React.FC = () => {
           transition={{ delay: 0.8, duration: 0.4 }}
         >
           <motion.a 
-            href="https://beets.fi"
+            href="https://beets.fi/pools/sonic/v3/0x8C1121B2BFD23ef4e152097C07764D6ad50477B4"
             target="_blank"
             rel="noopener noreferrer"
             className="trade-now-button"

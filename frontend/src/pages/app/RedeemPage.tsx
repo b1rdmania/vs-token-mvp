@@ -41,8 +41,7 @@ export const RedeemPage: React.FC = () => {
       const totalVestingPeriod = maturationTime - startTime;
       const timeElapsed = now - startTime;
       const calculatedProgress = (timeElapsed / totalVestingPeriod) * 100;
-      // Show at least 1% when vesting has started, but cap at 99% before full maturation
-      vestingProgress = Math.max(1, Math.min(99, Math.round(calculatedProgress)));
+      vestingProgress = Math.min(100, Number(calculatedProgress.toFixed(2)));
     }
   }
   
@@ -357,7 +356,7 @@ export const RedeemPage: React.FC = () => {
             
             <div className="button-with-tooltip">
               <a 
-                href="https://beets.fi"
+                href="https://beets.fi/pools/sonic/v3/0x8C1121B2BFD23ef4e152097C07764D6ad50477B4"
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="button-primary"

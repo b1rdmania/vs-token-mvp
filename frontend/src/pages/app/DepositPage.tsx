@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import './DepositPage.css';
 import { useSonicNFTContract, type SeasonData } from '../../hooks/useSonicNFTContract';
 import { useVaultContract } from '../../hooks/useVaultContract';
+import toast from 'react-hot-toast';
 
 interface Nft {
   id: number;
@@ -20,8 +21,25 @@ const DepositModal = ({ nft, onClose }: { nft: Nft; onClose: () => void }) => {
   const mintFee = lockedAmount * 0.01; // 1% mint fee
   const userReceives = lockedAmount - mintFee; // Amount after fee
   
-  const handleDeposit = () => {
-    deposit();
+  const handleDeposit = async () => {
+    try {
+      await toast.promise(
+        (async () => {
+          await deposit();
+        })(),
+        {
+          loading: 'Processing deposit...',
+          success: 'Deposit successful! vS tokens minted.',
+          error: (err) => `Deposit failed: ${err?.message || err}`,
+        },
+        {
+          style: { minWidth: '250px' },
+        }
+      );
+      onClose(); // Close modal on success
+    } catch (e) {
+      // Error is handled by toast
+    }
   };
   
   return (
@@ -96,7 +114,7 @@ const DepositModal = ({ nft, onClose }: { nft: Nft; onClose: () => void }) => {
             transition={{ delay: 0.35 }}
           >
             <span>Estimated Gas</span>
-            <strong>~0.005 S</strong>
+            <strong>Varies by network</strong>
           </motion.div>
         </div>
         
@@ -122,7 +140,6 @@ export const DepositPage: React.FC = () => {
   const { openConnectModal } = useConnectModal();
   const [selectedNft, setSelectedNft] = useState<Nft | null>(null);
   const { userNFTs, isLoadingUserNFTs, isApprovedForVault, approveVault, isApproving, season1Data } = useSonicNFTContract();
-  console.log('userNFTs', userNFTs, isLoadingUserNFTs, isApprovedForVault, approveVault, isApproving);
 
   // Map userNFTs (NFTInfo) to Nft type for display
   const mappedNFTs: Nft[] = (userNFTs || []).map((nft) => ({
@@ -240,15 +257,34 @@ export const DepositPage: React.FC = () => {
       )}
 
       {/* Loading State */}
-      {isLoadingUserNFTs && (
-        <motion.div 
-          className="loading-state"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
-          <div className="loading-spinner">⏳</div>
-          <p>Loading your fNFTs...</p>
-        </motion.div>
+      {isConnected && isLoadingUserNFTs && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
+          <motion.div 
+            className="loading-card"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+            style={{
+              background: '#fff',
+              borderRadius: '18px',
+              boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
+              padding: '2.5rem 2rem',
+              maxWidth: '350px',
+              width: '100%',
+              textAlign: 'center',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '1.2rem',
+            }}
+          >
+            <div className="loading-spinner" style={{ fontSize: '2.5rem' }}>⏳</div>
+            <div>
+              <h2 style={{ margin: 0, fontWeight: 700, fontSize: '1.4rem', color: '#222' }}>Loading your fNFTs</h2>
+              <p style={{ color: '#666', margin: '0.5rem 0 0 0', fontSize: '1rem' }}>Checking your wallet for available fNFTs...</p>
+            </div>
+          </motion.div>
+        </div>
       )}
 
       {/* No NFTs State */}
@@ -283,7 +319,7 @@ export const DepositPage: React.FC = () => {
       )}
 
       {/* Approval Banner */}
-      {isConnected && !isApprovedForVault && userNFTs && userNFTs.length > 0 && (
+      {isConnected && !isApprovedForVault && userNFTs && userNFTs.length > 0 && !isLoadingUserNFTs && (
         <motion.div 
           className="approval-banner"
           initial={{ opacity: 0, y: -10 }}
@@ -307,9 +343,15 @@ export const DepositPage: React.FC = () => {
       )}
 
       {/* NFT Grid */}
-      {isConnected && mappedNFTs && mappedNFTs.length > 0 && (
+      {isConnected && !isLoadingUserNFTs && mappedNFTs && mappedNFTs.length > 0 && (
         <motion.div 
           className="nft-grid-modern"
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: '2rem',
+            flexWrap: 'wrap',
+          }}
           variants={containerVariants}
           initial="hidden"
           animate="visible"
@@ -324,6 +366,7 @@ export const DepositPage: React.FC = () => {
               <motion.div 
                 key={nft.id} 
                 className="nft-card-modern"
+                style={{ maxWidth: 350, width: '100%' }}
                 variants={cardVariants}
                 whileHover={{ y: -8, scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 300 }}
