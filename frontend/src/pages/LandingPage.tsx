@@ -274,7 +274,7 @@ export const LandingPage: React.FC = () => {
                   {/* 🤔 */}
                   What if a claim fails?
                 </summary>
-                <p>Vault keeps retrying in smaller batches until all fNFTs are successfully claimed. Harvest runs in 20-NFT batches; protocol triggers it automatically.</p>
+                <p>Vault harvests all ERC-1155 fNFTs in a single batch using the ERC-1155 standard's batch operations. The protocol triggers harvest automatically at maturity, ensuring all fNFTs are claimed efficiently.</p>
               </details>
               <details>
                 <summary>

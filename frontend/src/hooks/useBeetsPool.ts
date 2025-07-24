@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 
 const SUBGRAPH_URL = 'https://backend-v3.beets-ftm-node.com/';
 
-// Update this with your actual pool ID
 const POOL_ID: string = '0x8C1121B2BFD23ef4e152097C07764D6ad50477B4';
 
 const POOL_QUERY = `
@@ -49,7 +48,7 @@ export const useBeetsPool = (enabled: boolean = true) => {
       return;
     }
     
-    if (!POOL_ID || POOL_ID === '0x0000000000000000000000000000000000000000000000000000000000000000') {
+    if (POOL_ID) {
       setData(null);
       setError('No pool ID set');
       return;
