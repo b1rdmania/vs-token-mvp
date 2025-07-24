@@ -13,16 +13,14 @@ import '@rainbow-me/rainbowkit/styles.css';
 const projectId = import.meta.env.VITE_PROJECT_ID;
 
 if (!projectId) {
-  // In a real app, you might render a fallback UI here.
-  // For this MVP, throwing an error is sufficient to identify the configuration issue.
   throw new Error("VITE_PROJECT_ID is not set. Please add it to your .env file or Vercel project settings.");
 }
 
 const config = createConfig({
   chains: [ sonicMainnet],
   // chains: [sonicTestnet, sonicMainnet],
+  // [sonicTestnet.id]: http(),
   transports: {
-    // [sonicTestnet.id]: http(),
     [sonicMainnet.id]: http(),
   },
   ssr: true,
