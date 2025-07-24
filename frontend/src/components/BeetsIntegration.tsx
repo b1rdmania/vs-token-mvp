@@ -33,7 +33,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useBeetsPoolLazy } from '../hooks/useBeetsPool';
 import './BeetsIntegration.css';
+
+// Simple Skeleton component
+const Skeleton = ({ width = 'w-16', height = 'h-6' }: { width?: string; height?: string }) => (
+  <div className={`${width} ${height} bg-gray-300 rounded-full animate-pulse`}>
+    &nbsp;
+  </div>
+);
 
 // Beets configuration (Sonic Mainnet)
 const BEETS_CONFIG = {
@@ -45,17 +53,7 @@ interface BeetsPoolInfoProps {
 }
 
 const BeetsPoolInfo: React.FC<BeetsPoolInfoProps> = ({ vsBalance }) => {
-  const [poolData, setPoolData] = useState({
-    tvl: 'TBD',
-    volume24h: 'TBD', 
-    apr: 'TBD',
-    vsPrice: 'TBD',
-    liquidityDepth: 'TBD',
-    poolWeight: 'TBD'
-  });
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { elementRef, data: poolData, loading: isLoading, error, hasIntersected } = useBeetsPoolLazy();
 
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -64,6 +62,7 @@ const BeetsPoolInfo: React.FC<BeetsPoolInfoProps> = ({ vsBalance }) => {
 
   return (
     <motion.div 
+      ref={elementRef}
       className="beets-integration-container"
       initial="hidden"
       animate="visible"
@@ -75,14 +74,14 @@ const BeetsPoolInfo: React.FC<BeetsPoolInfoProps> = ({ vsBalance }) => {
       <motion.div className="pool-header" variants={cardVariants}>
         <div className="pool-title-section">
           <h2 className="pool-title">
-            🎵 Beets Pool
+            🎵 {poolData?.name || 'Beets Pool'}
           </h2>
           <p className="pool-subtitle">
             Trade vS tokens on Beets with deep liquidity and smart order routing
           </p>
         </div>
         <div className="pool-status">
-          <span className="status-badge coming-soon">Coming Soon</span>
+          <span className="status-badge active">Live</span>
         </div>
       </motion.div>
 
@@ -92,7 +91,9 @@ const BeetsPoolInfo: React.FC<BeetsPoolInfoProps> = ({ vsBalance }) => {
           <div className="stat-icon">💰</div>
           <div className="stat-content">
             <div className="stat-label">Total Value Locked</div>
-            <div className="stat-value">{poolData.tvl}</div>
+            <div className="stat-value">
+              {!hasIntersected || isLoading ? <Skeleton width="w-16" /> : `$${poolData?.tvl || '0'}`}
+            </div>
           </div>
         </div>
         
@@ -100,23 +101,29 @@ const BeetsPoolInfo: React.FC<BeetsPoolInfoProps> = ({ vsBalance }) => {
           <div className="stat-icon">📊</div>
           <div className="stat-content">
             <div className="stat-label">24h Volume</div>
-            <div className="stat-value">{poolData.volume24h}</div>
+            <div className="stat-value">
+              {!hasIntersected || isLoading ? <Skeleton width="w-16" /> : `$${poolData?.volume24h || '0'}`}
+            </div>
           </div>
         </div>
         
         <div className="stat-card">
           <div className="stat-icon">🚀</div>
           <div className="stat-content">
-            <div className="stat-label">Current APR</div>
-            <div className="stat-value">{poolData.apr}</div>
+            <div className="stat-label">Swap Fee</div>
+            <div className="stat-value">
+              {!hasIntersected || isLoading ? <Skeleton width="w-12" /> : (poolData?.swapFee ? `${(parseFloat(poolData.swapFee) * 100).toFixed(2)}%` : '0%')}
+            </div>
           </div>
         </div>
         
         <div className="stat-card">
           <div className="stat-icon">💎</div>
           <div className="stat-content">
-            <div className="stat-label">vS Price</div>
-            <div className="stat-value">{poolData.vsPrice}</div>
+            <div className="stat-label">Pool Type</div>
+            <div className="stat-value">
+              {!hasIntersected || isLoading ? <Skeleton width="w-20" /> : (poolData?.type || 'WEIGHTED')}
+            </div>
           </div>
         </div>
       </motion.div>
