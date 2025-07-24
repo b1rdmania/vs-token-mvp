@@ -21,7 +21,7 @@ The vS Vault Protocol converts illiquid vesting Sonic NFTs (fNFTs) into liquid E
 2. **Mint vS (-1%)** → Get 990 vS tokens for 1,000 S face value (1% mint fee)
 3. **Trade/LP** → Use vS tokens immediately on Beets, lending, or liquidity provision
 4. **Month 9: Vault Harvest** → Protocol claims all fNFTs at 0% penalty burn
-5. **Redeem 1:1 (-2%)** → Burn 990 vS tokens, receive ~970 S tokens (2% redeem fee)
+5. **Redeem 1:1 (-2%)** → Burn 990 vS tokens, receive ~970 S tokens (2% redeem fee when redeeming vS → S)
 
 ## 💰 **Economics**
 
@@ -43,12 +43,12 @@ The vS Vault Protocol converts illiquid vesting Sonic NFTs (fNFTs) into liquid E
 ### **Attack Prevention**
 - ✅ **Self-delegation pattern** - Prevents delegation manipulation attacks
 - ✅ **Reentrancy protection** - All external functions protected
-- ✅ **Gas bomb protection** - Bounded batch processing (max 20 NFTs)
+- ✅ **Gas bomb protection** - Efficient batch processing using ERC-1155 batch operations
 - ✅ **Proportional redemption** - No hostage scenarios, always redeemable
 
 ### **Wait-and-Harvest Strategy**
 - ✅ **Zero penalty burns** - Vault never claims early, waits for 0% burn window
-- ✅ **Retry-safe batching** - Failed NFT claims don't block system
+- ✅ **Efficient batch harvesting** - All ERC-1155 fNFTs are harvested in a single batch using the ERC-1155 standard
 - ✅ **Permissionless harvesting** - Anyone can trigger harvest after maturity
 
 ## 🌊 **Why This Helps Sonic**
@@ -82,10 +82,10 @@ vS/
 
 ## 📊 **Contract Addresses (Sonic Mainnet)**
 
-| Contract | Address | Purpose |
-|----------|---------|---------|
-| **UpgradeableVault** | `[TO BE DEPLOYED]` | Main vault logic |
-| **UpgradeableVSToken** | `[TO BE DEPLOYED]` | vS token contract |
+| Contract              | Address                                      | Purpose             | Explorer Link |
+|----------------------|----------------------------------------------|---------------------|--------------|
+| **UpgradeableVault** | 0xE2BB365a107441C1734a7aC08930dbEbb421249d   | Main vault logic    | [View on SonicScan](https://sonicscan.org/address/0xE2BB365a107441C1734a7aC08930dbEbb421249d) |
+| **UpgradeableVSToken** | 0x2286bA4fcbb2eF06C4349fAF6B8970ece593f5DD | vS token contract   | [View on SonicScan](https://sonicscan.org/token/0x2286bA4fcbb2eF06C4349fAF6B8970ece593f5DD) |
 
 ## 🔍 **Key Design Decisions**
 
