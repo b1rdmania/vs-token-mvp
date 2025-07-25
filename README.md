@@ -108,7 +108,6 @@ vS/
 ## ⚖️ **License**
 
 MIT License - See [LICENSE](./LICENSE) for details.
-
 ---
 
 **© 2025 vS Vault Protocol**  
